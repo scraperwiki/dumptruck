@@ -6,6 +6,7 @@ It supports the following database formats.
 
 Quick start
 ---------
+Highwall makes relational databases feel more like document databases.
 
 Generic functions
 -----------
