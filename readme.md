@@ -12,7 +12,14 @@ The simplest `save` call looks like this.
 
 This saves a new row with "Thomas" in the "firstname" column and
 "Levine" in the "lastname" column. It uses the table "default" inside
-the database "default.db".
+the database "default.db". You can also pass a list of dictionaries.
+
+    data=[
+        {"firstname":"Thomas","lastname":"Levine"},
+        {"firstname":"Julian","lastname":"Assange"}
+    ]
+    save(data)
+
 
 Generic functions
 -----------
