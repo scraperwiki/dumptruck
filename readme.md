@@ -1,38 +1,39 @@
-Highwall is an document-like interface to relational databases that lets you relax.
+Highwall is an document-like interface to an SQLite database that lets you relax.
 It supports the following database formats.
-
-* SQLite
-* Comma separated values
 
 Quick start
 ---------
 Highwall makes relational databases feel more like document databases.
 
+## Saving
+The simplest `save` call looks like this.
+
+    save({"firstname":"Thomas","lastname":"Levine"})
+
+This saves a new row with "Thomas" in the "firstname" column and
+"Levine" in the "lastname" column. It uses the table "default" inside
+the database "default.db".
+
 Generic functions
 -----------
-Highwall gives you five generic functions.
+Highwall gives you eight functions.
 
 These two are the coolest.
 
-* `save`
-* `select`
+* `save`: Save to the database in a relaxing manner.
+* `select`: Select from the database in a relaxing manner.
 
 These two make it easy to save individual variables.
 
 * `get_var`
 * `save_var`
 
-This shows you the tables you have.
+Here are some wrappers for common commands.
 
 * `show_tables`
+* `drop`: Delete a particular table.
 
-Format-specific functions
---------------
-For the SQLite database format, the following additional functions are allowed.
+These two let you run normal SQL.
 
 * `execute`: Run raw SQL commands.
 * `commit`: Commit SQL commands
-
-For the CSV database format, the following additional functions are allowed.
-
-* `drop`: Delete a particular table.
