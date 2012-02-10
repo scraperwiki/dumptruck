@@ -4,7 +4,10 @@ It supports the following database formats.
 * SQLite
 * Comma separated values
 
-How to
+Quick start
+---------
+
+Generic functions
 -----------
 Highwall gives you five generic functions.
 
