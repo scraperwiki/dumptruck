@@ -23,7 +23,7 @@ if it needs to.
 
 You can specify the table with the `tablename` parameter.
 
-    h.save({"firstname":"Thomas","lastname":"Levine"},tablename="mine-engineers")
+    h.save({"firstname":"Thomas","lastname":"Levine"},tablename="diesel-engineers")
 
 You can also pass a list of dictionaries.
 
@@ -34,8 +34,6 @@ You can also pass a list of dictionaries.
     save(data)
 
 
-* `indices=[]`: Columns to set as indices.
-
 Slow start
 ---------
 ## Initialize
@@ -44,6 +42,16 @@ You can specify a few of keyword arguments when you initialize
 the Highwall object. Here they are with their defaults.
 
 * `dbname="highwall.db"`: File to use for the database
+
+So you can do
+
+    h = Highwall(dbname="earthmoving")
+
+## Indices
+You can 
+
+* `indices=[]`: Columns to set as indices.
+* `autoincrement="pk"`: Column to auto-increment. If this is set to `None`, no auto-incrementing column will be created.
 
 Generic functions
 -----------
