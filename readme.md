@@ -6,7 +6,7 @@ Quick start
 
 Highwall makes relational databases feel more like document databases.
 
-### Initialize
+## Initialize
 
 Open the database connection by initializing the a Highwall object
 
@@ -34,6 +34,14 @@ You can also pass a list of dictionaries.
     ]
     save(data)
 
+You can even past nested structures; dictionaries,
+sets and lists will be dumped to JSON.
+
+    data=[
+        {"title":"The Elements of Typographic Style","authors":["Robert Bringhurst"]},
+        {"title":"How to Read a Book","authors":["Mortimer Adler","Charles Van Doren"]}
+    ]
+    save(data)
 
 Slow start
 ---------
