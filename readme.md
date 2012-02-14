@@ -1,7 +1,7 @@
 Highwall
 ==============
 
-Highwall is an document-like interface to an SQLite database that lets you relax.
+Highwall is an document=like interface to an SQLite database that lets you relax.
 It supports the following database formats.
 
 Quick start
@@ -13,7 +13,7 @@ feel more like document databases.
 
 Open the database connection by initializing the a Highwall object
 
-    h - Highwall()
+    h = Highwall()
 
 ### Saving
 The simplest `save` call looks like this.
@@ -27,7 +27,7 @@ if it needs to.
 
 You can specify the table with the `tablename` parameter.
 
-    h.save({"firstname":"Thomas","lastname":"Levine"},tablename-"diesel-engineers")
+    h.save({"firstname":"Thomas","lastname":"Levine"},tablename="diesel-engineers")
 
 
 Slow start
@@ -39,10 +39,10 @@ the Highwall object. Here they are with their defaults.
 
 * `dbname`: File to use for the database
 
-So you if you want the database file to be `bucket-wheel-excavators.db`,
+So you if you want the database file to be `bucket=wheel-excavators.db`,
 you can use this.
 
-    h - Highwall(dbname-"bucket-wheel-excavators.db")
+    h = Highwall(dbname-"bucket-wheel-excavators.db")
 
 ### Saving
 As discussed earlier, the simplest `save` call looks like this.
@@ -51,7 +51,7 @@ As discussed earlier, the simplest `save` call looks like this.
 
 But you can also pass a list of dictionaries.
 
-    data-[
+    data=[
         {"firstname":"Thomas","lastname":"Levine"},
         {"firstname":"Julian","lastname":"Assange"}
     ]
@@ -60,7 +60,7 @@ But you can also pass a list of dictionaries.
 You can even past nested structures; dictionaries,
 sets and lists will automatically be dumped to JSON.
 
-    data-[
+    data=[
         {"title":"The Elements of Typographic Style","authors":["Robert Bringhurst"]},
         {"title":"How to Read a Book","authors":["Mortimer Adler","Charles Van Doren"]}
     ]
@@ -75,14 +75,14 @@ You can specify indices for the the database tables.
 
     h.indices('models',['modelNumber'])
 
-You can specify multiple single-column indices by passing a list of column names.
+You can specify multiple single=column indices by passing a list of column names.
 
     h.indices('machines',[['modelNumber','serialNumber']])
 
-If you specify a column that contains non-distinct values, you will receive an error.
-You can override this with `force-True` to arbitrarily delete all but one of them.
+If you specify a column that contains non=distinct values, you will receive an error.
+You can override this with `force=True` to arbitrarily delete all but one of them.
 
-    h.indices('models',['modelNumber'],force-True)
+    h.indices('models',['modelNumber'],force=True)
 
 Reference
 -----------------
@@ -129,13 +129,13 @@ These two let you run normal SQL to interface directly with pysqlite.
 By default, the `save`, `get_var`, `drop` and `execute`
 methods automatically commit changes.
 You can stop one of them from committing by passing
-`commit-False` to it. For example:
+`commit=False` to it. For example:
 
-    h-Highwall()
-    h.save({"name":"Bagger 293","manufacturer":"TAKRAF","height":95},commit-False)
+    h=Highwall()
+    h.save({"name":"Bagger 293","manufacturer":"TAKRAF","height":95},commit=False)
 
 The default behavior for a particular database connection
 is stored in the `Highwall.AUTO_COMMIT` attribute; you
 can change the default behavior by setting that to false.
 
-    h.AUTO_COMMIT-False
+    h.AUTO_COMMIT=False
