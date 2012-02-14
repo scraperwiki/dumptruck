@@ -2,10 +2,11 @@ Highwall is an document-like interface to an SQLite database that lets you relax
 It supports the following database formats.
 
 Quick start
----------
+==========
+
 Highwall makes relational databases feel more like document databases.
 
-## Initialize
+### Initialize
 
 Open the database connection by initializing the a Highwall object
 
