@@ -67,7 +67,7 @@ It would be cool if I can come up with a way for `h.save` to return
 the [rowid](http://www.sqlite.org/lang_createtable.html#rowid)(s) of the
 row(s) that are being saved. Dunno how annoying this would be....
 
-# Indices
+## Indices
 You can specify indices for the the database tables.
 
     h.indices('models',['modelNumber'])
@@ -83,12 +83,14 @@ You can override this with `force=True` to arbitrarily delete all but one of the
 
 Function reference
 =================
+## Summary
+### Methods
 Highwall gives you eight functions.
 
 These two are the coolest.
 
 * `save`: Save to the database in a relaxing manner.
-* `select`: Select from the database in a relaxing manner.
+* `load`: Select from the database in a relaxing manner.
 
 These two make it easy to save individual variables.
 
@@ -100,8 +102,21 @@ Here are some wrappers for common commands.
 * `show_tables`
 * `drop`: Delete a particular table.
 
-These two let you run normal SQL.
+These two let you run normal SQL to interface directly with pysqlite.
 
 * `execute`: Run raw SQL commands.
 * `commit`: Commit SQL commands
 
+### Options to the methods
+By default, all of the methods that commit changes.
+You can stop one of them from committing by passing
+`commit=False` to it. For example:
+
+    h=Highwall()
+    h.save({"name":"Bagger 293","manufacturer":"TAKRAF","height":95},commit=False)
+
+The default behavior for a particular database connection
+is stored in the `Highwall.AUTO_COMMIT` attribute; you
+can change the default behavior by setting that to false.
+
+    h.AUTO_COMMIT=False
