@@ -18,10 +18,23 @@ Things to consider
 --------------
 
 ### Database as an API
-
 The database can be an API that allows people using different
 programming languages to interact. (It is used like this on ScraperWiki.)
 
 As such, nothing specifically Pythonic should be dumped to the database.
 In particular, Highwall should use JSON instead of Pickle when
 dumping to the database.
+
+### Column types
+I don't really know what scraperlibs does with types. Whatever it does
+seems fine, but it might be worth documenting what happens when you save
+something of a different type to a column with a different type.
+
+Down the line
+---------------
+Scraperlibs implements wrappers around only the most basic parts
+of SQLite. Here are some features things that could be relaxed.
+
+* Updates
+* Deletes
+* Stored procedures
