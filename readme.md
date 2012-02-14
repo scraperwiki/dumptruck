@@ -81,10 +81,9 @@ You can override this with `force=True` to arbitrarily delete all but one of the
 
     h.indices('models',['modelNumber'],force=True)
 
-Function reference
+Reference
 =================
-## Summary
-### Methods
+## Summary of methods
 Highwall gives you eight functions.
 
 These two are the coolest.
@@ -107,8 +106,19 @@ These two let you run normal SQL to interface directly with pysqlite.
 * `execute`: Run raw SQL commands.
 * `commit`: Commit SQL commands
 
-### Options to the methods
-By default, all of the methods that commit changes.
+## Methods
+### save
+### load
+### get_var
+### save_var
+### show_tables
+### drop
+### execute
+### commit
+
+## Options to the methods
+By default, the `save`, `get_var`, `drop` and `execute`
+methods automatically commit changes.
 You can stop one of them from committing by passing
 `commit=False` to it. For example:
 
