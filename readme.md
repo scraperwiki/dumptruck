@@ -92,8 +92,10 @@ Reference
 ### Initializing
 Highwall's initialization method takes the following keyword arguments.
 
-* `dbname`: Database file to save to, default is highwall.db
-* `vars_table`: Table to use for `Highwall.get_var` and `Highwall.save_var`, default is `_highwallvars`
+* `dbname` is the database file to save to; the default is highwall.db.
+* `vars_table` is the name of the table to use for `Highwall.get_var`
+and `Highwall.save_var`; default is `_highwallvars`. Set it to `None`
+to disable the get_var and save_var methods.
 
 ### Summary of methods
 Once you've initialized a Highwall object, you can use eight functions.
