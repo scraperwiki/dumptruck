@@ -75,16 +75,17 @@ row(s) that are being saved. Dunno how annoying this would be....
 ### Indices
 You can specify indices for the the database tables.
 
-    h.indices('models',['modelNumber'])
+    h.indices['models']=['modelNumber']
 
 You can specify multiple single=column indices by passing a list of column names.
 
-    h.indices('machines',[['modelNumber','serialNumber']])
+    h.indices['machines']=[['modelNumber','serialNumber']]
 
 If you specify a column that contains non=distinct values, you will receive an error.
-You can override this with `force=True` to arbitrarily delete all but one of them.
+You can override this by running the underlying setter method with `force=True` to
+arbitrarily delete all but one of them.
 
-    h.indices('models',['modelNumber'],force=True)
+    h.setindices('models',['modelNumber'],force=True)
 
 Reference
 -----------------
@@ -119,12 +120,11 @@ This one lets you commit any changes that you previously delayed.
 
 ### Methods, in detail
 #### save
-#### load
+#### exec
 #### get_var
 #### save_var
 #### show_tables
 #### drop
-#### execute
 #### commit
 
 ### Standard options to the methods
