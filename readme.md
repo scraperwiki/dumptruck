@@ -3,8 +3,8 @@ It supports the following database formats.
 
 Quick start
 ==========
-
-Highwall makes relational databases feel more like document databases.
+Highwall helps you relax by making relational databases
+feel more like document databases.
 
 ## Initialize
 
