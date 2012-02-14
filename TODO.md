@@ -30,6 +30,10 @@ I don't really know what scraperlibs does with types. Whatever it does
 seems fine, but it might be worth documenting what happens when you save
 something of a different type to a column with a different type.
 
+
+### Attach
+Consider whether attaching databases changes any of the pretty wrappers.
+
 Down the line
 ---------------
 Scraperlibs implements wrappers around only the most basic parts
@@ -38,3 +42,6 @@ of SQLite. Here are some features things that could be relaxed.
 * Updates
 * Deletes
 * Stored procedures
+* In-memory databases
+* Foreign keys
+* `ON DELETE` and `ON UPDATE` actions
