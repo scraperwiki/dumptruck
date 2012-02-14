@@ -102,17 +102,17 @@ These two make it easy to save individual variables.
 * `get_var`: Save one variable to the database in a relaxing manner.
 * `save_var`: Retrieve one variable from the database in a relaxing manner.
 
-Here are some wrappers for common commands.
+These two are wrappers for common commands.
 
-* `show_tables`
+* `show_tables`: Return a set containing the names of the tables in the database.
 * `drop`: Delete a particular table.
 
 These two let you run normal SQL to interface directly with pysqlite.
 
 * `execute`: Run raw SQL commands.
-* `commit`: Commit SQL commands
+* `commit`: Manually commit changes to the database.
 
-## Methods
+## Methods, in detail
 ### save
 ### load
 ### get_var
