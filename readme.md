@@ -29,16 +29,30 @@ You can specify the table with the `tablename` parameter.
 
 Slow start
 =======
+## Initialize
+
+You can specify a few of keyword arguments when you initialize
+the Highwall object. Here they are with their defaults.
+
+* `dbname="highwall.db"`: File to use for the database
+
+So you if you want the database file to be `bucket-wheel-excavators.db`,
+you can use this.
+
+    h = Highwall(dbname="bucket-wheel-excavators.db")
 
 ## Saving
+As discussed earlier, the simplest `save` call looks like this.
 
-You can also pass a list of dictionaries.
+    h.save({"firstname":"Thomas","lastname":"Levine"})
+
+But you can also pass a list of dictionaries.
 
     data=[
         {"firstname":"Thomas","lastname":"Levine"},
         {"firstname":"Julian","lastname":"Assange"}
     ]
-    save(data)
+    h.save(data)
 
 You can even past nested structures; dictionaries,
 sets and lists will automatically be dumped to JSON.
@@ -47,25 +61,18 @@ sets and lists will automatically be dumped to JSON.
         {"title":"The Elements of Typographic Style","authors":["Robert Bringhurst"]},
         {"title":"How to Read a Book","authors":["Mortimer Adler","Charles Van Doren"]}
     ]
-    save(data)
+    h.save(data)
 
+It would be cool if I can come up with a way for `h.save` to return
+the [rowid](http://www.sqlite.org/lang_createtable.html#rowid)(s) of the
+row(s) that are being saved. Dunno how annoying this would be....
 
-## Initialize
-
-You can specify a few of keyword arguments when you initialize
-the Highwall object. Here they are with their defaults.
-
-* `dbname="highwall.db"`: File to use for the database
-
-So you can do
-
-    h = Highwall(dbname="earthmoving")
-
-## Indices
-You can 
+# Indices
+You can specify indices and 
 
 * `indices=[]`: Columns to set as indices.
-* `autoincrement="pk"`: Column to auto-increment. If this is set to `None`, no auto-incrementing column will be created.
+* `autoincrement="_id"`: Column to auto-increment. If this is set to `None`, no auto-incrementing column will be created.
+
 
 Function reference
 =================
