@@ -26,6 +26,12 @@ You can specify the table with the `tablename` parameter.
 
     h.save({"firstname":"Thomas","lastname":"Levine"},tablename="diesel-engineers")
 
+
+Slow start
+=======
+
+## Saving
+
 You can also pass a list of dictionaries.
 
     data=[
@@ -35,7 +41,7 @@ You can also pass a list of dictionaries.
     save(data)
 
 You can even past nested structures; dictionaries,
-sets and lists will be dumped to JSON.
+sets and lists will automatically be dumped to JSON.
 
     data=[
         {"title":"The Elements of Typographic Style","authors":["Robert Bringhurst"]},
@@ -43,8 +49,7 @@ sets and lists will be dumped to JSON.
     ]
     save(data)
 
-Slow start
----------
+
 ## Initialize
 
 You can specify a few of keyword arguments when you initialize
@@ -62,8 +67,8 @@ You can
 * `indices=[]`: Columns to set as indices.
 * `autoincrement="pk"`: Column to auto-increment. If this is set to `None`, no auto-incrementing column will be created.
 
-Generic functions
------------
+Function reference
+=================
 Highwall gives you eight functions.
 
 These two are the coolest.
@@ -85,3 +90,4 @@ These two let you run normal SQL.
 
 * `execute`: Run raw SQL commands.
 * `commit`: Commit SQL commands
+
