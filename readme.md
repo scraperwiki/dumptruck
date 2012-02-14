@@ -68,11 +68,18 @@ the [rowid](http://www.sqlite.org/lang_createtable.html#rowid)(s) of the
 row(s) that are being saved. Dunno how annoying this would be....
 
 # Indices
-You can specify indices and 
+You can specify indices for the the database tables.
 
-* `indices=[]`: Columns to set as indices.
-* `autoincrement="_id"`: Column to auto-increment. If this is set to `None`, no auto-incrementing column will be created.
+    h.indices('models',['modelNumber'])
 
+You can specify multiple single-column indices by passing a list of column names.
+
+    h.indices('machines',[['modelNumber','serialNumber']])
+
+If you specify a column that contains non-distinct values, you will receive an error.
+You can override this with `force=True` to arbitrarily delete all but one of them.
+
+    h.indices('models',['modelNumber'],force=True)
 
 Function reference
 =================
