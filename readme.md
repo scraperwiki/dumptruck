@@ -83,8 +83,14 @@ You can override this with `force=True` to arbitrarily delete all but one of the
 
 Reference
 =================
+## Initializing
+Highwall's initialization method takes the following keyword arguments.
+
+* `dbname`: Database file to save to, default is highwall.db
+* `vars_table`: Table to use for `Highwall.get_var` and `Highwall.save_var`, default is `_highwallvars`
+
 ## Summary of methods
-Highwall gives you eight functions.
+Once you've initialized a Highwall object, you can use eight functions.
 
 These two are the coolest.
 
@@ -93,8 +99,8 @@ These two are the coolest.
 
 These two make it easy to save individual variables.
 
-* `get_var`
-* `save_var`
+* `get_var`: Save one variable to the database in a relaxing manner.
+* `save_var`: Retrieve one variable from the database in a relaxing manner.
 
 Here are some wrappers for common commands.
 
@@ -116,7 +122,7 @@ These two let you run normal SQL to interface directly with pysqlite.
 ### execute
 ### commit
 
-## Options to the methods
+## Standard options to the methods
 By default, the `save`, `get_var`, `drop` and `execute`
 methods automatically commit changes.
 You can stop one of them from committing by passing
