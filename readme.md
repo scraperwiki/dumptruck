@@ -1,7 +1,7 @@
 Highwall
 ==============
 
-Highwall is an document=like interface to an SQLite database that lets you relax.
+Highwall is an document-like interface to an SQLite database that lets you relax.
 It supports the following database formats.
 
 Quick start
@@ -18,17 +18,19 @@ Open the database connection by initializing the a Highwall object
 ### Saving
 The simplest `save` call looks like this.
 
-    h.save({"firstname":"Thomas","lastname":"Levine"})
+    h.save({"firstname":"Thomas","lastname":"Levine"},"diesel-engineers")
 
 This saves a new row with "Thomas" in the "firstname" column and
-"Levine" in the "lastname" column. It uses the table "default"
+"Levine" in the "lastname" column. It uses the table "diesel-engineers"
 inside the database "highwall.db". It creates or alters the table
 if it needs to.
 
-You can specify the table with the `tablename` parameter.
+### Retrieving
+Once the database contains data, you can retrieve it.
 
-    h.save({"firstname":"Thomas","lastname":"Levine"},tablename="diesel-engineers")
+    data=h.exec('SELECT * FROM `diesel-engineers`')
 
+The data come out as a list of dictionaries, with one dictionary per row.
 
 Slow start
 -------
@@ -98,21 +100,21 @@ Once you've initialized a Highwall object, you can use eight functions.
 These two are the coolest.
 
 * `save`: Save to the database in a relaxing manner.
-* `load`: Select from the database in a relaxing manner.
+* `execute`: Run raw SQL commands. If you run a `SELECT`,
+its results are returned in a relaxing data structure.
 
 These two make it easy to save individual variables.
 
 * `get_var`: Save one variable to the database in a relaxing manner.
 * `save_var`: Retrieve one variable from the database in a relaxing manner.
 
-These two are wrappers for common commands.
+These two are wrappers for common SQL commands.
 
 * `show_tables`: Return a set containing the names of the tables in the database.
 * `drop`: Delete a particular table.
 
-These two let you run normal SQL to interface directly with pysqlite.
+This one lets you commit any changes that you previously delayed.
 
-* `execute`: Run raw SQL commands.
 * `commit`: Manually commit changes to the database.
 
 ### Methods, in detail
