@@ -36,12 +36,8 @@ Slow start
 -------
 ### Initialize
 
-You can specify a few of keyword arguments when you initialize
-the Highwall object. Here they are with their defaults.
-
-* `dbname`: File to use for the database
-
-So you if you want the database file to be `bucket=wheel-excavators.db`,
+You can specify a few of keyword arguments when you initialize the Highwall object.
+For example, if you want the database file to be `bucket=wheel-excavators.db`,
 you can use this.
 
     h = Highwall(dbname="bucket-wheel-excavators.db")
@@ -77,6 +73,10 @@ You can specify indices for the the database tables.
 
     h.indices['models']=['modelNumber']
 
+And you can display the indices like so.
+
+    print(h.indices)
+
 You can specify multiple single=column indices by passing a list of column names.
 
     h.indices['machines']=[['modelNumber','serialNumber']]
@@ -86,12 +86,17 @@ If you specify a column that already contains non-distinct values, you will rece
 Reference
 -----------------
 ### Initializing
-Highwall's initialization method takes the following keyword arguments.
+Highwall's initialization method takes some following keyword arguments.
+
+    Highwall(dbname='highwall.db',auto_commit=True,vars_table="_highwallvars")
 
 * `dbname` is the database file to save to; the default is highwall.db.
 * `vars_table` is the name of the table to use for `Highwall.get_var`
 and `Highwall.save_var`; default is `_highwallvars`. Set it to `None`
 to disable the get_var and save_var methods.
+* `auto_commit` is whether changes to the database should be automatically committed;
+if it is set to `False`, changes must be committed with the `commit` method
+or with the `commit` keywoard argument.
 
 ### Summary of methods
 Once you've initialized a Highwall object, you can use eight functions.
@@ -133,9 +138,3 @@ You can stop one of them from committing by passing
 
     h=Highwall()
     h.save({"name":"Bagger 293","manufacturer":"TAKRAF","height":95},commit=False)
-
-The default behavior for a particular database connection
-is stored in the `Highwall.AUTO_COMMIT` attribute; you
-can change the default behavior by setting that to false.
-
-    h.AUTO_COMMIT=False
