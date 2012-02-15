@@ -44,7 +44,7 @@ the Highwall object. Here they are with their defaults.
 So you if you want the database file to be `bucket=wheel-excavators.db`,
 you can use this.
 
-    h = Highwall(dbname-"bucket-wheel-excavators.db")
+    h = Highwall(dbname="bucket-wheel-excavators.db")
 
 ### Saving
 As discussed earlier, the simplest `save` call looks like this.
@@ -81,11 +81,7 @@ You can specify multiple single=column indices by passing a list of column names
 
     h.indices['machines']=[['modelNumber','serialNumber']]
 
-If you specify a column that contains non=distinct values, you will receive an error.
-You can override this by running the underlying setter method with `force=True` to
-arbitrarily delete all but one of them.
-
-    h.setindices('models',['modelNumber'],force=True)
+If you specify a column that already contains non-distinct values, you will receive an error.
 
 Reference
 -----------------
