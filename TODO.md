@@ -45,3 +45,4 @@ of SQLite. Here are some features things that could be relaxed.
 * In-memory databases
 * Foreign keys
 * `ON DELETE` and `ON UPDATE` actions
+* Views
