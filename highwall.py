@@ -32,7 +32,7 @@ class Highwall:
     self.auto_commit = auto_commit
 
     # Database connection
-    self.connection=sqlite3.connect(db_name)
+    self.connection=sqlite3.connect(dbname)
     self.cursor=self.connection.cursor()
 
     # Highwall variables table
@@ -51,7 +51,7 @@ class Highwall:
       raise self.InvalidTableName
 
   def __check_or_create_vars_table(self):
-    if self.vars_table in self.show_tables():
+    if self.__vars_table in self.show_tables():
       pass #Do something
     else:
       self.__check_table_name(self.__vars_table)
@@ -62,13 +62,13 @@ class Highwall:
           type TEXT
         );""" % self.__vars_table)
 
-  def exec(self, sql, quoted=None, commit = True):
+  def execute(self, sql, commit = True, *args, **kwargs):
     """
     Run raw SQL on the database, and receive relaxing output.
     This is sort of the foundational method that most of the
     others build on.
     """
-    self.cursor.execute(sql, quoted)
+    self.cursor.execute(sql, *args, **kwargs)
     colnames = [d[0] for d in self.cursor.description] 
     rows =self.cursor.fetchall()
 
@@ -82,18 +82,17 @@ class Highwall:
 
   def commit(self):
     "Commit database transactions."
-     return self.connection.commit()
+    return self.connection.commit()
 
   def close(self):
-     return self.connection.close()
+    return self.connection.close()
 
   def save(self, data, table_name, commit = True):
-    pass
-    return self.exec("", commit = False)
+    return self.execute("--;", commit = commit)
 
   def get_var(self, key):
     "Retrieve one saved variable from the database."
-    return self.exec("SELECT ? FROM `%s` WHERE `key` = ?", key, commit = False)
+    return self.execute("SELECT ? FROM `%s` WHERE `key` = ?", key, commit = False)
 
   def save_var(self, key, value, commit = True):
     "Save one variable to the database."
@@ -103,8 +102,9 @@ class Highwall:
     return self.save(data, self.__vars_table, commit = commit)
 
   def show_tables(self):
-    return self.exec("SELECT name FROM sqlite_master WHERE TYPE='table'", commit = False)
+    result = self.execute("SELECT name FROM sqlite_master WHERE TYPE='table'", commit = False)
+    return set([row['name'] for row in result])
 
   def drop(self, table_name, commit = True):
     self.__check_table_name(table_name)
-    return self.exec('DROP IF EXISTS `%s`;' % table_name, commit = commit)
+    return self.execute('DROP IF EXISTS `%s`;' % table_name, commit = commit)

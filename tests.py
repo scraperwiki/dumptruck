@@ -55,12 +55,12 @@ class TestSelect(TestDb):
     self.h = Highwall(dbname='test.db')
 
   def test_count(self):
-    data = self.h.exec('SELECT * FROM `bar`')
+    data = self.h.execute('SELECT * FROM `bar`')
     self.assertEqual(len(data),12)
 
   def test_data(self):
     h = Highwall(dbname='test.db')
-    data_observed = self.h.exec('SELECT * FROM `bar`')
+    data_observed = self.h.execute('SELECT * FROM `bar`')
     f = open('fixtures/testinsert.json')
     data_expected = loads(f.read())
     f.close()
