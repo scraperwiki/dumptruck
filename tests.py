@@ -31,7 +31,18 @@ class TestGetVar(TestDb):
    self.assertRaises(Highwall.NameError,h.get_var,'nonexistant_var')
 
 class TestSaveVar(TestDb):
-  pass
+  def test_save(self):
+    h = Highwall()
+    h.save_var('foo','bar')
+    h.close()
+    connection=sqlite3.connect('test.db')
+    cursor=connection.cursor()
+    cursor.execute('SELECT * FROM `_highwallvars`')
+    print cursor.fetchall()
+
+class TestSaveVar(TestDb):
+  def test_save(self):
+    self.h = Highwall(dbname = 'fixtures/absa-highwallvars.sqlite',vars_table="swvariables")
 
 class TestSelect(TestDb):
   def setUp(self):

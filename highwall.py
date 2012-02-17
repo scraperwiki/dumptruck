@@ -84,6 +84,9 @@ class Highwall:
     "Commit database transactions."
      return self.connection.commit()
 
+  def close(self):
+     return self.connection.close()
+
   def save(self, data, table_name, commit = True):
     pass
     return self.exec("", commit = False)
