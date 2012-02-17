@@ -19,6 +19,17 @@ class TestDb(TestCase):
         if (2, 'No such file or directory')!=e:
           raise
 
+class TestGetVar(TestDb):
+  def setUp(self):
+    self.cleanup()
+    self.h = Highwall('fixtures/foo.db')
+
+  def test_existing_var(self):
+   self.assertEquals(h.get_var('favorite-machine'),'wheel tractor-scraper')
+
+  def test_nonexisting_var(self):
+   self.assertRaises(Highwall.NameError,h.get_var,'nonexistant_var')
+
 class TestSelect(TestDb):
   def setUp(self):
     self.cleanUp()
@@ -41,7 +52,7 @@ class TestSelect(TestDb):
     f.close()
     self.assertListEqual(data_observed,data_expected)
 
-class TestInvalidParams(TestDb):
+class TestInvalidHighwallParams(TestDb):
   "Invalid parameters should raise appropriate errors."
 
   def test_auto_commit(self):
@@ -69,7 +80,7 @@ class TestInvalidParams(TestDb):
       self.assertRaises(TypeError, Highwall, vars_table = value)
 
 
-class TestParams(TestDb):
+class TestHighwallParams(TestDb):
   def test_params(self):
     self.assertFalse(os.path.isfile('test.db'))
     h = Highwall(dbname='test.db',auto_commit=False,vars_table="baz")
