@@ -113,7 +113,7 @@ Indices on one table act like a set, so this is how you drop an index:
 Reference
 -----------------
 ### Initializing
-Highwall's initialization method takes some following keyword arguments.
+Highwall's initialization method takes the following keyword arguments.
 
     Highwall(dbname='highwall.db',auto_commit=True,vars_table="_highwallvars")
 

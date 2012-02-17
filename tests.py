@@ -19,6 +19,14 @@ class TestDb(TestCase):
 
 class TestInitialize(TestDb):
 
+class TestDefaults(TestDb):
+  def test_defaults(self):
+    self.assertFalse(os.path.isfile('highwall.db'))
+    h = Highwall()
+    self.assertTrue(os.path.isfile('highwall.db'))
+    self.assertEqual(h.auto_commit, True)
+    self.assertEqual(h.__vars_table, "_highwallvars")
+
 class TestSave(TestDb):
   def test_foo_bar(self):
     pass
