@@ -1,4 +1,5 @@
 import json
+import sqlite3
 
 class Index:
   COLNAME_TYPES = set([unicode, str, int])
@@ -67,15 +68,20 @@ class Highwall:
     others build on.
     """
     self.cursor.execute(sql, quoted)
-    print self.cursor.fetchall()
-    out = None
+    colnames = [d[0] for d in self.cursor.description] 
+    rows =self.cursor.fetchall()
+
     if commit:
-      commit
-    return out
+      self.commit()
+
+    if rows==None:
+      return None
+    else:
+      return [dict(zip(colnames,row)) for row in rows]
 
   def commit(self):
     "Commit database transactions."
-     self.connection.commit()
+     return self.connection.commit()
 
   def save(self, data, table_name, commit = True):
     pass
@@ -93,7 +99,7 @@ class Highwall:
     return self.save(data, self.__vars_table, commit = commit)
 
   def show_tables(self):
-    return self.exec(".tables", commit = False)
+    return self.exec("SELECT name FROM sqlite_master WHERE TYPE='table'", commit = False)
 
   def drop(self, table_name, commit = True):
     self.__check_table_name(table_name)
