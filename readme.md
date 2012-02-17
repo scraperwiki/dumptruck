@@ -69,19 +69,46 @@ the [rowid](http://www.sqlite.org/lang_createtable.html#rowid)(s) of the
 row(s) that are being saved. Dunno how annoying this would be....
 
 ### Indices
-You can specify indices for the the database tables.
+Highwall allows you to manage indices as if they were
+normal Python objects
 
-    h.indices['models']=['modelNumber']
+#### Creating
+First, create an index object, specifying the columns.
 
-And you can display the indices like so.
+    i1=Index('modelNumber')
+
+Then add it to the set of indices for the table.
+
+    h.indices['models'].add(i1)
+
+If you want a unique index, do this.
+
+    i2=Index('year',unique=True)
+    h.indices['models'].add(i2)
+
+If you specify a column that already contains non-distinct values, you will receive an error.
+
+You can specify multiple single-column indices by passing a list of column names.
+
+    h.indices['machines']=Index(['modelNumber','serialNumber'])
+
+#### Retrieving
+You can display the indices for a database like so.
 
     print(h.indices)
 
-You can specify multiple single=column indices by passing a list of column names.
+You can retrieve them as a dictionary and save them somewhere else.
 
-    h.indices['machines']=[['modelNumber','serialNumber']]
+    d=h.indices
 
-If you specify a column that already contains non-distinct values, you will receive an error.
+In particular, you might want to copy indices from one table to another.
+
+    s=h.indices['models']
+    h.indices['models-test']=s
+
+Indices on one table act like a set, so this is how you drop an index:
+
+    h.indices['models'].remove(Index('modelnumber'))
 
 Reference
 -----------------
