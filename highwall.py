@@ -38,8 +38,6 @@ class Highwall:
     self.__vars_table = vars_table
     self.__check_or_create_vars_table()
 
-
-
   class InvalidTableName(Exception):
     pass
 
