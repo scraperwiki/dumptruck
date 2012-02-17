@@ -28,13 +28,17 @@ class Highwall:
     pass
     # Should database changes be committed automatically after each command?
     self.auto_commit = auto_commit
-    self.__check_table_name(vars_table)
-    self.__vars_table = vars_table
 
-
-    self._table_name=table_name
+    # Database connection
     self.connection=sqlite3.connect(db_name)
     self.cursor=self.connection.cursor()
+
+    # Highwall variables table
+    self.__check_table_name(vars_table)
+    self.__vars_table = vars_table
+    self.__check_or_create_vars_table()
+
+
 
   class InvalidTableName(Exception):
     pass
@@ -58,13 +62,14 @@ class Highwall:
           type TEXT
         );""" % self.__vars_table)
 
-
-  def exec(self, quoted, commit = True):
+  def exec(self, sql, quoted=None, commit = True):
     """
     Run raw SQL on the database, and receive relaxing output.
     This is sort of the foundational method that most of the
     others build on.
     """
+    self.cursor.execute(sql, quoted)
+    print self.cursor.fetchall()
     out = None
     if commit:
       commit
