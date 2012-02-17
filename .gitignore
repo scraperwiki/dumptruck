@@ -1,6 +1,9 @@
 # Most of this is from github's gitignore repository.
 # https://github.com/github/gitignore
 
+# Sqlite
+*.db
+
 # Vim
 .*.sw[a-z]
 *.un~
