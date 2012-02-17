@@ -17,10 +17,16 @@ class TestDb(TestCase):
         if (2, 'No such file or directory')!=e:
           raise
 
-class TestInitialize(TestDb):
+class TestParams(TestDb):
+  def test_params(self):
+    self.assertFalse(os.path.isfile('test.db'))
+    h = Highwall(dbname='test.db',auto_commit=False,vars_table="baz")
+    self.assertTrue(os.path.isfile('test.db'))
+    self.assertEqual(h.auto_commit, False)
+    self.assertEqual(h.__vars_table, "baz")
 
-class TestDefaults(TestDb):
-  def test_defaults(self):
+class TestParamsDefaults(TestDb):
+  def test_params(self):
     self.assertFalse(os.path.isfile('highwall.db'))
     h = Highwall()
     self.assertTrue(os.path.isfile('highwall.db'))
