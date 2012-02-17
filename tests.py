@@ -22,13 +22,16 @@ class TestDb(TestCase):
 class TestGetVar(TestDb):
   def setUp(self):
     self.cleanup()
-    self.h = Highwall('fixtures/foo.db')
+    self.h = Highwall(dbname = 'fixtures/absa-highwallvars.sqlite',vars_table="swvariables")
 
   def test_existing_var(self):
-   self.assertEquals(h.get_var('favorite-machine'),'wheel tractor-scraper')
+   self.assertEquals(h.get_var('DATE'),1329518937.92)
 
   def test_nonexisting_var(self):
    self.assertRaises(Highwall.NameError,h.get_var,'nonexistant_var')
+
+class TestSaveVar(TestDb):
+  pass
 
 class TestSelect(TestDb):
   def setUp(self):

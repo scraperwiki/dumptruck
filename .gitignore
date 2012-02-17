@@ -3,6 +3,7 @@
 
 # Sqlite
 *.db
+*.sqlite
 
 # Vim
 .*.sw[a-z]

@@ -96,7 +96,7 @@ class Highwall:
     "Save one variable to the database."
     valuetype = "str" #This is a lie.
     #valuetype in ("json", "unicode", "str", &c)
-    data = {"key":key, "value":value, "type":valuetype}
+    data = {"name":key, "value_blob":value, "type":valuetype}
     return self.save(data, self.__vars_table, commit = commit)
 
   def show_tables(self):
