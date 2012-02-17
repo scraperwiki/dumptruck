@@ -37,12 +37,17 @@ Consider whether attaching databases changes any of the pretty wrappers.
 Down the line
 ---------------
 Scraperlibs implements wrappers around only the most basic parts
-of SQLite. Here are some features things that could be relaxed.
+of SQLite. Here are some other basic features things that could be relaxed.
 
 * Updates
 * Deletes
+* Foreign keys
+* Views
+* Unique and non-unique indices
+* Composite primary keys
+
+These might be more advanced and thus less important to relax.
+
 * Stored procedures
 * In-memory databases
-* Foreign keys
 * `ON DELETE` and `ON UPDATE` actions
-* Views
