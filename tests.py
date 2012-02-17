@@ -52,19 +52,21 @@ class TestInvalidParams(TestDb):
     for value in (None,3,True,False,set([3]),[]):
       self.assertRaises(TypeError, Highwall, dbname = value)
 
-  def test_dbname(self):
+  def test_vars_table_str(self):
     "http://stackoverflow.com/questions/3694276/what-are-valid-table-names-in-sqlite"
     str_values = (
       'abc123', '123abc','abc_123',
       '_123abc','abc-abc','abc.abc',
     )
+    for value in str_values:
+      self.assertRaises(Highwall.TableNameError, Highwall, vars_table = value)
+
+  def test_vars_table_nonstr(self):
     nonstr_values = (
       None, 3, True, False, set([3]), []
     )
-    for value in str_values:
-      self.assertRaises(Highwall.TableNameError, Highwall, dbname = value)
     for value in nonstr_values:
-      self.assertRaises(TypeError, Highwall, dbname = value)
+      self.assertRaises(TypeError, Highwall, vars_table = value)
 
 
 class TestParams(TestDb):
