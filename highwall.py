@@ -4,6 +4,9 @@ import sqlite3
 class Index:
   COLNAME_TYPES = set([unicode, str, int])
 
+  class TableNameError(Exception):
+    pass
+
   class DuplicateColumnError(Exception):
     pass
 
@@ -19,8 +22,6 @@ class Index:
         raise self.DuplicateColumnError
       else:
         self.__columns = str_columns
-      
-    
 
 class Highwall:
   "A relaxing interface to SQLite"

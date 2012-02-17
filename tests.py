@@ -1,5 +1,6 @@
 from unittest import TestCase, main
 from highwall import Highwall, Index
+import sqlite3
 import os
 
 class TestDb(TestCase):
@@ -17,6 +18,28 @@ class TestDb(TestCase):
       except OSError as e:
         if (2, 'No such file or directory')!=e:
           raise
+
+class TestSelect(TestDb):
+  def setUp(self):
+    self.cleanUp()
+    connection=sqlite3.connect('test.db')
+    cursor=connection.cursor()
+    cursor.execute(open('fixtures/testinsert.sql').read())
+    connection.commit()
+    connection.close()
+    self.h = Highwall(dbname='test.db')
+
+  def test_count(self):
+    data = self.h.exec('SELECT * FROM `bar`')
+    self.assertEqual(len(data),12)
+
+  def test_data(self):
+    h = Highwall(dbname='test.db')
+    data_observed = self.h.exec('SELECT * FROM `bar`')
+    f = open('fixtures/testinsert.json')
+    data_expected = loads(f.read())
+    f.close()
+    self.assertListEqual(data_observed,data_expected)
 
 class TestInvalidParams(TestDb):
   "Invalid parameters should raise appropriate errors."
