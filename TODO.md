@@ -50,4 +50,4 @@ These might be more advanced and thus less important to relax.
 
 * Stored procedures
 * In-memory databases
-* `ON DELETE` and `ON UPDATE` actions
+* Triggers
