@@ -156,10 +156,9 @@ Indices on one table act like a set, so this is how you drop an index:
 ### Views
 
 ### Delaying commits
-By default, the `save`, `get_var`, `drop` and `execute`
-methods automatically commit changes.
-You can stop one of them from committing by passing
-`commit=False` to it. For example:
+By default, the `save`, `get_var`, `drop` and `execute` methods automatically commit changes.
+You can stop one of them from committing by passing `commit=False` to the method.
+Commit manually with the `commit` method.  For example:
 
     h=Highwall()
     h.insert({"name":"Bagger 293","manufacturer":"TAKRAF","height":95}, commit=False)
