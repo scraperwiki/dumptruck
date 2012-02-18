@@ -73,27 +73,28 @@ class Highwall:
     else:
       self.__vars_table = vars_table
 
-  def __check_or_create_table(table_name):
-    if self.__vars_table in self.show_tables():
+  def __check_or_create_table(self, table_name):
+    if self.__is_table(table_name):
       pass #Do something
     else:
-      self.__check_table_name(self.__vars_table)
       self.cursor.execute("""
         CREATE TABLE `%s` (
-          ROWID INTEGER PRIMARY KEY,
-        );""" % self.__vars_table)
+          ROWID INTEGER PRIMARY KEY
+        );""" % table_name)
+      self.connection.commit()
 
   def __check_or_create_vars_table(self):
     if self.__vars_table in self.show_tables():
       pass #Do something
     else:
-      self.__check_table_name(self.__vars_table)
+      self.__is_table(self.__vars_table)
       self.cursor.execute("""
         CREATE TABLE `%s` (
           key TEXT,
           value BLOB,
           type TEXT
         );""" % self.__vars_table)
+      self.cursor.commit()
 
   def execute(self, sql, *args, **kwargs):
     """
@@ -105,7 +106,7 @@ class Highwall:
     colnames = [d[0] for d in self.cursor.description] 
     rows =self.cursor.fetchall()
 
-    if commit:
+    if 'commit' in kwargs and kwargs['commit']:
       self.commit()
 
     if rows==None:
@@ -122,12 +123,15 @@ class Highwall:
 
 
   def __add_column(self, table_name, column_name, column_type):
-    sql = 'ALTER TABLE `%s` ADD COLUMN ? ?' % table_name 
-    self.execute(sql, (column_name, column_type), commit = True)
+    sql = 'ALTER TABLE `%s` ADD ? ?' % table_name 
+    self.execute(sql, [column_name, column_type], commit = True)
 
   def __column_types(self, table_name):
     self.cursor.execute("PRAGMA table_info(`%s`)" % table_name)
     return {column[1]:column[2] for column in self.cursor.fetchall()}
+
+  def __is_table(self,table_name):
+    return table_name in self.show_tables()
 
   def __check_and_add_columns(self, table_name, conved_data_row):
     column_types = self.__column_types(table_name)
@@ -135,7 +139,6 @@ class Highwall:
       if key not in column_types:
         #raise NotImplementedError("Pretend this alters the table to add the column.")
         self.__add_column(table_name, key, PYTHON_SQLITE_TYPE_MAP[type(value)])
-
 
   def __cast_data_to_column_type(self, data):
     column_types = self.__column_types(table_name)
@@ -159,7 +162,7 @@ class Highwall:
     except TypeError:
       raise TypeError('The data argument must be a dict or an iterable of dicts.')
 
-    self.__check_and_create_table(table_name)
+    self.__check_or_create_table(table_name)
 
     conved_data = [DataDump(row).dump() for row in data]
     for row in conved_data:
@@ -197,7 +200,6 @@ class Highwall:
     return set([row['name'] for row in result])
 
   def drop(self, table_name, commit = True):
-    self.__check_table_name(table_name)
     return self.execute('DROP IF EXISTS `%s`;' % table_name, commit = commit)
 
 class DataDump:
