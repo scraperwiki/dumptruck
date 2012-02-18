@@ -32,17 +32,33 @@ class TestGetVar(TestDb):
    self.assertRaises(Highwall.NameError,self.h.get_var,'nonexistant_var')
 
 class TestSaveVar(TestDb):
-  def test_save(self):
+  def setUp(self):
+    self.cleanUp()
     h = Highwall(dbname = 'test.db')
     h.save_var("birthday","November 30, 1888")
     h.close()
-
     connection=sqlite3.connect('test.db')
-    cursor=connection.cursor()
-    cursor.execute("SELECT * FROM `_highwallvars`")
-    observed = cursor.fetchall()
+    self.cursor=connection.cursor()
+
+  def test_save(self):
+    self.cursor.execute("SELECT * FROM `_highwallvars`")
+    observed = self.cursor.fetchall()
     expected = [("birthday", "November 30, 1888", "text")]
     self.assertEqual(observed, expected)
+
+  def test_has_some_index(self):
+    """
+    PRAGMA index_info(index-name);
+
+    This pragma returns one row each column in the named index. The first column of the result is the rank of the column within the index. The second column of the result is the rank of the column within the table. The third column of output is the name of the column being indexed.
+
+    PRAGMA index_list(table-name);
+
+    This pragma returns one row for each index associated with the given table. Columns of the result set include the index name and a flag to indicate whether or not the index is UNIQUE.
+    """
+    self.cursor.execute("PRAGMA index_list(_highwallvars)")
+    indices = self.cursor.fetchall()
+    self.assertNotEqual(indices,[])
 
 class TestSelect(TestDb):
   def test_select(self):
