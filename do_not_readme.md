@@ -32,3 +32,11 @@ Add some nice way of specifying views.
 
 ### Stored procedures.
 Add some nice way of specifying stored procedures.
+
+#### Output to a table
+You might want to store the output of a query in the database.
+If this is what you want to do, ...
+
+1. Maybe it's an option to `Highwall.execute`
+2. Consider whether the result should rewrite or append to the table in which it is to be stored.
+3. Or maybe an error is raised if the table already exists.
