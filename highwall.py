@@ -10,6 +10,13 @@ SQLITE_PYTHON_TYPE_MAP={
   u"integer": int,
   u"real": float,
 }
+
+# Only for compatibility with scraperwiki;
+# we should use the SQLite names
+SWVARIABLES_PYTHON_TYPE_MAP={
+  u"float": float
+}
+
 PYTHON_SQLITE_TYPE_MAP={
   unicode: u"text",
   str: u"text",
@@ -42,6 +49,9 @@ class MineCollapse(Exception):
 
 class Highwall:
   "A relaxing interface to SQLite"
+
+  class NameError(NameError):
+    pass
 
   class TableNameError(MineCollapse):
     pass
@@ -90,8 +100,8 @@ class Highwall:
       self.__is_table(self.__vars_table)
       self.cursor.execute("""
         CREATE TABLE `%s` (
-          key TEXT,
-          value BLOB,
+          name TEXT,
+          value_blob BLOB,
           type TEXT
         );""" % self.__vars_table)
       self.cursor.commit()
@@ -176,11 +186,23 @@ class Highwall:
       self.execute(sql, row.values(), commit=False)
     self.commit()
 
+  class HighwallVarsError(MineCollapse):
+    pass
+
   def get_var(self, key):
     "Retrieve one saved variable from the database."
-    row = self.execute("SELECT `value_blob` FROM `%s` WHERE `key` = ?" % self.__vars_table, key, commit = False)[0]
-    # return SQLITE_PYTHON_TYPE_MAP[row['type']](row['value_blob'])
-    return row['value_blob']
+    data = self.execute("SELECT * FROM `%s` WHERE `name` = ?" % self.__vars_table, [key], commit = False)
+    if data == []:
+      raise self.NameError("The Highwall variables table doesn't have a value for %s." % key)
+    else:
+      row = data[0]
+      if SQLITE_PYTHON_TYPE_MAP.has_key(row['type']):
+        cast = SQLITE_PYTHON_TYPE_MAP[row['type']]
+      elif SWVARIABLES_PYTHON_TYPE_MAP.has_key(row['type']):
+        cast = SWVARIABLES_PYTHON_TYPE_MAP[row['type']]
+      else:
+        raise self.HighwallVarsError("A Python type for '%s' could not be found." % row['type'])
+      return cast(row['value_blob'])
 
   def save_var(self, key, value, commit = True):
     "Save one variable to the database."
