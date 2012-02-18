@@ -26,3 +26,9 @@ These two are wrappers for common SQL commands.
 This one lets you commit any changes that you previously delayed.
 
 * `commit`: Manually commit changes to the database.
+
+### Views
+Add some nice way of specifying views.
+
+### Stored procedures.
+Add some nice way of specifying stored procedures.

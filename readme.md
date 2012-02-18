@@ -153,12 +153,6 @@ Indices on one table act like a set, so this is how you drop an index:
 
     h.indices['models'].remove(Index('modelnumber'))
 
-### Views
-Add some nice way of specifying views.
-
-### Stored procedures.
-Add some nice way of specifying stored procedures.
-
 ### Delaying commits
 By default, the `save`, `get_var`, `drop` and `execute` methods automatically commit changes.
 You can stop one of them from committing by passing `commit=False` to the method.
