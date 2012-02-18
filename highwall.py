@@ -57,6 +57,7 @@ class Highwall:
 
     # Make sure it's a good table name
     self.__check_table_name(vars_table)
+    self.__vars_table = vars_table
 
   @staticmethod
   def __check_table_name(table_name):
@@ -149,13 +150,12 @@ class Highwall:
 
   def get_var(self, key):
     "Retrieve one saved variable from the database."
-    return self.execute("SELECT ? FROM `%s` WHERE `key` = ?", key, commit = False)
+    return self.execute("SELECT ? FROM `%s` WHERE `key` = ?" % self.__vars_table, key, commit = False)
 
   def save_var(self, key, value, commit = True):
     "Save one variable to the database."
 
     # Check whether Highwall's variables table exists
-    self.__vars_table = vars_table
     self.__check_or_create_vars_table()
 
     # Prepare for save
