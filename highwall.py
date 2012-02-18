@@ -98,43 +98,6 @@ class Highwall:
   def save(self, data, table_name, commit = True):
     return self.execute("--;", commit = commit)
 
-  @staticmethod
-  def __checkdata(scraper_data):
-    #Based on scraperlibs
-    for key scraper_data.keys():
-      if not key:
-        raise self.ColumnNameError('key must not be blank')
-      elif type(key) not in (unicode, str):
-        raise self.ColumnNameError('key must be string type')
-      elif not re.match("[a-zA-Z0-9_\- ]+$", key):
-        raise self.ColumnNameError('key must be simple text')
-
-  @staticmethod
-  def __convdata(scraper_data):
-    #Based on scraperlibs
-    jdata = {}
-    for key, value in scraper_data.items():
-      if type(value) == datetime.date:
-        value = value.isoformat()
-      elif type(value) == datetime.datetime:
-        if value.tzinfo is None:
-          value = value.isoformat()
-        else:
-          value = value.astimezone(pytz.timezone('UTC')).isoformat()
-          assert "+00:00" in value
-          value = value.replace("+00:00", "")
-      elif value == None:
-        pass
-      elif type(value) == str:
-        try:
-          value = value.decode("utf-8")
-        except:
-          raise self.EncodingError("Binary strings must be utf-8 encoded")
-      elif type(value) not in [int, bool, float, unicode, str]:
-        value = unicode(value)
-      jdata[key] = value
-    return jdata
-
   def get_var(self, key):
     "Retrieve one saved variable from the database."
     return self.execute("SELECT ? FROM `%s` WHERE `key` = ?", key, commit = False)
@@ -160,3 +123,63 @@ class Highwall:
   def drop(self, table_name, commit = True):
     self.__check_table_name(table_name)
     return self.execute('DROP IF EXISTS `%s`;' % table_name, commit = commit)
+
+
+class DataDump:
+  "A data dictionary converter"
+  def __init__(self, data):
+    self.data = data
+    self.checkdata()
+    self.jsonify()
+    self.convdata()
+    return self.data
+
+  class CouldNotJSONify(Exception):
+    pass
+
+  def jsonify(self):
+    for key, value in self.data.items():
+      if type(value)==set:
+        # Convert sets to dicts
+        self.data[key] = dict(zip( list(value), [None]*len(value) ))
+
+      if type(value) in (list, dict):
+        try:
+          value = dumps(value)
+        except TypeError:
+          raise CouldNotJSONify("The value for %s is a complex object that could not be dumped to JSON.")
+
+  def checkdata(self):
+    #Based on scraperlibs
+    for key self.data.keys():
+      if not key:
+        raise self.ColumnNameError('key must not be blank')
+      elif type(key) not in (unicode, str):
+        raise self.ColumnNameError('key must be string type')
+      elif not re.match("[a-zA-Z0-9_\- ]+$", key):
+        raise self.ColumnNameError('key must be simple text')
+
+  def convdata(self):
+    #Based on scraperlibs
+    jdata = {}
+    for key, value in self.data.items():
+      if type(value) == datetime.date:
+        value = value.isoformat()
+      elif type(value) == datetime.datetime:
+        if value.tzinfo is None:
+          value = value.isoformat()
+        else:
+          value = value.astimezone(pytz.timezone('UTC')).isoformat()
+          assert "+00:00" in value
+          value = value.replace("+00:00", "")
+      elif value == None:
+        pass
+      elif type(value) == str:
+        try:
+          value = value.decode("utf-8")
+        except:
+          raise self.EncodingError("Binary strings must be utf-8 encoded")
+      elif type(value) not in [int, bool, float, unicode, str]:
+        value = unicode(value)
+      jdata[key] = value
+    self.data = jdata
