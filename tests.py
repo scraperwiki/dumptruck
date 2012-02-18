@@ -1,7 +1,7 @@
 from unittest import TestCase, main
 from highwall import Highwall, Index
 import sqlite3
-import os
+import os, shutil
 
 class TestDb(TestCase):
   def setUp(self):
@@ -16,8 +16,9 @@ class TestDb(TestCase):
       try:
         os.remove(filename)
       except OSError as e:
-        if (2, 'No such file or directory')!=e:
-          raise
+        pass
+#       if (2, 'No such file or directory')!=e:
+#         raise
 
 class TestGetVar(TestDb):
   def setUp(self):
@@ -45,6 +46,15 @@ class TestSaveVar(TestDb):
     self.h = Highwall(dbname = 'fixtures/absa-highwallvars.sqlite',vars_table="swvariables")
 
 class TestSelect(TestDb):
+  def test_select(self):
+    shutil.copy('fixtures/landbank_branches.sqlite','.')
+    h = Highwall(dbname='landbank_branches.sqlite')
+    data_observed = h.execute("SELECT * FROM `branches` WHERE Fax is not null ORDER BY Fax LIMIT 3;")
+    data_expected = [{'town': u'\r\nCenturion', 'date_scraped': 1327791915.618461, 'Fax': u' (012) 312 3647', 'Tel': u' (012) 686 0500', 'address_raw': u'\r\n420 Witch Hazel Ave\n\r\nEcopark\n\r\nCenturion\n\r\n0001\n (012) 686 0500\n (012) 312 3647', 'blockId': 14, 'street-address': None, 'postcode': u'\r\n0001', 'address': u'\r\n420 Witch Hazel Ave\n\r\nEcopark\n\r\nCenturion\n\r\n0001', 'branchName': u'Head Office'}, {'town': u'\r\nCenturion', 'date_scraped': 1327792245.787187, 'Fax': u' (012) 312 3647', 'Tel': u' (012) 686 0500', 'address_raw': u'\r\n420 Witch Hazel Ave\n\r\nEcopark\n\r\nCenturion\n\r\n0001\n (012) 686 0500\n (012) 312 3647', 'blockId': 14, 'street-address': u'\r\n420 Witch Hazel Ave\n\r\nEcopark', 'postcode': u'\r\n0001', 'address': u'\r\n420 Witch Hazel Ave\n\r\nEcopark\n\r\nCenturion\n\r\n0001', 'branchName': u'Head Office'}, {'town': u'\r\nMiddelburg', 'date_scraped': 1327791915.618461, 'Fax': u' (013) 282 6558', 'Tel': u' (013) 283 3500', 'address_raw': u'\r\n184 Jan van Riebeeck Street\n\r\nMiddelburg\n\r\n1050\n (013) 283 3500\n (013) 282 6558', 'blockId': 17, 'street-address': None, 'postcode': u'\r\n1050', 'address': u'\r\n184 Jan van Riebeeck Street\n\r\nMiddelburg\n\r\n1050', 'branchName': u'Middelburg'}]
+    self.assertListEqual(data_observed, data_expected)
+    os.remove('landbank_branches.sqlite')
+
+class TestInsert(TestDb):
   def setUp(self):
     self.cleanUp()
     connection=sqlite3.connect('test.db')
