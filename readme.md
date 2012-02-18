@@ -38,32 +38,6 @@ Once the database contains data, you can retrieve it.
 
 The data come out as a list of dictionaries, with one dictionary per row.
 
-### Individual values
-It's often useful to be able to quickly and easily save one metadata value.
-For example, you can record which page the last run of a script managed to get up to.
-
-    h.save_var('last_page', 27)
-    27 == h.get_var('last_page')
-
-It's stored in a table that you can specify when initializing Highwall.
-If you don't specify one, it's stored in `_highwallvars`.
-
-If you want to save anything other than an int, float or string type,
-use json or pickle.
-
-### Helpers
-Highwall provides specialized wrappers for several commands,
-but here are some of the most common.
-
-`Highwall.show_tables` returns a set of all of the tables in the database.
-
-    h.show_tables()
-
-`Highwall.drop` drops a table.
-
-    h.drop("diesel-engineers")
-
-
 
 Slow start
 -------
@@ -112,6 +86,30 @@ sets and lists will automatically be dumped to JSON.
 It would be cool if I can come up with a way for `h.save` to return
 the [rowid](http://www.sqlite.org/lang_createtable.html#rowid)(s) of the
 row(s) that are being saved. Dunno how annoying this would be....
+
+### Individual values
+It's often useful to be able to quickly and easily save one metadata value.
+For example, you can record which page the last run of a script managed to get up to.
+
+    h.save_var('last_page', 27)
+    27 == h.get_var('last_page')
+
+It's stored in a table that you can specify when initializing Highwall.
+If you don't specify one, it's stored in `_highwallvars`.
+
+If you want to save anything other than an int, float or string type,
+use json or pickle.
+
+### Helpers
+Highwall provides specialized wrapper around some common commands.
+
+`Highwall.show_tables` returns a set of all of the tables in the database.
+
+    h.show_tables()
+
+`Highwall.drop` drops a table.
+
+    h.drop("diesel-engineers")
 
 ### Indices
 Highwall allows you to manage indices as if they were
