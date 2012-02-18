@@ -2,6 +2,7 @@ import json
 import sqlite3
 from copy import copy
 
+# Mappings between Python types and SQLite types
 SQLITE_TYPE_MAP={
   str: u"text",
   int: u"integer",
