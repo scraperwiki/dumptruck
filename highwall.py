@@ -4,11 +4,24 @@ import sqlite3
 class Index:
   COLNAME_TYPES = set([unicode, str, int])
 
-  class TableNameError(Exception):
+  class MineCollapse(Exception):
     pass
 
-  class DuplicateColumnError(Exception):
+  class TableNameError(self.MineCollapse):
     pass
+
+  class DuplicateColumnError(self.MineCollapse):
+    pass
+
+  class InvalidTableName(self.MineCollapse):
+    pass
+
+  class ColumnNameError(self.MineCollapse):
+    pass
+
+  class EncodingError(self.MineCollapse):
+    pass
+
 
   def __init__(self, columns, unique = False):
     self.unique = unique
@@ -37,9 +50,6 @@ class Highwall:
 
     # Make sure it's a good table name
     self.__check_table_name(vars_table)
-
-  class InvalidTableName(Exception):
-    pass
 
   @staticmethod
   def __check_table_name(table_name):
@@ -88,9 +98,6 @@ class Highwall:
   def save(self, data, table_name, commit = True):
     return self.execute("--;", commit = commit)
 
-  class ColumnNameError(Exception):
-    pass
-
   @staticmethod
   def __checkdata(scraper_data):
     #Based on scraperlibs
@@ -101,9 +108,6 @@ class Highwall:
         raise self.ColumnNameError('key must be string type')
       elif not re.match("[a-zA-Z0-9_\- ]+$", key):
         raise self.ColumnNameError('key must be simple text')
-
-  class EncodingError(Exception):
-    pass
 
   @staticmethod
   def __convdata(scraper_data):
