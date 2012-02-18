@@ -9,6 +9,12 @@ Quick start
 Highwall helps you relax by making relational databases
 feel more like document databases.
 
+### Install
+
+    # This doesn't actually work yet; this here so I don't forget
+    # to put it in once I put it on PyPI once it's ready.
+    pip install highwall
+
 ### Initialize
 
 Open the database connection by initializing the a Highwall object
