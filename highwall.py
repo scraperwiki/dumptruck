@@ -159,7 +159,7 @@ class Highwall:
         except ValueError:
           raise TypeError("Data could not be converted to match the existing `%s` column type.")
 
-  def save(self, data, table_name, commit = True):
+  def insert(self, data, table_name, commit = True):
 
     # Allow single rows to be dictionaries.
     if type(data)==dict:
@@ -215,7 +215,7 @@ class Highwall:
     #valuetype in ("json", "unicode", "str", &c)
     data = {"name":key, "value_blob":value, "type":valuetype}
 
-    return self.save(data, self.__vars_table, commit = commit)
+    return self.insert(data, self.__vars_table, commit = commit)
 
   def show_tables(self):
     result = self.execute("SELECT name FROM sqlite_master WHERE TYPE='table'", commit = False)

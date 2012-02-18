@@ -40,7 +40,7 @@ class TestSaveVar(TestDb):
     connection=sqlite3.connect('test.db')
     self.cursor=connection.cursor()
 
-  def test_save(self):
+  def test_insert(self):
     self.cursor.execute("SELECT * FROM `_highwallvars`")
     observed = self.cursor.fetchall()
     expected = [("birthday", "November 30, 1888", "text")]
@@ -78,7 +78,7 @@ class TestShowTables(TestDb):
 class SaveAndCheck(TestDb):
   def save_and_check(self, dataIn, table_name, dataOut):
     h = Highwall(dbname = 'test.db')
-    h.save(dataIn, table_name)
+    h.insert(dataIn, table_name)
     h.close()
 
     connection=sqlite3.connect('test.db')
