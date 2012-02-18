@@ -43,7 +43,9 @@ class TestSaveVar(TestDb):
 
 class TestSaveVar(TestDb):
   def test_save(self):
-    self.h = Highwall(dbname = 'fixtures/absa-highwallvars.sqlite',vars_table="swvariables")
+    shutil.copy('fixtures/absa-highwallvars.sqlite','.')
+    self.h = Highwall(dbname = 'absa-highwallvars.sqlite',vars_table="swvariables")
+    os.remove('absa-highwallvars.sqlite')
 
 class TestSelect(TestDb):
   def test_select(self):
@@ -53,6 +55,12 @@ class TestSelect(TestDb):
     data_expected = [{'town': u'\r\nCenturion', 'date_scraped': 1327791915.618461, 'Fax': u' (012) 312 3647', 'Tel': u' (012) 686 0500', 'address_raw': u'\r\n420 Witch Hazel Ave\n\r\nEcopark\n\r\nCenturion\n\r\n0001\n (012) 686 0500\n (012) 312 3647', 'blockId': 14, 'street-address': None, 'postcode': u'\r\n0001', 'address': u'\r\n420 Witch Hazel Ave\n\r\nEcopark\n\r\nCenturion\n\r\n0001', 'branchName': u'Head Office'}, {'town': u'\r\nCenturion', 'date_scraped': 1327792245.787187, 'Fax': u' (012) 312 3647', 'Tel': u' (012) 686 0500', 'address_raw': u'\r\n420 Witch Hazel Ave\n\r\nEcopark\n\r\nCenturion\n\r\n0001\n (012) 686 0500\n (012) 312 3647', 'blockId': 14, 'street-address': u'\r\n420 Witch Hazel Ave\n\r\nEcopark', 'postcode': u'\r\n0001', 'address': u'\r\n420 Witch Hazel Ave\n\r\nEcopark\n\r\nCenturion\n\r\n0001', 'branchName': u'Head Office'}, {'town': u'\r\nMiddelburg', 'date_scraped': 1327791915.618461, 'Fax': u' (013) 282 6558', 'Tel': u' (013) 283 3500', 'address_raw': u'\r\n184 Jan van Riebeeck Street\n\r\nMiddelburg\n\r\n1050\n (013) 283 3500\n (013) 282 6558', 'blockId': 17, 'street-address': None, 'postcode': u'\r\n1050', 'address': u'\r\n184 Jan van Riebeeck Street\n\r\nMiddelburg\n\r\n1050', 'branchName': u'Middelburg'}]
     self.assertListEqual(data_observed, data_expected)
     os.remove('landbank_branches.sqlite')
+
+class TestShowTables(TestDb):
+  def test_show_tables(self):
+    shutil.copy('fixtures/landbank_branches.sqlite','test.db')
+    h = Highwall(dbname = 'test.db')
+    self.assertSetEqual(h.show_tables(),set(['blocks','branches']))
 
 class TestInsert(TestDb):
   def setUp(self):

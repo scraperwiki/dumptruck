@@ -35,11 +35,6 @@ class Highwall:
     self.connection=sqlite3.connect(dbname)
     self.cursor=self.connection.cursor()
 
-    # Highwall variables table
-    self.__check_table_name(vars_table)
-    self.__vars_table = vars_table
-    self.__check_or_create_vars_table()
-
   class InvalidTableName(Exception):
     pass
 
@@ -96,9 +91,17 @@ class Highwall:
 
   def save_var(self, key, value, commit = True):
     "Save one variable to the database."
+
+    # Check whether Highwall's variables table exists
+    self.__check_table_name(vars_table)
+    self.__vars_table = vars_table
+    self.__check_or_create_vars_table()
+
+    # Prepare for save
     valuetype = "str" #This is a lie.
     #valuetype in ("json", "unicode", "str", &c)
     data = {"name":key, "value_blob":value, "type":valuetype}
+
     return self.save(data, self.__vars_table, commit = commit)
 
   def show_tables(self):
