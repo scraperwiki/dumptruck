@@ -5,7 +5,13 @@ import re
 import datetime
 
 # Mappings between Python types and SQLite types
-SQLITE_TYPE_MAP={
+SQLITE_PYTHON_TYPE_MAP={
+  u"text": unicode,
+  u"integer": int,
+  u"real": float,
+}
+PYTHON_SQLITE_TYPE_MAP={
+  unicode: u"text",
   str: u"text",
   int: u"integer",
   float: u"real",
@@ -67,6 +73,16 @@ class Highwall:
     else:
       self.__vars_table = vars_table
 
+  def __check_or_create_table(table_name):
+    if self.__vars_table in self.show_tables():
+      pass #Do something
+    else:
+      self.__check_table_name(self.__vars_table)
+      self.cursor.execute("""
+        CREATE TABLE `%s` (
+          ROWID INTEGER PRIMARY KEY,
+        );""" % self.__vars_table)
+
   def __check_or_create_vars_table(self):
     if self.__vars_table in self.show_tables():
       pass #Do something
@@ -79,13 +95,13 @@ class Highwall:
           type TEXT
         );""" % self.__vars_table)
 
-  def execute(self, sql, commit = True, *args, **kwargs):
+  def execute(self, sql, *args, **kwargs):
     """
     Run raw SQL on the database, and receive relaxing output.
     This is sort of the foundational method that most of the
     others build on.
     """
-    self.cursor.execute(sql, *args, **kwargs)
+    self.cursor.execute(sql, *args)
     colnames = [d[0] for d in self.cursor.description] 
     rows =self.cursor.fetchall()
 
@@ -104,6 +120,11 @@ class Highwall:
   def close(self):
     return self.connection.close()
 
+
+  def __add_column(self, table_name, column_name, column_type):
+    sql = 'ALTER TABLE `%s` ADD COLUMN ? ?' % table_name 
+    self.execute(sql, (column_name, column_type), commit = True)
+
   def __column_types(self, table_name):
     self.cursor.execute("PRAGMA table_info(`%s`)" % table_name)
     return {column[1]:column[2] for column in self.cursor.fetchall()}
@@ -112,7 +133,8 @@ class Highwall:
     column_types = self.__column_types(table_name)
     for key,value in conved_data_row.items():
       if key not in column_types:
-        raise NotImplementedError("Pretend this alters the table to add the column.")
+        #raise NotImplementedError("Pretend this alters the table to add the column.")
+        self.__add_column(table_name, key, PYTHON_SQLITE_TYPE_MAP[type(value)])
 
 
   def __cast_data_to_column_type(self, data):
@@ -136,6 +158,8 @@ class Highwall:
       set([ type(e) for e in data])==set([dict])
     except TypeError:
       raise TypeError('The data argument must be a dict or an iterable of dicts.')
+
+    self.__check_and_create_table(table_name)
 
     conved_data = [DataDump(row).dump() for row in data]
     for row in conved_data:
