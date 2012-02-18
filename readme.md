@@ -22,7 +22,7 @@ Open the database connection by initializing the a Highwall object
     h = Highwall()
 
 ### Save
-The simplest `save` call looks like this.
+The simplest `insert` call looks like this.
 
     h.insert({"firstname":"Thomas","lastname":"Levine"},"diesel-engineers")
 
@@ -62,7 +62,7 @@ if it is set to `False`, changes must be committed with the `commit` method
 or with the `commit` keywoard argument.
 
 ### Saving
-As discussed earlier, the simplest `save` call looks like this.
+As discussed earlier, the simplest `insert` call looks like this.
 
     h.insert({"firstname":"Thomas","lastname":"Levine"})
 
@@ -83,7 +83,7 @@ sets and lists will automatically be dumped to JSON.
     ]
     h.insert(data)
 
-It would be cool if I can come up with a way for `h.save` to return
+It would be cool if I can come up with a way for `h.insert` to return
 the [rowid](http://www.sqlite.org/lang_createtable.html#rowid)(s) of the
 row(s) that are being saved. Dunno how annoying this would be....
 
@@ -154,7 +154,7 @@ Indices on one table act like a set, so this is how you drop an index:
     h.indices['models'].remove(Index('modelnumber'))
 
 ### Delaying commits
-By default, the `save`, `get_var`, `drop` and `execute` methods automatically commit changes.
+By default, the `insert`, `get_var`, `drop` and `execute` methods automatically commit changes.
 You can stop one of them from committing by passing `commit=False` to the method.
 Commit manually with the `commit` method.  For example:
 
