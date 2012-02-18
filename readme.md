@@ -21,7 +21,7 @@ Open the database connection by initializing the a Highwall object
 
     h = Highwall()
 
-### Saving
+### Save
 The simplest `save` call looks like this.
 
     h.insert({"firstname":"Thomas","lastname":"Levine"},"diesel-engineers")
@@ -31,7 +31,7 @@ This saves a new row with "Thomas" in the "firstname" column and
 inside the database "highwall.db". It creates or alters the table
 if it needs to.
 
-### Retrieving
+### Retrieve
 Once the database contains data, you can retrieve it.
 
     data=h.execute('SELECT * FROM `diesel-engineers`')
