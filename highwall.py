@@ -12,24 +12,8 @@ SQLITE_TYPE_MAP={
 class Index:
   COLNAME_TYPES = set([unicode, str, int])
 
-  class MineCollapse(Exception):
+  class DuplicateColumnError(Exception):
     pass
-
-  class TableNameError(self.MineCollapse):
-    pass
-
-  class DuplicateColumnError(self.MineCollapse):
-    pass
-
-  class InvalidTableName(self.MineCollapse):
-    pass
-
-  class ColumnNameError(self.MineCollapse):
-    pass
-
-  class EncodingError(self.MineCollapse):
-    pass
-
 
   def __init__(self, columns, unique = False):
     self.unique = unique
@@ -46,6 +30,21 @@ class Index:
 
 class Highwall:
   "A relaxing interface to SQLite"
+
+  class MineCollapse(Exception):
+    pass
+
+  class TableNameError(self.MineCollapse):
+    pass
+
+  class InvalidTableName(self.MineCollapse):
+    pass
+
+  class ColumnNameError(self.MineCollapse):
+    pass
+
+  class EncodingError(self.MineCollapse):
+    pass
 
   def __init__(self, dbname = "highwall.db", vars_table = "_highwallvars", auto_commit = True):
     pass
