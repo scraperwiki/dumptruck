@@ -1,6 +1,8 @@
 import json
 import sqlite3
 from copy import copy
+import re
+import datetime
 
 # Mappings between Python types and SQLite types
 SQLITE_TYPE_MAP={
@@ -38,9 +40,6 @@ class Highwall:
   class TableNameError(MineCollapse):
     pass
 
-  class InvalidTableName(MineCollapse):
-    pass
-
   class ColumnNameError(MineCollapse):
     pass
 
@@ -50,22 +49,23 @@ class Highwall:
   def __init__(self, dbname = "highwall.db", vars_table = "_highwallvars", auto_commit = True):
     pass
     # Should database changes be committed automatically after each command?
-    self.auto_commit = auto_commit
+    if type(auto_commit) != bool:
+      raise TypeError("auto_commit must be True or False.")
+    else:
+      self.auto_commit = auto_commit
 
     # Database connection
-    self.connection=sqlite3.connect(dbname)
-    self.cursor=self.connection.cursor()
+    if type(dbname) not in [unicode, str]:
+      raise TypeError("dbname must be a string")
+    else:
+      self.connection=sqlite3.connect(dbname)
+      self.cursor=self.connection.cursor()
 
     # Make sure it's a good table name
-    self.__check_table_name(vars_table)
-    self.__vars_table = vars_table
-
-  @staticmethod
-  def __check_table_name(table_name):
-    "Check that the table name has no quote character. Raise an error if it does."
-    if "`" in table_name:
-      #Raise an error? Remove it?
-      raise self.InvalidTableName
+    if type(vars_table) not in [unicode, str]:
+      raise TypeError("auto_commit must be a string")
+    else:
+      self.__vars_table = vars_table
 
   def __check_or_create_vars_table(self):
     if self.__vars_table in self.show_tables():
@@ -108,9 +108,9 @@ class Highwall:
     self.cursor.execute("PRAGMA table_info(`%s`)" % table_name)
     return {column[1]:column[2] for column in self.cursor.fetchall()}
 
-  def __check_and_add_columns(self, table_name, conved_data):
+  def __check_and_add_columns(self, table_name, conved_data_row):
     column_types = self.__column_types(table_name)
-    for key,value in conved_data.items():
+    for key,value in conved_data_row.items():
       if key not in column_types:
         raise NotImplementedError("Pretend this alters the table to add the column.")
 
@@ -133,13 +133,13 @@ class Highwall:
     # http://stackoverflow.com/questions/1952464/
     # in-python-how-do-i-determine-if-a-variable-is-iterable
     try:
-      set([ type(e) for e in my_object])==set([dict])
+      set([ type(e) for e in data])==set([dict])
     except TypeError:
       raise TypeError('The data argument must be a dict or an iterable of dicts.')
 
     conved_data = [DataDump(row).dump() for row in data]
-
-    self.__check_and_add_columns(conved_data)
+    for row in conved_data:
+      self.__check_and_add_columns(table_name, row)
     
     # .keys() and .items() are in the same order
     # http://www.python.org/dev/peps/pep-3106/
@@ -151,7 +151,9 @@ class Highwall:
 
   def get_var(self, key):
     "Retrieve one saved variable from the database."
-    return self.execute("SELECT ? FROM `%s` WHERE `key` = ?" % self.__vars_table, key, commit = False)
+    row = self.execute("SELECT ? FROM `%s` WHERE `key` = ?" % self.__vars_table, key, commit = False)[0]
+    # return SQLITE_PYTHON_TYPE_MAP[row['type']](row['value_blob'])
+    return row['value_blob']
 
   def save_var(self, key, value, commit = True):
     "Save one variable to the database."

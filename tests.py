@@ -62,27 +62,19 @@ class TestShowTables(TestDb):
     h = Highwall(dbname = 'test.db')
     self.assertSetEqual(h.show_tables(),set(['blocks','branches']))
 
-class TestInsert(TestDb):
-  def setUp(self):
-    self.cleanUp()
+class TestSave(TestDb):
+  def test_save(self):
+    h = Highwall(dbname = 'test.db')
+    h.save({"firstname":"Thomas","lastname":"Levine"},"diesel-engineers")
+    h.close()
+
     connection=sqlite3.connect('test.db')
     cursor=connection.cursor()
-    cursor.execute(open('fixtures/testinsert.sql').read())
-    connection.commit()
+    cursor.execute("SELECT * FROM `diesel-engineers`")
+    observed = cursor.fetchall()
     connection.close()
-    self.h = Highwall(dbname='test.db')
 
-  def test_count(self):
-    data = self.h.execute('SELECT * FROM `bar`')
-    self.assertEqual(len(data),12)
-
-  def test_data(self):
-    h = Highwall(dbname='test.db')
-    data_observed = self.h.execute('SELECT * FROM `bar`')
-    f = open('fixtures/testinsert.json')
-    data_expected = loads(f.read())
-    f.close()
-    self.assertListEqual(data_observed,data_expected)
+    expected = 
 
 class TestInvalidHighwallParams(TestDb):
   "Invalid parameters should raise appropriate errors."
@@ -95,14 +87,14 @@ class TestInvalidHighwallParams(TestDb):
     for value in (None,3,True,False,set([3]),[]):
       self.assertRaises(TypeError, Highwall, dbname = value)
 
-  def test_vars_table_str(self):
-    "http://stackoverflow.com/questions/3694276/what-are-valid-table-names-in-sqlite"
-    str_values = (
-      'abc123', '123abc','abc_123',
-      '_123abc','abc-abc','abc.abc',
-    )
-    for value in str_values:
-      self.assertRaises(Highwall.TableNameError, Highwall, vars_table = value)
+# def test_vars_table_str(self):
+#   "http://stackoverflow.com/questions/3694276/what-are-valid-table-names-in-sqlite"
+#   str_values = (
+#     'abc123', '123abc','abc_123',
+#     '_123abc','abc-abc','abc.abc',
+#   )
+#   for value in str_values:
+#     self.assertRaises(Highwall.TableNameError, Highwall, vars_table = value)
 
   def test_vars_table_nonstr(self):
     nonstr_values = (
@@ -127,10 +119,6 @@ class TestParamsDefaults(TestDb):
     self.assertTrue(os.path.isfile('highwall.db'))
     self.assertEqual(h.auto_commit, True)
     self.assertEqual(h.__vars_table, "_highwallvars")
-
-class TestSave(TestDb):
-  def test_foo_bar(self):
-    pass
 
 if __name__ == '__main__':
   main()
