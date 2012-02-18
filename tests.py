@@ -65,7 +65,7 @@ class TestShowTables(TestDb):
 class TestSave(TestDb):
   def test_save(self):
     h = Highwall(dbname = 'test.db')
-    h.save({"firstname":"Thomas","lastname":"Levine"},"diesel-engineers")
+    h.save({"firstname":"Robert","lastname":"LeTourneau"},"diesel-engineers")
     h.close()
 
     connection=sqlite3.connect('test.db')
@@ -74,7 +74,8 @@ class TestSave(TestDb):
     observed = cursor.fetchall()
     connection.close()
 
-    expected = 
+    expected = [(1, u'LeTourneau', u'Robert')]
+    self.assertListEqual(observed, expected)
 
 class TestInvalidHighwallParams(TestDb):
   "Invalid parameters should raise appropriate errors."

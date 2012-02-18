@@ -103,15 +103,15 @@ class Highwall:
     others build on.
     """
     self.cursor.execute(sql, *args)
-    colnames = [d[0] for d in self.cursor.description] 
     rows =self.cursor.fetchall()
 
     if 'commit' in kwargs and kwargs['commit']:
       self.commit()
 
-    if rows==None:
+    if None == self.cursor.description:
       return None
     else:
+      colnames = [d[0] for d in self.cursor.description] 
       return [dict(zip(colnames,row)) for row in rows]
 
   def commit(self):
@@ -123,8 +123,8 @@ class Highwall:
 
 
   def __add_column(self, table_name, column_name, column_type):
-    sql = 'ALTER TABLE `%s` ADD ? ?' % table_name 
-    self.execute(sql, [column_name, column_type], commit = True)
+    sql = 'ALTER TABLE `%s` ADD COLUMN %s %s ' % (table_name, column_name, column_type)
+    self.execute(sql, commit = True)
 
   def __column_types(self, table_name):
     self.cursor.execute("PRAGMA table_info(`%s`)" % table_name)
@@ -172,13 +172,13 @@ class Highwall:
     # http://www.python.org/dev/peps/pep-3106/
     for row in conved_data:
       question_marks = ','.join('?'*len(row.keys()))
-      sql = "INSERT INTO `%s`(%s) VALUES (%s);" % (table_name, question_marks, question_marks)
-      self.execute(sql, (row.keys(), row.values()) ,commit=False)
+      sql = "INSERT INTO `%s` (%s) VALUES (%s);" % (table_name, ','.join(row.keys()), question_marks)
+      self.execute(sql, row.values(), commit=False)
     self.commit()
 
   def get_var(self, key):
     "Retrieve one saved variable from the database."
-    row = self.execute("SELECT ? FROM `%s` WHERE `key` = ?" % self.__vars_table, key, commit = False)[0]
+    row = self.execute("SELECT `value_blob` FROM `%s` WHERE `key` = ?" % self.__vars_table, key, commit = False)[0]
     # return SQLITE_PYTHON_TYPE_MAP[row['type']](row['value_blob'])
     return row['value_blob']
 
