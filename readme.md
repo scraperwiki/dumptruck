@@ -32,6 +32,19 @@ Once the database contains data, you can retrieve it.
 
 The data come out as a list of dictionaries, with one dictionary per row.
 
+### Individual values
+It's often useful to be able to quickly and easily save one metadata value.
+For example, to record which page the last run of a script managed to get up to. 
+
+    h.save_var('last_page', 27)
+    27 == h.get_var('last_page')
+
+It's stored in a table that you can specify when initializing Highwall.
+If you don't specify one, it's stored in `_highwallvars`.
+
+If you want to save anything other than an int, float or string type,
+use json or pickle.
+
 Slow start
 -------
 ### Initialize
