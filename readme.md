@@ -126,13 +126,11 @@ if it is set to `False`, changes must be committed with the `commit` method
 or with the `commit` keywoard argument.
 
 ### Summary of methods
-Once you've initialized a Highwall object, you can use eight functions.
 
-These two are the coolest.
+Basic functions, around which the others are based.
 
 * `save`: Save to the database in a relaxing manner.
-* `execute`: Run raw SQL commands. If you run a `SELECT`,
-its results are returned in a relaxing data structure.
+* `execute`: Run raw SQL commands. Results are returned in a relaxing data structure.
 
 These two make it easy to save individual variables.
 
@@ -147,15 +145,6 @@ These two are wrappers for common SQL commands.
 This one lets you commit any changes that you previously delayed.
 
 * `commit`: Manually commit changes to the database.
-
-### Methods, in detail
-#### save
-#### exec
-#### get_var
-#### save_var
-#### show_tables
-#### drop
-#### commit
 
 ### Standard options to the methods
 By default, the `save`, `get_var`, `drop` and `execute`
