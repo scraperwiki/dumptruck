@@ -28,22 +28,23 @@ class Index:
       else:
         self.__columns = str_columns
 
+
+class MineCollapse(Exception):
+  pass
+
 class Highwall:
   "A relaxing interface to SQLite"
 
-  class MineCollapse(Exception):
+  class TableNameError(MineCollapse):
     pass
 
-  class TableNameError(self.MineCollapse):
+  class InvalidTableName(MineCollapse):
     pass
 
-  class InvalidTableName(self.MineCollapse):
+  class ColumnNameError(MineCollapse):
     pass
 
-  class ColumnNameError(self.MineCollapse):
-    pass
-
-  class EncodingError(self.MineCollapse):
+  class EncodingError(MineCollapse):
     pass
 
   def __init__(self, dbname = "highwall.db", vars_table = "_highwallvars", auto_commit = True):
@@ -202,7 +203,7 @@ class DataDump:
 
   def checkdata(self):
     #Based on scraperlibs
-    for key self.data.keys():
+    for key in self.data.keys():
       if not key:
         raise self.ColumnNameError('key must not be blank')
       elif type(key) not in (unicode, str):
