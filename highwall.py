@@ -230,7 +230,7 @@ class DataDump:
           value = value.decode("utf-8")
         except:
           raise self.EncodingError("Binary strings must be utf-8 encoded")
-      elif type(value) not in [int, bool, float, unicode, str]:
+      elif type(value) not in (int, bool, float, unicode, str):
         value = unicode(value)
       jdata[key] = value
     self.data = jdata
