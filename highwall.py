@@ -35,6 +35,9 @@ class Highwall:
     self.connection=sqlite3.connect(dbname)
     self.cursor=self.connection.cursor()
 
+    # Make sure it's a good table name
+    self.__check_table_name(vars_table)
+
   class InvalidTableName(Exception):
     pass
 
@@ -93,7 +96,6 @@ class Highwall:
     "Save one variable to the database."
 
     # Check whether Highwall's variables table exists
-    self.__check_table_name(vars_table)
     self.__vars_table = vars_table
     self.__check_or_create_vars_table()
 
