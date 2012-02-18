@@ -88,6 +88,49 @@ class Highwall:
   def save(self, data, table_name, commit = True):
     return self.execute("--;", commit = commit)
 
+  class ColumnNameError(Exception):
+    pass
+
+  @staticmethod
+  def __checkdata(scraper_data):
+    #Based on scraperlibs
+    for key scraper_data.keys():
+      if not key:
+        raise self.ColumnNameError('key must not be blank')
+      elif type(key) not in (unicode, str):
+        raise self.ColumnNameError('key must be string type')
+      elif not re.match("[a-zA-Z0-9_\- ]+$", key):
+        raise self.ColumnNameError('key must be simple text')
+
+  class EncodingError(Exception):
+    pass
+
+  @staticmethod
+  def __convdata(scraper_data):
+    #Based on scraperlibs
+    jdata = {}
+    for key, value in scraper_data.items():
+      if type(value) == datetime.date:
+        value = value.isoformat()
+      elif type(value) == datetime.datetime:
+        if value.tzinfo is None:
+          value = value.isoformat()
+        else:
+          value = value.astimezone(pytz.timezone('UTC')).isoformat()
+          assert "+00:00" in value
+          value = value.replace("+00:00", "")
+      elif value == None:
+        pass
+      elif type(value) == str:
+        try:
+          value = value.decode("utf-8")
+        except:
+          raise self.EncodingError("Binary strings must be utf-8 encoded")
+      elif type(value) not in [int, bool, float, unicode, str]:
+        value = unicode(value)
+      jdata[key] = value
+    return jdata
+
   def get_var(self, key):
     "Retrieve one saved variable from the database."
     return self.execute("SELECT ? FROM `%s` WHERE `key` = ?", key, commit = False)
@@ -113,3 +156,43 @@ class Highwall:
   def drop(self, table_name, commit = True):
     self.__check_table_name(table_name)
     return self.execute('DROP IF EXISTS `%s`;' % table_name, commit = commit)
+
+
+
+
+def save(unique_keys, data, table_name="swdata", verbose=2, date=None):
+    if unique_keys != None and type(unique_keys) not in [ list, tuple ]:
+        raise databaseexception({ "error":'unique_keys must a list or tuple', "unique_keys_type":str(type(unique_keys)) })
+
+            
+
+    if type(data) == dict:
+        rjdata = convdata(unique_keys, data)
+        if rjdata.get("error"):
+            raise databaseexception(rjdata)
+        if date:
+            rjdata["date"] = date
+    else:
+        rjdata = [ ]
+        for ldata in data:
+            ljdata = convdata(unique_keys, ldata)
+            if ljdata.get("error"):
+                raise databaseexception(ljdata)
+            rjdata.append(ljdata)
+    result = scraperwiki.datastore.request({"maincommand":'save_sqlite', "unique_keys":unique_keys, "data":rjdata, "swdatatblname":table_name})
+
+    if "error" in result:
+        raise databaseexception(result)
+
+    if verbose >= 2:
+        pdata = {}
+        if type(data) == dict:
+            for key, value in data.items():
+                pdata[strencode_trunc(key, 50)] = strencode_trunc(value, 50)
+        elif data:
+            for key, value in data[0].items():
+                pdata[strencode_trunc(key, 50)] = strencode_trunc(value, 50)
+            pdata["number_records"] = "Number Records: %d" % len(data)
+        scraperwiki.dumpMessage({'message_type':'data', 'content': pdata})
+    return result
+
