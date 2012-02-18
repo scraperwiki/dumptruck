@@ -104,7 +104,7 @@ class Highwall:
           value_blob BLOB,
           type TEXT
         );""" % self.__vars_table)
-      self.cursor.commit()
+      self.connection.commit()
 
   def execute(self, sql, *args, **kwargs):
     """
@@ -211,7 +211,7 @@ class Highwall:
     self.__check_or_create_vars_table()
 
     # Prepare for save
-    valuetype = "str" #This is a lie.
+    valuetype = PYTHON_SQLITE_TYPE_MAP[type(value)]
     #valuetype in ("json", "unicode", "str", &c)
     data = {"name":key, "value_blob":value, "type":valuetype}
 

@@ -33,9 +33,16 @@ class TestGetVar(TestDb):
 
 class TestSaveVar(TestDb):
   def test_save(self):
-    shutil.copy('fixtures/absa-highwallvars.sqlite','.')
-    self.h = Highwall(dbname = 'absa-highwallvars.sqlite',vars_table="swvariables")
-    os.remove('absa-highwallvars.sqlite')
+    h = Highwall(dbname = 'test.db')
+    h.save_var("birthday","November 30, 1888")
+    h.close()
+
+    connection=sqlite3.connect('test.db')
+    cursor=connection.cursor()
+    cursor.execute("SELECT * FROM `_highwallvars`")
+    observed = cursor.fetchall()
+    expected = [("birthday", "November 30, 1888", "text")]
+    self.assertEqual(observed, expected)
 
 class TestSelect(TestDb):
   def test_select(self):
