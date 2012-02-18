@@ -2,6 +2,12 @@ import json
 import sqlite3
 from copy import copy
 
+SQLITE_TYPE_MAP={
+  str: u"text",
+  int: u"integer",
+  float: u"real",
+}
+
 class Index:
   COLNAME_TYPES = set([unicode, str, int])
 
@@ -96,6 +102,26 @@ class Highwall:
   def close(self):
     return self.connection.close()
 
+  def __column_types(self, table_name):
+    self.cursor.execute("PRAGMA table_info(`%s`)" % table_name)
+    return {column[1]:column[2] for column in self.cursor.fetchall()}
+
+  def __check_and_add_columns(self, table_name, conved_data):
+    column_types = self.__column_types(table_name)
+    for key,value in conved_data.items():
+      if key not in column_types:
+        raise NotImplementedError("Pretend this alters the table to add the column.")
+
+
+  def __cast_data_to_column_type(self, data):
+    column_types = self.__column_types(table_name)
+    for key,value in data.items():
+      if SQLITE_TYPE_MAP[type(key)] != column_types[key]:
+        try:
+          data[key] = type(key)(value)
+        except ValueError:
+          raise TypeError("Data could not be converted to match the existing `%s` column type.")
+
   def save(self, data, table_name, commit = True):
 
     # Allow single rows to be dictionaries.
@@ -110,6 +136,8 @@ class Highwall:
       raise TypeError('The data argument must be a dict or an iterable of dicts.')
 
     conved_data = [DataDump(row).dump() for row in data]
+
+    self.__check_and_add_columns(conved_data)
     
     # .keys() and .items() are in the same order
     # http://www.python.org/dev/peps/pep-3106/
