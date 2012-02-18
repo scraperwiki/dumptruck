@@ -1,5 +1,6 @@
 import json
 import sqlite3
+from copy import copy
 
 class Index:
   COLNAME_TYPES = set([unicode, str, int])
@@ -96,7 +97,27 @@ class Highwall:
     return self.connection.close()
 
   def save(self, data, table_name, commit = True):
-    return self.execute("--;", commit = commit)
+
+    # Allow single rows to be dictionaries.
+    if type(data)==dict:
+      data = [data]
+
+    # http://stackoverflow.com/questions/1952464/
+    # in-python-how-do-i-determine-if-a-variable-is-iterable
+    try:
+      set([ type(e) for e in my_object])==set([dict])
+    except TypeError:
+      raise TypeError('The data argument must be a dict or an iterable of dicts.')
+
+    conved_data = [DataDump(row).dump() for row in data]
+    
+    # .keys() and .items() are in the same order
+    # http://www.python.org/dev/peps/pep-3106/
+    for row in conved_data:
+      question_marks = ','.join('?'*len(row.keys()))
+      sql = "INSERT INTO `%s`(%s) VALUES (%s);" % (table_name, question_marks, question_marks)
+      self.execute(sql, (row.keys(), row.values()) ,commit=False)
+    self.commit()
 
   def get_var(self, key):
     "Retrieve one saved variable from the database."
@@ -124,11 +145,13 @@ class Highwall:
     self.__check_table_name(table_name)
     return self.execute('DROP IF EXISTS `%s`;' % table_name, commit = commit)
 
-
 class DataDump:
   "A data dictionary converter"
   def __init__(self, data):
-    self.data = data
+    self.raw = data
+
+  def dump(self):
+    self.data = copy(self.raw)
     self.checkdata()
     self.jsonify()
     self.convdata()
