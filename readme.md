@@ -112,46 +112,76 @@ Highwall provides specialized wrapper around some common commands.
     h.drop("diesel-engineers")
 
 ### Indices
-Highwall allows you to manage indices as if they were
-normal Python objects
 
-#### Creating
+#### Index objects
+Highwall allows you to manage indices as if they were
+normal Python objects.
+
 First, create an index object, specifying the columns.
 
     i1=Index('modelNumber')
 
-Then add it to the set of indices for the table.
+You can specify multiple single-column indices by passing a list of column names.
 
-    h.indices['models'].add(i1)
+    h.index_list['machines']=Index(['modelNumber','serialNumber'])
+
+#### Managing indices
+There are two methods for managing indices,
+`Highwall.index_list` and `Highwall.index_info`.
+
+`Highwall.index_list` lets you access indices by table.
+It acts like a dictionary. Here's how you specify an index.
+
+    i=Index('modelNumber')
+    h.index_list['machines']['machines_modelNumber'] = i
+
+This adds an index on the `modelNumber` column to the `machines` table.
+In SQLite, all indices have names; in this case, the index is named `machines_modelNumber`.
 
 If you want a unique index, do this.
 
     i2=Index('year',unique=True)
-    h.indices['models'].add(i2)
+    h.index_list['models']['model_year'] = i2
 
 If you specify a column that already contains non-distinct values, you will receive an error.
 
-You can specify multiple single-column indices by passing a list of column names.
+We can retrieve a dictionary of all indices for the `machines` table like so.
 
-    h.indices['machines']=Index(['modelNumber','serialNumber'])
+    print(h.index_list['machines'])
 
-#### Retrieving
-You can display the indices for a database like so.
+And we can retrieve a dictionary of indices by table for the whole database like so.
 
-    print(h.indices)
+    print(h.index_list)
 
-You can retrieve them as a dictionary and save them somewhere else.
+We can retrieve them as a dictionary and save them somewhere else.
 
-    d=h.indices
+    d=h.index_list
 
-In particular, you might want to copy indices from one table to another.
+We can delete an the index like we delete a normal dictionary value.
 
-    s=h.indices['models']
-    h.indices['models-test']=s
+    del(h.index_list['machines']['machines_modelNumber'] )
 
-Indices on one table act like a set, so this is how you drop an index:
+We can delete all indices on a particular table.
 
-    h.indices['models'].remove(Index('modelnumber'))
+    del(h.index_list['machines'])
+
+`Highwall.index_info` acts like `Highwall.index_list`
+except that indices are not organized by table.
+You can use it to retrieve indices by name without specifying the table name.
+
+    print(h.index_info['machines_modelNumber'])
+
+This returns a dictionary containing a `table_name` and an `index`.
+
+You can set indices by assigning a tuple or a dict to Highwall.index_info.
+Either way, it should have two elements; a tuple should have an Index
+object followed by a table name, and a dict should have an `index` key
+and a `table_name` key. For example, here are three equivalent index assignments.
+
+    i2=Index('year',unique=True)
+    h.index_list['models']['model_year'] = i2
+    h.index_info['model_year'] = (i2, 'models')
+    h.index_info['model_year'] = {'index':i2, 'table_name':'models')
 
 ### Delaying commits
 By default, the `insert`, `get_var`, `drop` and `execute` methods automatically commit changes.
@@ -162,3 +192,7 @@ Commit manually with the `commit` method.  For example:
     h.insert({"name":"Bagger 293","manufacturer":"TAKRAF","height":95}, commit=False)
     h.save_var('page_number', 42, commit=False)
     h.commit()
+
+When you use `Highwall.index_info` or `Highwall.index_list`,
+your changes are automatically committed. If you need to delay the commits,
+you can use the underlying getter method, passing a `commit = True` keyword argument.
