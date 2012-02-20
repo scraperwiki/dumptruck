@@ -32,7 +32,7 @@ inside the database "highwall.db". It creates or alters the table
 if it needs to.
 
 ### Retrieve
-Once the database contains data, you can retrieve it.
+Once the database contains data, you can retrieve them.
 
     data=h.execute('SELECT * FROM `diesel-engineers`')
 
