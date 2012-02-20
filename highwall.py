@@ -25,22 +25,27 @@ PYTHON_SQLITE_TYPE_MAP={
 }
 
 class IndexList:
+  'Like running `PRAGMA index_list(?);`'
   def __init__(self,highwall_object):
     self.h = highwall_object
 
   def __getitem__(self, table_name):
     "Retrive the indices for a table."
-    indices = self.h.execute("PRAGMA index_list(`%s`)" % table_name, commit = False)
-    return IndexInfo(self.h, indices)
+    return IndexInfo(self.h, table_name)
+
+  def __setitem__(self, index_info):
+    "I don't think this will ever be implemented."
+    print "This should not run."
 
 class IndexInfo:
+  'Like running `PRAGMA index_info(?);`'
 
   class IndexNameError(Exception):
     pass
 
-  def __init__(self,highwall_object, table_indices):
+  def __init__(self,highwall_object, table_name):
     self.h = highwall_object
-    self.table_indices = table_indices
+    self.table_indices = self.h.execute("PRAGMA index_list(`%s`)" % table_name, commit = False)
 
   def __getitem__(self, index_name):
     "Retrive an index."
@@ -59,13 +64,20 @@ class IndexInfo:
 
     return Index([col['name'] for col in index], unique = unique)
 
+  def __setitem__(self, index_name, index):
+    sql = "CREATE %s INDEX IF NOT EXISTS ? ON `%s` (%s)"
+    indexed_columns = ','.join(index.columns)
+    self.h.execute(sql % (unique, table_name, indexed_columns), index_name)
+
 class Index:
-  COLNAME_TYPES = set([unicode, str, int])
+  "An index absent of a table"
+
+  COLNAME_TYPES = set([unicode, str, int, IndexedColumn])
 
   class DuplicateColumnError(Exception):
     pass
 
-  def __init__(self, columns, unique = False, collate = None, sort = None):
+  def __init__(self, columns, unique = False):
     self.unique = unique
 
     # Set columns
@@ -79,6 +91,13 @@ class Index:
         raise self.DuplicateColumnError
       else:
         self.columns = str_columns
+
+class IndexedColumn:
+  "This is how you do COLLATE or ASC."
+  def __init__(self, collate = None, sort = None):
+    self.collate = collate
+    self.sort = sort
+    raise NotImplementedError("IndexedColumn doesn't work yet.")
 
 class MineCollapse(Exception):
   pass
