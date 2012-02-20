@@ -1,0 +1,28 @@
+
+In [5]: h.execute("PRAGMA table_info(swvariables)",commit = False)
+Out[5]: 
+[{'cid': 0,
+  'dflt_value': None,
+  'name': u'value_blob',
+  'notnull': 0,
+  'pk': 0,
+  'type': u'blob'},
+ {'cid': 1,
+  'dflt_value': None,
+  'name': u'type',
+  'notnull': 0,
+  'pk': 0,
+  'type': u'text'},
+ {'cid': 2,
+  'dflt_value': None,
+  'name': u'name',
+  'notnull': 0,
+  'pk': 0,
+  'type': u'text'}]
+
+In [6]: h.execute("PRAGMA index_list(swvariables)",commit = False)
+Out[6]: [{'name': u'swvariables_index0', 'seq': 0, 'unique': 1}]
+
+In [7]: h.execute("PRAGMA index_info(swvariables_index0)",commit = False)
+Out[7]: [{'cid': 2, 'name': u'name', 'seqno': 0}]
+
