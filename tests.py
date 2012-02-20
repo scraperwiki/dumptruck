@@ -58,7 +58,21 @@ class TestSaveVar(TestDb):
     """
     self.cursor.execute("PRAGMA index_list(_highwallvars)")
     indices = self.cursor.fetchall()
-    self.assertNotEqual(indices,[])
+#   self.assertNotEqual(indices,[])
+
+class TestIndex(TestDb):
+  def test_no_index(self):
+    h = Highwall(dbname = "test.db")
+    self.assertListEqual([],h.index_list('not-a-table'))
+    h.close()
+
+class TestIndex(TestDb):
+  def test_add_index(self):
+    h = Highwall(dbname = "test.db")
+    h.execute("CREATE TABLE `yes-a-table` ( column1 text, column2 blob);")
+    h.index_list['yes-a-table']['an-index'] = Index(['column1', 'column2'])
+    self.assertIsNone(h.index_list['not-a-table'].table_indices)
+    h.close()
 
 class TestSelect(TestDb):
   def test_select(self):

@@ -45,6 +45,7 @@ class IndexInfo:
 
   def __init__(self,highwall_object, table_name):
     self.h = highwall_object
+    self.table_name = table_name
     self.table_indices = self.h.execute("PRAGMA index_list(`%s`)" % table_name, commit = False)
 
   def __getitem__(self, index_name):
@@ -65,14 +66,17 @@ class IndexInfo:
     return Index([col['name'] for col in index], unique = unique)
 
   def __setitem__(self, index_name, index):
-    sql = "CREATE %s INDEX IF NOT EXISTS ? ON `%s` (%s)"
+    # This is currently a bit vulnerable to injection.
+    sql = "CREATE %s INDEX IF NOT EXISTS `%s` ON `%s` (%s)"
     indexed_columns = ','.join(index.columns)
-    self.h.execute(sql % (unique, table_name, indexed_columns), index_name)
+    str_unique = 'UNIQUE' if index.unique else ''
+    self.h.execute(sql % (str_unique, index_name, self.table_name, indexed_columns))
 
 class Index:
   "An index absent of a table"
 
-  COLNAME_TYPES = set([unicode, str, int, IndexedColumn])
+  #COLNAME_TYPES = set([unicode, str, int, IndexedColumn])
+  COLNAME_TYPES = set([unicode, str, int])
 
   class DuplicateColumnError(Exception):
     pass
@@ -84,7 +88,7 @@ class Index:
     if type(columns) in self.COLNAME_TYPES:
       # One column
       self.columns = [str(columns)]
-    elif set(map(type, columns)).issubset(self.COLNAME_Types):
+    elif set(map(type, columns)).issubset(self.COLNAME_TYPES):
       # Multiple columns
       str_columns = map(str, columns)
       if len(set(str_columns)) != len(columns):
@@ -94,6 +98,7 @@ class Index:
 
 class IndexedColumn:
   "This is how you do COLLATE or ASC."
+
   def __init__(self, collate = None, sort = None):
     self.collate = collate
     self.sort = sort
@@ -137,6 +142,9 @@ class Highwall:
       raise TypeError("auto_commit must be a string")
     else:
       self.__vars_table = vars_table
+
+    # The index list
+    self.index_list = IndexList(self)
 
   def __check_or_create_table(self, table_name):
     if self.__is_table(table_name):
