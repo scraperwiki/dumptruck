@@ -26,3 +26,15 @@ Out[6]: [{'name': u'swvariables_index0', 'seq': 0, 'unique': 1}]
 In [7]: h.execute("PRAGMA index_info(swvariables_index0)",commit = False)
 Out[7]: [{'cid': 2, 'name': u'name', 'seqno': 0}]
 
+
+
+In [12]: h.execute("create index  abc on branches (Street_Address, Telephone)")
+
+In [13]: h.execute("PRAGMA index_list(branches)")
+Out[13]: [{'name': u'abc', 'seq': 0, 'unique': 0}]
+
+In [14]: h.execute("PRAGMA index_info(abc)")
+Out[14]: 
+[{'cid': 5, 'name': u'Street_Address', 'seqno': 0},
+ {'cid': 2, 'name': u'Telephone', 'seqno': 1}]
+
