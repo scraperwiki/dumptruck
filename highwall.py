@@ -24,25 +24,61 @@ PYTHON_SQLITE_TYPE_MAP={
   float: u"real",
 }
 
+class IndexList:
+  def __init__(self,highwall_object):
+    self.h = highwall_object
+
+  def __getitem__(self, table_name):
+    "Retrive the indices for a table."
+    indices = self.h.execute("PRAGMA index_list(`%s`)" % table_name, commit = False)
+    return IndexInfo(self.h, indices)
+
+class IndexInfo:
+
+  class IndexNameError(Exception):
+    pass
+
+  def __init__(self,highwall_object, table_indices):
+    self.h = highwall_object
+    self.table_indices = table_indices
+
+  def __getitem__(self, index_name):
+    "Retrive an index."
+    index = self.h.execute("PRAGMA index_info(`%s`)" % index_name, commit = False)
+
+    # Determine whether it's unique.
+    for i in self.table_indices:
+      if i['name'] == index_name:
+        unique = i['unique']
+        break
+
+    try:
+      unique
+    except NameError:
+      raise self.IndexNameError('There is no index with the name "%s".' % index_name)
+
+    return Index([col['name'] for col in index], unique = unique)
+
 class Index:
   COLNAME_TYPES = set([unicode, str, int])
 
   class DuplicateColumnError(Exception):
     pass
 
-  def __init__(self, columns, unique = False):
+  def __init__(self, columns, unique = False, collate = None, sort = None):
     self.unique = unique
+
+    # Set columns
     if type(columns) in self.COLNAME_TYPES:
       # One column
-      self.__columns = [str(columns)]
+      self.columns = [str(columns)]
     elif set(map(type, columns)).issubset(self.COLNAME_Types):
       # Multiple columns
       str_columns = map(str, columns)
       if len(set(str_columns)) != len(columns):
         raise self.DuplicateColumnError
       else:
-        self.__columns = str_columns
-
+        self.columns = str_columns
 
 class MineCollapse(Exception):
   pass
