@@ -111,8 +111,58 @@ Highwall provides specialized wrapper around some common commands.
 
     h.drop("diesel-engineers")
 
+### Creating empty tables
+When working with relational databases, one typically defines a schema
+before populating the database. You can use the `Highwall.insert` method
+like this by calling it with `create_only = True`.
+
+For example, if the table `tools` does not exist, the following call will create the table
+`tools` with the columns `toolName` and `weight`, with the types `TEXT` and `INTEGER`,
+respectively, but will not insert the dictionary values ("jackhammer" and 58) into the table.
+
+    h.insert({"toolName":"jackhammer", "weight": 58}, "tools", create_only = True)
+
 ### Indices
 
+#### Creating
+Highwall contains a special method for creating indices. To create an index,
+first create an empty table. (See "Creating empty tables" above.)
+Then, use the `Highwall.add_index` method.
+
+    h.create_index('tools', ['toolName'])
+
+This will create a non-unique index on the column `tool`. To create a unique
+index, use the keyword argument `unique = True`.
+
+    h.create_index('tools', ['toolName'], unique = True)
+
+You can also specify multi-column indices.
+
+    h.create_index('tools', ['toolName', 'weight'])
+
+Highwall names these indices according to the names of the relevant table and columns.
+The index created in the previous example might be named `tools_toolName_weight0`.
+The 0 is an arbitrary number that is changed in case the index name would otherwise
+be the same as the name of an existing index.
+
+#### Other index manipulation
+Highwall does not implement special methods for viewing or removing indices, but here
+are the relevant SQLite SQL commands.
+
+The following command lists indices on the `tools` table.
+
+    h.execute('PRAGMA index_list(tools)')
+
+The following command gives more information about the index named `tools_toolName_weight0`.
+
+    h.execute('PRAGMA index_list(tools_toolName_weight0)')
+
+And this one deletes the index.
+
+    h.execute('DROP INDEX tools_toolName_weight0')
+
+For more information on indices and, particularly, the `PRAGMA' commands, check
+the [SQLite documentation]().
 
 ### Delaying commits
 By default, the `insert`, `get_var`, `drop` and `execute` methods automatically commit changes.
