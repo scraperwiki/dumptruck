@@ -112,13 +112,20 @@ class Highwall:
     return self.connection.close()
 
   def create_unique_index(table_name, columns):
+    self.create_index(table_name, columns, unique = True)
+
+  def create_index(table_name, columns, unique = False):
     "Create a unique index on the column(s) passed."
     index_name = table_name + '__' + '_'.join(columns)
     arbitrary_number = 0
     while True:
       try:
         # This is vulnerable to injection.
-        self.execute("CREATE UNIQUE INDEX ? ON `%s` (`%s`)" % (table_name, '`,`'.join(columns)), index_name+str(arbitrary_number))
+        if unique:
+          sql = "CREATE UNIQUE INDEX ? ON `%s` (`%s`)"
+        else:
+          sql = "CREATE INDEX ? ON `%s` (`%s`)"
+        self.execute(sql % (table_name, '`,`'.join(columns)), index_name+str(arbitrary_number))
       except:
         arbitrary_number += 1
 
