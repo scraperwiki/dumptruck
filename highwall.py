@@ -67,6 +67,7 @@ class Highwall:
     if self.__is_table(table_name):
       pass #Do something
     else:
+      # This is vulnerable to injection.
       self.cursor.execute("""
         CREATE TABLE `%s` (
           ROWID INTEGER PRIMARY KEY
@@ -78,6 +79,7 @@ class Highwall:
       pass #Do something
     else:
       self.__is_table(self.__vars_table)
+      # This is vulnerable to injection.
       self.cursor.execute("""
         CREATE TABLE `%s` (
           name TEXT,
