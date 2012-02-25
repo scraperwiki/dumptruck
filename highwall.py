@@ -111,6 +111,15 @@ class Highwall:
   def close(self):
     return self.connection.close()
 
+  def create_unique_index(table_name, columns):
+    "Create a unique index on the column(s) passed."
+    index_name = table_name + '__' + '_'.join(columns)
+    arbitrary_number = 0
+    while True:
+      try:
+        self.execute("CREATE UNIQUE INDEX ? ON `%s` (`%s`)" % (table_name, '`,`'.join(columns)), index_name+str(arbitrary_number))
+      except:
+        arbitrary_number += 1
 
   def __add_column(self, table_name, column_name, column_type):
     sql = 'ALTER TABLE `%s` ADD COLUMN %s %s ' % (table_name, column_name, column_type)
