@@ -36,9 +36,6 @@ class Highwall:
   class TableNameError(MineCollapse):
     pass
 
-  class ColumnNameError(MineCollapse):
-    pass
-
   class EncodingError(MineCollapse):
     pass
 
@@ -232,6 +229,9 @@ class DataDump:
   "A data dictionary converter"
   def __init__(self, data):
     self.raw = data
+
+  class ColumnNameError(MineCollapse):
+    pass
 
   def dump(self):
     self.data = copy(self.raw)
