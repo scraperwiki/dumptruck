@@ -220,15 +220,15 @@ class DataDump:
 
   def dump(self):
     self.data = copy(self.raw)
-    self.checkdata()
-    self.jsonify()
-    self.convdata()
+    self.__checkdata()
+    self.__jsonify()
+    self.__convdata()
     return self.data
 
   class CouldNotJSONify(Exception):
     pass
 
-  def jsonify(self):
+  def __jsonify(self):
     for key, value in self.data.items():
       if type(value)==set:
         # Convert sets to dicts
@@ -240,7 +240,7 @@ class DataDump:
         except TypeError:
           raise CouldNotJSONify("The value for %s is a complex object that could not be dumped to JSON.")
 
-  def checkdata(self):
+  def __checkdata(self):
     #Based on scraperlibs
     for key in self.data.keys():
       if not key:
@@ -250,7 +250,7 @@ class DataDump:
       elif not re.match("[a-zA-Z0-9_\- ]+$", key):
         raise self.ColumnNameError('key must be simple text')
 
-  def convdata(self):
+  def __convdata(self):
     #Based on scraperlibs
     jdata = {}
     for key, value in self.data.items():
