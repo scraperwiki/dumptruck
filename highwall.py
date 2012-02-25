@@ -117,15 +117,18 @@ class Highwall:
     arbitrary_number = 0
     while True:
       try:
+        # This is vulnerable to injection.
         self.execute("CREATE UNIQUE INDEX ? ON `%s` (`%s`)" % (table_name, '`,`'.join(columns)), index_name+str(arbitrary_number))
       except:
         arbitrary_number += 1
 
   def __add_column(self, table_name, column_name, column_type):
+    # This is vulnerable to injection.
     sql = 'ALTER TABLE `%s` ADD COLUMN %s %s ' % (table_name, column_name, column_type)
     self.execute(sql, commit = True)
 
   def __column_types(self, table_name):
+    # This is vulnerable to injection.
     self.cursor.execute("PRAGMA table_info(`%s`)" % table_name)
     return {column[1]:column[2] for column in self.cursor.fetchall()}
 
@@ -171,6 +174,7 @@ class Highwall:
     # http://www.python.org/dev/peps/pep-3106/
     for row in conved_data:
       question_marks = ','.join('?'*len(row.keys()))
+      # This is vulnerable to injection.
       sql = "INSERT INTO `%s` (%s) VALUES (%s);" % (table_name, ','.join(row.keys()), question_marks)
       self.execute(sql, row.values(), commit=False)
     self.commit()
@@ -180,6 +184,7 @@ class Highwall:
 
   def get_var(self, key):
     "Retrieve one saved variable from the database."
+    # This is vulnerable to injection.
     data = self.execute("SELECT * FROM `%s` WHERE `name` = ?" % self.__vars_table, [key], commit = False)
     if data == []:
       raise self.NameError("The Highwall variables table doesn't have a value for %s." % key)
@@ -211,6 +216,7 @@ class Highwall:
     return set([row['name'] for row in result])
 
   def drop(self, table_name, commit = True):
+    # This is vulnerable to injection.
     return self.execute('DROP IF EXISTS `%s`;' % table_name, commit = commit)
 
 class DataDump:
