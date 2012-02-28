@@ -60,15 +60,15 @@ class Highwall:
     else:
       self.__vars_table = vars_table
 
-  def __check_or_create_table(self, table_name):
+  def __check_or_create_table(self, table_name, startkey):
     if self.__is_table(table_name):
       pass #Do something
     else:
       # This is vulnerable to injection.
       self.cursor.execute("""
         CREATE TABLE `%s` (
-          ROWID INTEGER PRIMARY KEY
-        );""" % table_name)
+          ? %s
+        );""" % (table_name, PYTHON_SQLITE_TYPE_MAP[type(startkey)]), startkey)
       self.connection.commit()
 
   def __check_or_create_vars_table(self):
@@ -170,7 +170,7 @@ class Highwall:
     except TypeError:
       raise TypeError('The data argument must be a dict or an iterable of dicts.')
 
-    self.__check_or_create_table(table_name)
+    self.__check_or_create_table(table_name, data[0].keys()[0])
 
     conved_data = [DataDump(row).dump() for row in data]
     for row in conved_data:
