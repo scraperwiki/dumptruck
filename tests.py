@@ -95,23 +95,33 @@ class TestSaveInt(SaveAndCheck):
     self.save_and_check(
       {"modelNumber": 293}
     , "model-numbers"
-    , [(293)]
+    , [(293,)]
     )
 
 class TestSaveWeirdTableName(SaveAndCheck):
-  def test_save_string(self):
+  def test_save(self):
     self.save_and_check(
       {"firstname":"Robert","lastname":"LeTourneau"}
-    , "[asoeu&-oeu$]"
+    , "[asoeu]"
     , [(u'LeTourneau', u'Robert')]
     )
 
 class TestSaveString(SaveAndCheck):
-  def test_save_string(self):
+  def test_save(self):
     self.save_and_check(
       {"firstname":"Robert","lastname":"LeTourneau"}
     , "diesel-engineers"
     , [(u'LeTourneau', u'Robert')]
+    )
+
+import datetime
+
+class TestSave(SaveAndCheck):
+  def test_save(self):
+    self.save_and_check(
+      {"birthday":datetime.datetime.strptime('1990-03-30', '%Y-%m-%d').date()}
+    , "birthdays"
+    , [(u'1990-03-30')]
     )
 
 class TestInvalidHighwallParams(TestDb):
