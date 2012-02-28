@@ -1,5 +1,5 @@
 from unittest import TestCase, main
-from highwall import Highwall, Index
+from highwall import Highwall
 import sqlite3
 import os, shutil
 
@@ -60,19 +60,6 @@ class TestSaveVar(TestDb):
     indices = self.cursor.fetchall()
 #   self.assertNotEqual(indices,[])
 
-class TestIndex(TestDb):
-  def test_no_index(self):
-    h = Highwall(dbname = "test.db")
-    self.assertIsNone(h.index_list['not-a-table'].table_indices)
-    h.close()
-
-class TestIndex(TestDb):
-  def test_add_index(self):
-    h = Highwall(dbname = "test.db")
-    h.execute("CREATE TABLE `yes-a-table` ( column1 text, column2 blob);")
-    h.index_list['yes-a-table']['an-index'] = Index(['column1', 'column2'])
-    h.close()
-
 class TestSelect(TestDb):
   def test_select(self):
     shutil.copy('fixtures/landbank_branches.sqlite','.')
@@ -108,7 +95,15 @@ class TestSaveInt(SaveAndCheck):
     self.save_and_check(
       {"modelNumber": 293}
     , "model-numbers"
-    , [(1, 293)]
+    , [(293)]
+    )
+
+class TestSaveWeirdTableName(SaveAndCheck):
+  def test_save_string(self):
+    self.save_and_check(
+      {"firstname":"Robert","lastname":"LeTourneau"}
+    , "[asoeu&-oeu$]"
+    , [(u'LeTourneau', u'Robert')]
     )
 
 class TestSaveString(SaveAndCheck):
@@ -116,7 +111,7 @@ class TestSaveString(SaveAndCheck):
     self.save_and_check(
       {"firstname":"Robert","lastname":"LeTourneau"}
     , "diesel-engineers"
-    , [(1, u'LeTourneau', u'Robert')]
+    , [(u'LeTourneau', u'Robert')]
     )
 
 class TestInvalidHighwallParams(TestDb):
