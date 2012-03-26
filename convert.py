@@ -1,4 +1,7 @@
 "Convert a dictionary into a form ready to be inserted."
+from copy import copy
+import re
+import datetime
 
 def convert(datarow_raw):
   data = copy(datarow_raw)
