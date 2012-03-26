@@ -83,6 +83,9 @@ sets and lists will automatically be dumped to JSON.
     ]
     h.insert(data)
 
+Column names and table names automatically get quoted if you pass them without quotes,
+so you can use bizarre table and column names, like @no^[hs!'e?'s`f_"&`'@
+
 It would be cool if I can come up with a way for `h.insert` to return
 the [rowid](http://www.sqlite.org/lang_createtable.html#rowid)(s) of the
 row(s) that are being saved. Dunno how annoying this would be....
