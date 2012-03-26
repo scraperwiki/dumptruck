@@ -98,6 +98,14 @@ class TestSaveInt(SaveAndCheck):
     , [(293,)]
     )
 
+class TestSaveHyphen(SaveAndCheck):
+  def test_save_int(self):
+    self.save_and_check(
+      {"model-number": 293}
+    , "model-numbers"
+    , [(293,)]
+    )
+
 class TestSaveWeirdTableName(SaveAndCheck):
   def test_save(self):
     self.save_and_check(

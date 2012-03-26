@@ -61,6 +61,11 @@ class Highwall:
       self.__vars_table = vars_table
 
   def __check_or_create_table(self, table_name, startdata):
+    for k, v in startdata.items():
+      if v != None:
+        break
+    print k,v
+
     if self.__is_table(table_name):
       pass #Do something
     else:
@@ -68,7 +73,7 @@ class Highwall:
       self.cursor.execute("""
         CREATE TABLE `%s` (
           %s %s
-        );""" % (table_name, startdata.keys()[0], PYTHON_SQLITE_TYPE_MAP[type(startdata.values()[0])]))
+        );""" % (table_name, k, PYTHON_SQLITE_TYPE_MAP[type(startdata[k])]))
       self.connection.commit()
 
   def __check_or_create_vars_table(self):
@@ -235,6 +240,7 @@ class DataDump:
 
   def dump(self):
     self.data = copy(self.raw)
+    self.__remove_null()
     self.__checkdata()
     self.__jsonify()
     self.__convdata()
@@ -242,6 +248,11 @@ class DataDump:
 
   class CouldNotJSONify(Exception):
     pass
+
+  def __remove_null(self):
+    for key, value in self.data.items():
+      if value == None:
+        del(self.data[key])
 
   def __jsonify(self):
     for key, value in self.data.items():
