@@ -118,10 +118,6 @@ class Highwall:
       except:
         arbitrary_number += 1
 
-  def __add_column(self, table_name, column_name, column_type):
-    # This is vulnerable to injection.
-    sql = 'ALTER TABLE %s ADD COLUMN %s %s ' % (table_name, column_name, column_type)
-    self.execute(sql, commit = True)
 
   def __column_types(self, table_name):
     # This is vulnerable to injection.
@@ -132,7 +128,9 @@ class Highwall:
     column_types = self.__column_types(table_name)
     for key,value in converted_data_row.items():
       try:
-        self.__add_column(quote(table_name), key, PYTHON_SQLITE_TYPE_MAP[type(value)])
+        params = (quote(table_name), key, PYTHON_SQLITE_TYPE_MAP[type(value)])
+        sql = 'ALTER TABLE %s ADD COLUMN %s %s ' % params
+        self.execute(sql, commit = True)
       except sqlite3.OperationalError, msg:
         if str(msg).split(':')[0] == 'duplicate column name':
           # The column is already there.
