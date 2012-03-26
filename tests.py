@@ -22,6 +22,14 @@ class TestQuote(TestCase):
     self.assertQuote('ao 98!?o-_Ho[e&((*^ueu','`ao 98!?o-_Ho[e&((*^ueu`')
     self.assertQuote('ao 98!?o-_H`oe&((*^ueu','[ao 98!?o-_H`oe&((*^ueu]')
 
+class TestQuoteError(TestCase):
+  "Unquotables should raise a particular ValueError."
+  def assertQuoteError(self, textIn):
+    self.assertRaises(ValueError, lambda: quote(textIn))
+
+  def test_quote_error(self):
+    self.assertQuoteError(']`')
+
 class TestDb(TestCase):
   def setUp(self):
     self.cleanUp()
