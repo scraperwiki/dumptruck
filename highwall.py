@@ -31,9 +31,9 @@ PYTHON_SQLITE_TYPE_MAP={
 
 # Only for compatibility with scraperwiki;
 # we should use the SQLite names
-SWVARIABLES_PYTHON_TYPE_MAP={
-  u"float": float
-}
+#SWVARIABLES_PYTHON_TYPE_MAP={
+#  u"float": float
+#}
 
 class Highwall:
   "A relaxing interface to SQLite"
@@ -65,14 +65,16 @@ class Highwall:
       if v != None:
         break
 
-    if self.__is_table(table_name):
-      pass #Do something
-    else:
+    try:
       # This is vulnerable to injection.
       self.cursor.execute("""
-        CREATE TABLE `%s` (
-          `%s` %s
-        );""" % (table_name, k, PYTHON_SQLITE_TYPE_MAP[type(startdata[k])]))
+        CREATE TABLE %s (
+          %s %s
+        );""" % (quote(table_name), quote(k), PYTHON_SQLITE_TYPE_MAP[type(startdata[k])]))
+    except sqlite3.OperationalError, msg:
+      if not re.match(r'^table.+already exists$', str(msg)):
+        raise
+    else:
       self.connection.commit()
 
   def __check_or_create_vars_table(self):
@@ -82,7 +84,9 @@ class Highwall:
         CREATE TABLE `%s` (
           name TEXT,
           value_blob BLOB,
-          type TEXT
+          sql_type TEXT,
+          lang TEXT,
+          lang_type TEXT
         );""" % self.__vars_table)
     except:
       raise
@@ -149,7 +153,6 @@ class Highwall:
     column_types = self.__column_types(table_name)
     for key,value in conved_data_row.items():
       try:
-        #raise NotImplementedError("Pretend this alters the table to add the column.")
         self.__add_column(quote(table_name), key, PYTHON_SQLITE_TYPE_MAP[type(value)])
       except sqlite3.OperationalError, msg:
         if str(msg).split(':')[0] == 'duplicate column name':
@@ -180,6 +183,7 @@ class Highwall:
     except TypeError:
       raise TypeError('The data argument must be a dict or an iterable of dicts.')
 
+    # This is a race condition.
     self.__check_or_create_table(table_name, data[0])
 
     conved_data = [convert(row) for row in data]
@@ -203,10 +207,9 @@ class Highwall:
       raise NameError("The Highwall variables table doesn't have a value for %s." % key)
     else:
       row = data[0]
-      if SQLITE_PYTHON_TYPE_MAP.has_key(row['type']):
-        cast = SQLITE_PYTHON_TYPE_MAP[row['type']]
-      elif SWVARIABLES_PYTHON_TYPE_MAP.has_key(row['type']):
-        cast = SWVARIABLES_PYTHON_TYPE_MAP[row['type']]
+      print row
+      if row.has_key('sql_type') and SQLITE_PYTHON_TYPE_MAP.has_key(row['sql_type']):
+        cast = SQLITE_PYTHON_TYPE_MAP[row['sql_type']]
       else:
         raise TypeError("A Python type for '%s' could not be found." % row['type'])
       return cast(row['value_blob'])
@@ -218,9 +221,25 @@ class Highwall:
     self.__check_or_create_vars_table()
 
     # Prepare for save
-    valuetype = PYTHON_SQLITE_TYPE_MAP[type(value)]
+    if type(value) in PYTHON_SQLITE_TYPE_MAP:
+      sqltype = PYTHON_SQLITE_TYPE_MAP[type(value)]
+      lang = None
+      langtype = None
+    elif type(value) in PYTHON_JSON_TYPE_MAP:
+      sqltype = None
+      langtype = PYTHON_JSON_TYPE_MAP[type(value)]
+      lang = 'json'
+    elif type(value) in PYTHON_PYTHON_TYPE_MAP:
+      sqltype = None
+      langtype = PYTHON_PYTHON_TYPE_MAP[type(value)]
+      lang = 'python'
+
     #valuetype in ("json", "unicode", "str", &c)
-    data = {"name":key, "value_blob":value, "type":valuetype}
+    data = {
+      "name":key, "value_blob":value,
+      "sql_type":sqltype,
+      "lang": lang, "lang_type": langtype
+    }
 
     return self.insert(data, self.__vars_table, commit = commit)
 

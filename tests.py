@@ -17,6 +17,8 @@ class TestQuote(TestCase):
     self.assertQuote('"','`"`')
     self.assertQuote('\'','`\'`')
 
+    self.assertQuote('[aoeu]','[aoeu]')
+
     self.assertQuote('ao 98!?o-_Ho[e&((*^ueu','`ao 98!?o-_Ho[e&((*^ueu`')
     self.assertQuote('ao 98!?o-_H`oe&((*^ueu','[ao 98!?o-_H`oe&((*^ueu]')
 
@@ -37,16 +39,17 @@ class TestDb(TestCase):
 #       if (2, 'No such file or directory')!=e:
 #         raise
 
-class TestGetVar(TestDb):
-  def setUp(self):
-    self.cleanUp()
-    self.h = Highwall(dbname = 'fixtures/absa-highwallvars.sqlite',vars_table="swvariables")
-
-  def test_existing_var(self):
-   self.assertEquals(self.h.get_var('DATE'),1329518937.92)
-
-  def test_nonexisting_var(self):
-   self.assertRaises(NameError,self.h.get_var,'nonexistant_var')
+#Move this to a ScraperWiki drop-in replacement library.
+#class TestGetVar(TestDb):
+#  def setUp(self):
+#    self.cleanUp()
+#    self.h = Highwall(dbname = 'fixtures/absa-highwallvars.sqlite',vars_table="swvariables")
+#
+#  def test_existing_var(self):
+#   self.assertEquals(self.h.get_var('DATE'),1329518937.92)
+#
+#  def test_nonexisting_var(self):
+#   self.assertRaises(NameError,self.h.get_var,'nonexistant_var')
 
 class TestSaveVar(TestDb):
   def setUp(self):
@@ -58,9 +61,9 @@ class TestSaveVar(TestDb):
     self.cursor=connection.cursor()
 
   def test_insert(self):
-    self.cursor.execute("SELECT * FROM `_highwallvars`")
+    self.cursor.execute("SELECT name, value_blob, sql_type, lang, lang_type FROM `_highwallvars`")
     observed = self.cursor.fetchall()
-    expected = [("birthday", "November 30, 1888", "text")]
+    expected = [("birthday", "November 30, 1888", "text", None, None)]
     self.assertEqual(observed, expected)
 
   def test_has_some_index(self):
@@ -83,12 +86,12 @@ class TestVars(TestDb):
     h.save_var(key, value)
     h.close()
 
-  def check(self, key, value, dbtype):
+  def check(self, key, value, sqltype, lang = None, langtype = None):
     connection=sqlite3.connect('test.db')
     self.cursor=connection.cursor()
-    self.cursor.execute("SELECT * FROM `_highwallvars`")
+    self.cursor.execute("SELECT name, value_blob, `sql_type`, `lang`, `lang_type` FROM `_highwallvars`")
     observed = self.cursor.fetchall()
-    expected = [(key, value, dbtype)]
+    expected = [(key, value, sqltype, lang, langtype)]
     self.assertEqual(observed, expected)
 
   def get(self, key, value):
@@ -96,18 +99,17 @@ class TestVars(TestDb):
     self.assertEqual(h.get_var(key), value)
     h.close()
 
-  def save_check_get(self, key, valueIn, dbtype, valueOut = None):
+  def save_check_get(self, key, valueIn, sqltype, lang = None, langtype = None, valueOut = None):
     if valueOut == None:
       valueOut = valueIn
 
     self.save(key, valueIn)
-    self.check(key, valueOut, dbtype)
+    self.check(key, valueOut, sqltype, lang, langtype = langtype)
     self.get(key, valueOut)
 
 class TestVarsSQL(TestVars):
   def test_integer(self):
-    self.save('foo', 42)
-#    self.save_check_get('foo', 42, 'integer')
+    self.save_check_get('foo', 42, 'integer')
 
 #class TestVarsJSON(TestVars):
 #  def test_list(self):
@@ -183,6 +185,14 @@ class TestSaveWeirdTableName1(SaveAndCheck):
     )
 
 class TestSaveWeirdTableName2(SaveAndCheck):
+  def test_save(self):
+    self.save_and_check(
+      {"firstname":"Robert","lastname":"LeTourneau"}
+    , "`asoeu`"
+    , [(u'LeTourneau', u'Robert')]
+    )
+
+class TestSaveWeirdTableName3(SaveAndCheck):
   def test_save(self):
     self.save_and_check(
       {"firstname":"Robert","lastname":"LeTourneau"}
