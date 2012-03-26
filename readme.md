@@ -44,7 +44,7 @@ Slow start
 ### Initialize
 
 You can specify a few of keyword arguments when you initialize the Highwall object.
-For example, if you want the database file to be `bucket=wheel-excavators.db`,
+For example, if you want the database file to be `bucket-wheel-excavators.db`,
 you can use this.
 
     h = Highwall(dbname="bucket-wheel-excavators.db")
