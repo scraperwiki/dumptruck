@@ -162,22 +162,35 @@ class TestCreateTable(TestDb):
     self.assertListEqual(observed, expected)
 
 class SaveAndCheck(TestDb):
-  def save_and_check(self, dataIn, tableIn, dataOut, tableOut = None):
+  def save_and_check(self, dataIn, tableIn, dataOut, tableOut = None, twice = True):
     if tableOut == None:
       tableOut = quote(tableIn)
 
+    # Insert
     h = Highwall(dbname = 'test.db')
     h.insert(dataIn, tableIn)
     h.close()
 
+    # Observe with pysqlite
     connection=sqlite3.connect('test.db')
     cursor=connection.cursor()
     cursor.execute("SELECT * FROM %s" % tableOut)
-    observed = cursor.fetchall()
+    observed1 = cursor.fetchall()
     connection.close()
 
-    expected = dataOut
-    self.assertListEqual(observed, expected)
+    if twice:
+      # Observe with Highwall
+      h = Highwall(dbname = 'test.db')
+      observed2 = h.execute('SELECT * FROM %s' % tableOut)
+      h.close()
+ 
+      #Check
+      expected1 = dataOut
+      expected2 = [dataIn] if type(dataIn) == dict else dataIn
+ 
+      self.assertListEqual(observed1, expected1)
+      self.assertListEqual(observed2, expected2)
+      
 
 class TestSaveTwice(SaveAndCheck):
   def test_save_twice(self):
@@ -190,6 +203,7 @@ class TestSaveTwice(SaveAndCheck):
       {"modelNumber": 293}
     , "model-numbers"
     , [(293,), (293,)]
+    , twice = False
     )
 
 class TestSaveInt(SaveAndCheck):
