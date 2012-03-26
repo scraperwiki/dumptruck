@@ -59,24 +59,6 @@ class Highwall:
     else:
       self.__vars_table = vars_table
 
-  def __check_or_create_table(self, table_name, startdata):
-    # Select a non-null item
-    for k, v in startdata.items():
-      if v != None:
-        break
-
-    try:
-      # This is vulnerable to injection.
-      self.cursor.execute("""
-        CREATE TABLE %s (
-          %s %s
-        );""" % (quote(table_name), quote(k), PYTHON_SQLITE_TYPE_MAP[type(startdata[k])]))
-    except sqlite3.OperationalError, msg:
-      if not re.match(r'^table.+already exists$', str(msg)):
-        raise
-    else:
-      self.connection.commit()
-
   def __check_or_create_vars_table(self):
     try:
       # This is vulnerable to injection.
@@ -149,9 +131,9 @@ class Highwall:
   def __is_table(self,table_name):
     return table_name in self.show_tables()
 
-  def __check_and_add_columns(self, table_name, conved_data_row):
+  def __check_and_add_columns(self, table_name, converted_data_row):
     column_types = self.__column_types(table_name)
-    for key,value in conved_data_row.items():
+    for key,value in converted_data_row.items():
       try:
         self.__add_column(quote(table_name), key, PYTHON_SQLITE_TYPE_MAP[type(value)])
       except sqlite3.OperationalError, msg:
@@ -170,29 +152,46 @@ class Highwall:
         except ValueError:
           raise TypeError("Data could not be converted to match the existing `%s` column type.")
 
-  def insert(self, data, table_name, commit = True):
+  def create_table(self, data, table_name, commit = True):
+    "Create a table based on the data, but don't insert anything."
+    converted_data = convert(data)
+    startdata = converted_data[0]
 
-    # Allow single rows to be dictionaries.
-    if type(data)==dict:
-      data = [data]
+    # Select a non-null item
+    for k, v in startdata.items():
+      if v != None:
+        break
 
-    # http://stackoverflow.com/questions/1952464/
-    # in-python-how-do-i-determine-if-a-variable-is-iterable
     try:
-      set([ type(e) for e in data])==set([dict])
-    except TypeError:
-      raise TypeError('The data argument must be a dict or an iterable of dicts.')
+      # This is vulnerable to injection.
+      self.cursor.execute("""
+        CREATE TABLE %s (
+          %s %s
+        );""" % (quote(table_name), quote(k), PYTHON_SQLITE_TYPE_MAP[type(startdata[k])]))
+    except sqlite3.OperationalError, msg:
+      if not re.match(r'^table.+already exists$', str(msg)):
+        raise
+    else:
+      self.connection.commit()
 
-    # This is a race condition.
-    self.__check_or_create_table(table_name, data[0])
+    for row in converted_data:
+      self.__check_and_add_columns(table_name, row)
 
-    conved_data = [convert(row) for row in data]
-    for row in conved_data:
+
+  def insert(self, data, table_name, commit = True):
+    try:
+      self.create_table(data, table_name)
+    except:
+      raise
+
+    converted_data = convert(data)
+
+    for row in converted_data:
       self.__check_and_add_columns(table_name, row)
     
     # .keys() and .items() are in the same order
     # http://www.python.org/dev/peps/pep-3106/
-    for row in conved_data:
+    for row in converted_data:
       question_marks = ','.join('?'*len(row.keys()))
       # This is vulnerable to injection.
       sql = "INSERT INTO %s (%s) VALUES (%s);" % (quote(table_name), ','.join(row.keys()), question_marks)

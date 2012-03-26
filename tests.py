@@ -137,6 +137,21 @@ class TestShowTables(TestDb):
     h = Highwall(dbname = 'test.db')
     self.assertSetEqual(h.show_tables(),set(['blocks','branches']))
 
+class TestCreateTable(TestDb):
+  def test_create_table(self):
+    h = Highwall(dbname = 'test.db')
+    h.create_table({"foo": 0, "bar": 1, "baz": 2}, 'zombies')
+    h.close()
+
+    connection=sqlite3.connect('test.db')
+    cursor=connection.cursor()
+    cursor.execute("SELECT foo, bar, baz FROM zombies")
+    observed = cursor.fetchall()
+    connection.close()
+
+    expected = []
+    self.assertListEqual(observed, expected)
+
 class SaveAndCheck(TestDb):
   def save_and_check(self, dataIn, tableIn, dataOut, tableOut = None):
     if tableOut == None:

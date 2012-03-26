@@ -3,14 +3,21 @@ from copy import copy
 import re
 import datetime
 
-def convert(datarow_raw):
-  data = copy(datarow_raw)
-  data = __remove_null(data)
-  data = __checkdata(data)
-  data = __jsonify(data)
-  data = __convdata(data)
+def convert(data):
+  # Allow single rows to be dictionaries.
+  if type(data)==dict:
+    data = [data]
 
-  data_quoted = {quote(k): v for k, v in data.items()}
+  # http://stackoverflow.com/questions/1952464/
+  # in-python-how-do-i-determine-if-a-variable-is-iterable
+  try:
+    set([ type(e) for e in data])==set([dict])
+  except TypeError:
+    raise TypeError('The data argument must be a dict or an iterable of dicts.')
+
+  data = [__convdata(__jsonify(__checkdata(__remove_null(row)))) for row in data]
+
+  data_quoted = [{quote(k): v for k, v in row.items()} for row in data]
   return data_quoted
 
 def __remove_null(data):
