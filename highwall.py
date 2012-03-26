@@ -128,9 +128,6 @@ class Highwall:
     self.cursor.execute("PRAGMA table_info(%s)" % quote(table_name))
     return {column[1]:column[2] for column in self.cursor.fetchall()}
 
-  def __is_table(self,table_name):
-    return table_name in self.tables()
-
   def __check_and_add_columns(self, table_name, converted_data_row):
     column_types = self.__column_types(table_name)
     for key,value in converted_data_row.items():
