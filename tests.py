@@ -21,6 +21,7 @@ class TestQuote(TestCase):
 
     self.assertQuote('ao 98!?o-_Ho[e&((*^ueu','`ao 98!?o-_Ho[e&((*^ueu`')
     self.assertQuote('ao 98!?o-_H`oe&((*^ueu','[ao 98!?o-_H`oe&((*^ueu]')
+    self.assertQuote('no^[hs!\'e]?\'sf_"&\'', '`no^[hs!\'e]?\'sf_"&\'`')
 
 class TestQuoteError(TestCase):
   "Unquotables should raise a particular ValueError."
