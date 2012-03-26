@@ -28,20 +28,8 @@ SWVARIABLES_PYTHON_TYPE_MAP={
   u"float": float
 }
 
-class MineCollapse(Exception):
-  pass
-
 class Highwall:
   "A relaxing interface to SQLite"
-
-  class NameError(NameError):
-    pass
-
-  class TableNameError(MineCollapse):
-    pass
-
-  class EncodingError(MineCollapse):
-    pass
 
   def __init__(self, dbname = "highwall.db", vars_table = "_highwallvars", auto_commit = True):
     pass
@@ -194,15 +182,12 @@ class Highwall:
       self.execute(sql, row.values(), commit=False)
     self.commit()
 
-  class HighwallVarsError(MineCollapse):
-    pass
-
   def get_var(self, key):
     "Retrieve one saved variable from the database."
     # This is vulnerable to injection.
     data = self.execute("SELECT * FROM `%s` WHERE `name` = ?" % self.__vars_table, [key], commit = False)
     if data == []:
-      raise self.NameError("The Highwall variables table doesn't have a value for %s." % key)
+      raise NameError("The Highwall variables table doesn't have a value for %s." % key)
     else:
       row = data[0]
       if SQLITE_PYTHON_TYPE_MAP.has_key(row['type']):
@@ -210,7 +195,7 @@ class Highwall:
       elif SWVARIABLES_PYTHON_TYPE_MAP.has_key(row['type']):
         cast = SWVARIABLES_PYTHON_TYPE_MAP[row['type']]
       else:
-        raise self.HighwallVarsError("A Python type for '%s' could not be found." % row['type'])
+        raise TypeError("A Python type for '%s' could not be found." % row['type'])
       return cast(row['value_blob'])
 
   def save_var(self, key, value, commit = True):
@@ -239,9 +224,6 @@ class DataDump:
   def __init__(self, data):
     self.raw = data
 
-  class ColumnNameError(MineCollapse):
-    pass
-
   def dump(self):
     self.data = copy(self.raw)
     self.__remove_null()
@@ -268,17 +250,17 @@ class DataDump:
         try:
           value = dumps(value)
         except TypeError:
-          raise CouldNotJSONify("The value for %s is a complex object that could not be dumped to JSON.")
+          raise TypeError("The value for %s is a complex object that could not be dumped to JSON.")
 
   def __checkdata(self):
     #Based on scraperlibs
     for key in self.data.keys():
       if not key:
-        raise self.ColumnNameError('key must not be blank')
+        raise ValueError('key must not be blank')
       elif type(key) not in (unicode, str):
-        raise self.ColumnNameError('key must be string type')
+        raise ValueError('key must be string type')
       elif not re.match("[a-zA-Z0-9_\- ]+$", key):
-        raise self.ColumnNameError('key must be simple text')
+        raise ValueError('key must be simple text')
 
   def __convdata(self):
     #Based on scraperlibs
@@ -299,7 +281,7 @@ class DataDump:
         try:
           value = value.decode("utf-8")
         except:
-          raise self.EncodingError("Binary strings must be utf-8 encoded")
+          raise UnicodeEncodeError("Binary strings must be utf-8 encoded")
       elif type(value) not in [int, bool, float, unicode, str]:
         value = unicode(value)
       jdata[key] = value
