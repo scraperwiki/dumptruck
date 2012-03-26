@@ -9,7 +9,9 @@ def convert(datarow_raw):
   data = __checkdata(data)
   data = __jsonify(data)
   data = __convdata(data)
-  return data
+
+  data_quoted = {quote(k): v for k, v in data.items()}
+  return data_quoted
 
 def __remove_null(data):
   for key, value in data.items():
@@ -30,19 +32,43 @@ def __jsonify(data):
         raise TypeError("The value for %s is a complex object that could not be dumped to JSON.")
   return data
 
+
+QUOTEPAIRS = [
+  ('[', ']'),
+# ('"', '"'),
+# ('\'', '\''),
+  ('`', '`'),
+]
+#QUOTECHARS = '\'"`'
+QUOTECHARS = '`'
+def quote(text):
+  "Handle quote characters"
+  # Look for quote characters. Keep the text as is if it's already quoted.
+  for qp in QUOTEPAIRS:
+    if text[0] == qp[0] and text[-1] == qp[-1] and len(text) >= 2:
+      return text
+
+  # If it's not quoted, try quoting
+  for qc in QUOTECHARS:
+    if qc not in text:
+      return qc + text + qc
+
+  #If the text has the quote characters, check for brackets.
+  if ']' not in text:
+    return '[' + text + ']'
+
+  #Darn
+  raise ValueError('The value "%s" is not quoted and contains too many quote characters to quote' % text)
+
 def __checkdata(data):
   #Based on scraperlibs
   for key in data.keys():
-    if not key:
+    if key in [None, '']:
       raise ValueError('key must not be blank')
     elif type(key) not in (unicode, str):
       raise ValueError('key must be string type')
     elif not re.match("[a-zA-Z0-9_\- ]+$", key):
       raise ValueError('key must be simple text')
-    elif key[0] == '[' and key[-1] == ']':
-      #Remove the brackets so we can add them back later.
-      data[key[1:-1]] = data[key]
-      del(data[key])
   return data
 
 def __convdata(data):

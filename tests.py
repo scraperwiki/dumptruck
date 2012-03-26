@@ -1,14 +1,31 @@
 from unittest import TestCase, main
 from highwall import Highwall
+from convert import quote
 import sqlite3
 import os, shutil
+import datetime
+
+class TestQuote(TestCase):
+  def assertQuote(self, textIn, textOut):
+    self.assertEqual(quote(textIn), textOut)
+
+  def test_quote(self):
+    self.assertQuote('a','`a`')
+
+    self.assertQuote('[','`[`')
+    self.assertQuote('`','[`]')
+    self.assertQuote('"','`"`')
+    self.assertQuote('\'','`\'`')
+
+    self.assertQuote('ao 98!?o-_Ho[e&((*^ueu','`ao 98!?o-_Ho[e&((*^ueu`')
+    self.assertQuote('ao 98!?o-_H`oe&((*^ueu','[ao 98!?o-_H`oe&((*^ueu]')
 
 class TestDb(TestCase):
   def setUp(self):
     self.cleanUp()
 
   def tearDown(self):
-    self.cleanUp()
+    pass #self.cleanUp()
 
   def cleanUp(self):
     "Clean up temporary files."
@@ -76,14 +93,17 @@ class TestShowTables(TestDb):
     self.assertSetEqual(h.show_tables(),set(['blocks','branches']))
 
 class SaveAndCheck(TestDb):
-  def save_and_check(self, dataIn, table_name, dataOut):
+  def save_and_check(self, dataIn, tableIn, dataOut, tableOut = None):
+    if tableOut == None:
+      tableOut = quote(tableIn)
+
     h = Highwall(dbname = 'test.db')
-    h.insert(dataIn, table_name)
+    h.insert(dataIn, tableIn)
     h.close()
 
     connection=sqlite3.connect('test.db')
     cursor=connection.cursor()
-    cursor.execute("SELECT * FROM `%s`" % table_name)
+    cursor.execute("SELECT * FROM %s" % tableOut)
     observed = cursor.fetchall()
     connection.close()
 
@@ -91,7 +111,7 @@ class SaveAndCheck(TestDb):
     self.assertListEqual(observed, expected)
 
 class TestSaveInt(SaveAndCheck):
-  def test_save_int(self):
+  def test_save(self):
     self.save_and_check(
       {"modelNumber": 293}
     , "model-numbers"
@@ -99,7 +119,7 @@ class TestSaveInt(SaveAndCheck):
     )
 
 class TestSaveWeirdTableName1(SaveAndCheck):
-  def test_save_int(self):
+  def test_save(self):
     self.save_and_check(
       {"modelNumber": 293}
     , "This should-be a_valid.table+name!?"
@@ -129,8 +149,6 @@ class TestSaveString(SaveAndCheck):
     , "diesel-engineers"
     , [(u'LeTourneau', u'Robert')]
     )
-
-import datetime
 
 class TestSave(SaveAndCheck):
   def test_save(self):

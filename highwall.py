@@ -2,7 +2,7 @@ import json
 import sqlite3
 import re
 import datetime
-from convert import convert
+from convert import convert, quote
 
 # Mappings between Python types and SQLite types
 SQLITE_PYTHON_TYPE_MAP={
@@ -60,10 +60,10 @@ class Highwall:
       self.__vars_table = vars_table
 
   def __check_or_create_table(self, table_name, startdata):
+    # Select a non-null item
     for k, v in startdata.items():
       if v != None:
         break
-    print k,v
 
     if self.__is_table(table_name):
       pass #Do something
@@ -125,21 +125,21 @@ class Highwall:
       try:
         # This is vulnerable to injection.
         if unique:
-          sql = "CREATE UNIQUE INDEX ? ON [%s] ([%s])"
+          sql = "CREATE UNIQUE INDEX ? ON %s (%s)"
         else:
-          sql = "CREATE INDEX ? ON [%s] ([%s])"
-        self.execute(sql % (table_name, '],['.join(columns)), index_name+str(arbitrary_number))
+          sql = "CREATE INDEX ? ON %s (%s)"
+        self.execute(sql % (quote(table_name), ','.join(columns)), index_name+str(arbitrary_number))
       except:
         arbitrary_number += 1
 
   def __add_column(self, table_name, column_name, column_type):
     # This is vulnerable to injection.
-    sql = 'ALTER TABLE `%s` ADD COLUMN %s %s ' % (table_name, column_name, column_type)
+    sql = 'ALTER TABLE %s ADD COLUMN %s %s ' % (table_name, column_name, column_type)
     self.execute(sql, commit = True)
 
   def __column_types(self, table_name):
     # This is vulnerable to injection.
-    self.cursor.execute("PRAGMA table_info(`%s`)" % table_name)
+    self.cursor.execute("PRAGMA table_info(%s)" % quote(table_name))
     return {column[1]:column[2] for column in self.cursor.fetchall()}
 
   def __is_table(self,table_name):
@@ -148,9 +148,15 @@ class Highwall:
   def __check_and_add_columns(self, table_name, conved_data_row):
     column_types = self.__column_types(table_name)
     for key,value in conved_data_row.items():
-      if key not in column_types:
+      try:
         #raise NotImplementedError("Pretend this alters the table to add the column.")
-        self.__add_column(table_name, key, PYTHON_SQLITE_TYPE_MAP[type(value)])
+        self.__add_column(quote(table_name), key, PYTHON_SQLITE_TYPE_MAP[type(value)])
+      except sqlite3.OperationalError, msg:
+        if str(msg) == 'duplicate column name: modelNumber':
+          # The column is already there.
+          pass
+        else:
+          raise
 
   def __cast_data_to_column_type(self, data):
     column_types = self.__column_types(table_name)
@@ -185,14 +191,14 @@ class Highwall:
     for row in conved_data:
       question_marks = ','.join('?'*len(row.keys()))
       # This is vulnerable to injection.
-      sql = "INSERT INTO [%s] ([%s]) VALUES (%s);" % (table_name, '],['.join(row.keys()), question_marks)
+      sql = "INSERT INTO %s (%s) VALUES (%s);" % (quote(table_name), ','.join(row.keys()), question_marks)
       self.execute(sql, row.values(), commit=False)
     self.commit()
 
   def get_var(self, key):
     "Retrieve one saved variable from the database."
     # This is vulnerable to injection.
-    data = self.execute("SELECT * FROM `%s` WHERE `name` = ?" % self.__vars_table, [key], commit = False)
+    data = self.execute("SELECT * FROM %s WHERE `name` = ?" % quote(self.__vars_table), [key], commit = False)
     if data == []:
       raise NameError("The Highwall variables table doesn't have a value for %s." % key)
     else:
@@ -224,4 +230,4 @@ class Highwall:
 
   def drop(self, table_name, commit = True):
     # This is vulnerable to injection.
-    return self.execute('DROP IF EXISTS `%s`;' % table_name, commit = commit)
+    return self.execute('DROP IF EXISTS %s;' % quote(table_name), commit = commit)
