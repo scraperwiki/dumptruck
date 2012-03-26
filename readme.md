@@ -51,7 +51,7 @@ you can use this.
 
 It actually takes up to three keyword arguments.
 
-    Highwall(dbname='highwall.db',auto_commit=True,vars_table="_highwallvars")
+    Highwall(dbname='highwall.db', auto_commit = True, vars_table = "_highwallvars")
 
 * `dbname` is the database file to save to; the default is highwall.db.
 * `vars_table` is the name of the table to use for `Highwall.get_var`
@@ -64,13 +64,13 @@ or with the `commit` keywoard argument.
 ### Saving
 As discussed earlier, the simplest `insert` call looks like this.
 
-    h.insert({"firstname":"Thomas","lastname":"Levine"})
+    h.insert({"firstname": "Thomas", "lastname": "Levine"})
 
 But you can also pass a list of dictionaries.
 
     data=[
-        {"firstname":"Thomas","lastname":"Levine"},
-        {"firstname":"Julian","lastname":"Assange"}
+        {"firstname": "Thomas", "lastname": "Levine"},
+        {"firstname": "Julian", "lastname": "Assange"}
     ]
     h.insert(data)
 
