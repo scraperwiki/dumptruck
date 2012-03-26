@@ -1,5 +1,5 @@
 from unittest import TestCase, main
-from highwall import Highwall
+from dumptruck import DumpTruck
 from convert import quote
 import sqlite3
 import os, shutil
@@ -40,7 +40,7 @@ class TestDb(TestCase):
 
   def cleanUp(self):
     "Clean up temporary files."
-    for filename in ('test.db', 'highwall.db'):
+    for filename in ('test.db', 'dumptruck.db'):
       try:
         os.remove(filename)
       except OSError as e:
@@ -52,7 +52,7 @@ class TestDb(TestCase):
 #class TestGetVar(TestDb):
 #  def setUp(self):
 #    self.cleanUp()
-#    self.h = Highwall(dbname = 'fixtures/absa-highwallvars.sqlite',vars_table="swvariables")
+#    self.h = DumpTruck(dbname = 'fixtures/absa-dumptruckvars.sqlite',vars_table="swvariables")
 #
 #  def test_existing_var(self):
 #   self.assertEquals(self.h.get_var('DATE'),1329518937.92)
@@ -63,14 +63,14 @@ class TestDb(TestCase):
 class TestSaveVar(TestDb):
   def setUp(self):
     self.cleanUp()
-    h = Highwall(dbname = 'test.db')
+    h = DumpTruck(dbname = 'test.db')
     h.save_var("birthday","November 30, 1888")
     h.close()
     connection=sqlite3.connect('test.db')
     self.cursor=connection.cursor()
 
   def test_insert(self):
-    self.cursor.execute("SELECT name, value_blob, sql_type, lang, lang_type FROM `_highwallvars`")
+    self.cursor.execute("SELECT name, value_blob, sql_type, lang, lang_type FROM `_dumptruckvars`")
     observed = self.cursor.fetchall()
     expected = [("birthday", "November 30, 1888", "text", None, None)]
     self.assertEqual(observed, expected)
@@ -85,26 +85,26 @@ class TestSaveVar(TestDb):
 
     This pragma returns one row for each index associated with the given table. Columns of the result set include the index name and a flag to indicate whether or not the index is UNIQUE.
     """
-    self.cursor.execute("PRAGMA index_list(_highwallvars)")
+    self.cursor.execute("PRAGMA index_list(_dumptruckvars)")
     indices = self.cursor.fetchall()
 #   self.assertNotEqual(indices,[])
 
 class TestVars(TestDb):
   def save(self, key, value):
-    h = Highwall(dbname = 'test.db')
+    h = DumpTruck(dbname = 'test.db')
     h.save_var(key, value)
     h.close()
 
   def check(self, key, value, sqltype, lang = None, langtype = None):
     connection=sqlite3.connect('test.db')
     self.cursor=connection.cursor()
-    self.cursor.execute("SELECT name, value_blob, `sql_type`, `lang`, `lang_type` FROM `_highwallvars`")
+    self.cursor.execute("SELECT name, value_blob, `sql_type`, `lang`, `lang_type` FROM `_dumptruckvars`")
     observed = self.cursor.fetchall()
     expected = [(key, value, sqltype, lang, langtype)]
     self.assertEqual(observed, expected)
 
   def get(self, key, value):
-    h = Highwall(dbname = 'test.db')
+    h = DumpTruck(dbname = 'test.db')
     self.assertEqual(h.get_var(key), value)
     h.close()
 
@@ -134,7 +134,7 @@ class TestVarsSQL(TestVars):
 class TestSelect(TestDb):
   def test_select(self):
     shutil.copy('fixtures/landbank_branches.sqlite','.')
-    h = Highwall(dbname='landbank_branches.sqlite')
+    h = DumpTruck(dbname='landbank_branches.sqlite')
     data_observed = h.execute("SELECT * FROM `branches` WHERE Fax is not null ORDER BY Fax LIMIT 3;")
     data_expected = [{'town': u'\r\nCenturion', 'date_scraped': 1327791915.618461, 'Fax': u' (012) 312 3647', 'Tel': u' (012) 686 0500', 'address_raw': u'\r\n420 Witch Hazel Ave\n\r\nEcopark\n\r\nCenturion\n\r\n0001\n (012) 686 0500\n (012) 312 3647', 'blockId': 14, 'street-address': None, 'postcode': u'\r\n0001', 'address': u'\r\n420 Witch Hazel Ave\n\r\nEcopark\n\r\nCenturion\n\r\n0001', 'branchName': u'Head Office'}, {'town': u'\r\nCenturion', 'date_scraped': 1327792245.787187, 'Fax': u' (012) 312 3647', 'Tel': u' (012) 686 0500', 'address_raw': u'\r\n420 Witch Hazel Ave\n\r\nEcopark\n\r\nCenturion\n\r\n0001\n (012) 686 0500\n (012) 312 3647', 'blockId': 14, 'street-address': u'\r\n420 Witch Hazel Ave\n\r\nEcopark', 'postcode': u'\r\n0001', 'address': u'\r\n420 Witch Hazel Ave\n\r\nEcopark\n\r\nCenturion\n\r\n0001', 'branchName': u'Head Office'}, {'town': u'\r\nMiddelburg', 'date_scraped': 1327791915.618461, 'Fax': u' (013) 282 6558', 'Tel': u' (013) 283 3500', 'address_raw': u'\r\n184 Jan van Riebeeck Street\n\r\nMiddelburg\n\r\n1050\n (013) 283 3500\n (013) 282 6558', 'blockId': 17, 'street-address': None, 'postcode': u'\r\n1050', 'address': u'\r\n184 Jan van Riebeeck Street\n\r\nMiddelburg\n\r\n1050', 'branchName': u'Middelburg'}]
     self.assertListEqual(data_observed, data_expected)
@@ -143,12 +143,12 @@ class TestSelect(TestDb):
 class TestShowTables(TestDb):
   def test_show_tables(self):
     shutil.copy('fixtures/landbank_branches.sqlite','test.db')
-    h = Highwall(dbname = 'test.db')
+    h = DumpTruck(dbname = 'test.db')
     self.assertSetEqual(h.tables(),set(['blocks','branches']))
 
 class TestCreateTable(TestDb):
   def test_create_table(self):
-    h = Highwall(dbname = 'test.db')
+    h = DumpTruck(dbname = 'test.db')
     h.create_table({"foo": 0, "bar": 1, "baz": 2}, 'zombies')
     h.close()
 
@@ -167,7 +167,7 @@ class SaveAndCheck(TestDb):
       tableOut = quote(tableIn)
 
     # Insert
-    h = Highwall(dbname = 'test.db')
+    h = DumpTruck(dbname = 'test.db')
     h.insert(dataIn, tableIn)
     h.close()
 
@@ -179,8 +179,8 @@ class SaveAndCheck(TestDb):
     connection.close()
 
     if twice:
-      # Observe with Highwall
-      h = Highwall(dbname = 'test.db')
+      # Observe with DumpTruck
+      h = DumpTruck(dbname = 'test.db')
       observed2 = h.execute('SELECT * FROM %s' % tableOut)
       h.close()
  
@@ -270,49 +270,40 @@ class TestSaveDateTime(SaveAndCheck):
     , [(u'1990-03-30T00:00:00',)]
     )
 
-class TestInvalidHighwallParams(TestDb):
+class TestInvalidDumpTruckParams(TestDb):
   "Invalid parameters should raise appropriate errors."
 
   def test_auto_commit(self):
     for value in (None,3,'uaoeu',set([3]),[]):
-      self.assertRaises(TypeError, Highwall, auto_commit = value)
+      self.assertRaises(TypeError, DumpTruck, auto_commit = value)
 
   def test_dbname(self):
     for value in (None,3,True,False,set([3]),[]):
-      self.assertRaises(TypeError, Highwall, dbname = value)
-
-# def test_vars_table_str(self):
-#   "http://stackoverflow.com/questions/3694276/what-are-valid-table-names-in-sqlite"
-#   str_values = (
-#     'abc123', '123abc','abc_123',
-#     '_123abc','abc-abc','abc.abc',
-#   )
-#   for value in str_values:
-#     self.assertRaises(Highwall.TableNameError, Highwall, vars_table = value)
+      self.assertRaises(TypeError, DumpTruck, dbname = value)
 
   def test_vars_table_nonstr(self):
     nonstr_values = (
       None, 3, True, False, set([3]), []
     )
     for value in nonstr_values:
-      self.assertRaises(TypeError, Highwall, vars_table = value)
+      self.assertRaises(TypeError, DumpTruck, vars_table = value)
 
 
-class TestHighwallParams(TestDb):
+class TestDumpTruckParams(TestDb):
   def test_params(self):
     self.assertFalse(os.path.isfile('test.db'))
-    h = Highwall(dbname='test.db',auto_commit=False,vars_table="baz")
+    h = DumpTruck(dbname='test.db',auto_commit=False,vars_table="baz")
     self.assertTrue(os.path.isfile('test.db'))
 #   self.assertEqual(h.auto_commit, False)
 #   self.assertEqual(h.__vars_table, "baz")
 
 class TestParamsDefaults(TestDb):
   def test_params(self):
-    self.assertFalse(os.path.isfile('highwall.db'))
-    h = Highwall()
-    self.assertTrue(os.path.isfile('highwall.db'))
+    self.assertFalse(os.path.isfile('dumptruck.db'))
+    h = DumpTruck()
+    self.assertTrue(os.path.isfile('dumptruck.db'))
 #   self.assertEqual(h.auto_commit, True)
-#   self.assertEqual(h.__vars_table, "_highwallvars")
+#   self.assertEqual(h.__vars_table, "_dumptruckvars")
 
 if __name__ == '__main__':
   main()

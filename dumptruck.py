@@ -35,10 +35,10 @@ PYTHON_SQLITE_TYPE_MAP={
 #  u"float": float
 #}
 
-class Highwall:
+class DumpTruck:
   "A relaxing interface to SQLite"
 
-  def __init__(self, dbname = "highwall.db", vars_table = "_highwallvars", auto_commit = True):
+  def __init__(self, dbname = "dumptruck.db", vars_table = "_dumptruckvars", auto_commit = True):
     pass
     # Should database changes be committed automatically after each command?
     if type(auto_commit) != bool:
