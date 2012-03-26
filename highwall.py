@@ -9,6 +9,8 @@ SQLITE_PYTHON_TYPE_MAP={
   u"text": unicode,
   u"integer": int,
   u"real": float,
+  u"date": datetime.date,
+  u"datetime": datetime.datetime,
 }
 
 PYTHON_SQLITE_TYPE_MAP={
@@ -16,6 +18,8 @@ PYTHON_SQLITE_TYPE_MAP={
   str: u"text",
   int: u"integer",
   float: u"real",
+  datetime.date: u"date",
+  datetime.datetime: u"datetime",
 }
 
 # Only for compatibility with scraperwiki;
