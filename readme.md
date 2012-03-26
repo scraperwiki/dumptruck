@@ -13,7 +13,7 @@ feel more like document databases.
 
     # This doesn't actually work yet; this here so I don't forget
     # to put it in once I put it on PyPI once it's ready.
-    pip install highwall
+    pip2 install highwall || pip install highwall
 
 ### Initialize
 
