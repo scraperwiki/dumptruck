@@ -67,8 +67,8 @@ def __checkdata(data):
       raise ValueError('key must not be blank')
     elif type(key) not in (unicode, str):
       raise ValueError('key must be string type')
-    elif not re.match("[a-zA-Z0-9_\- ]+$", key):
-      raise ValueError('key must be simple text')
+#   elif not re.match("[a-zA-Z0-9_\- ]+$", key):
+#     raise ValueError('key must be simple text')
   return data
 
 def __convdata(data):

@@ -25,7 +25,7 @@ class TestDb(TestCase):
     self.cleanUp()
 
   def tearDown(self):
-    pass #self.cleanUp()
+    self.cleanUp()
 
   def cleanUp(self):
     "Clean up temporary files."
@@ -77,6 +77,49 @@ class TestSaveVar(TestDb):
     indices = self.cursor.fetchall()
 #   self.assertNotEqual(indices,[])
 
+class TestVars(TestDb):
+  def save(self, key, value):
+    h = Highwall(dbname = 'test.db')
+    h.save_var(key, value)
+    h.close()
+
+  def check(self, key, value, dbtype):
+    connection=sqlite3.connect('test.db')
+    self.cursor=connection.cursor()
+    self.cursor.execute("SELECT * FROM `_highwallvars`")
+    observed = self.cursor.fetchall()
+    expected = [(key, value, dbtype)]
+    self.assertEqual(observed, expected)
+
+  def get(self, key, value):
+    h = Highwall(dbname = 'test.db')
+    self.assertEqual(h.get_var(key), value)
+    h.close()
+
+  def save_check_get(self, key, valueIn, dbtype, valueOut = None):
+    if valueOut == None:
+      valueOut = valueIn
+
+    self.save(key, valueIn)
+    self.check(key, valueOut, dbtype)
+    self.get(key, valueOut)
+
+class TestVarsSQL(TestVars):
+  def test_integer(self):
+    self.save('foo', 42)
+#    self.save_check_get('foo', 42, 'integer')
+
+#class TestVarsJSON(TestVars):
+#  def test_list(self):
+#    self.save_check_get('foo', [], 'text')
+#  def test_dict(self):
+#    self.save_check_get('foo', {}, 'text')
+
+#class TestVarsPickle(TestVars):
+#  def test_func(self):
+#    y = lambda x: x^2
+#    self.save_check_get('foo', y, 'blob')
+
 class TestSelect(TestDb):
   def test_select(self):
     shutil.copy('fixtures/landbank_branches.sqlite','.')
@@ -109,6 +152,19 @@ class SaveAndCheck(TestDb):
 
     expected = dataOut
     self.assertListEqual(observed, expected)
+
+class TestSaveTwice(SaveAndCheck):
+  def test_save_twice(self):
+    self.save_and_check(
+      {"modelNumber": 293}
+    , "model-numbers"
+    , [(293,)]
+    )
+    self.save_and_check(
+      {"modelNumber": 293}
+    , "model-numbers"
+    , [(293,), (293,)]
+    )
 
 class TestSaveInt(SaveAndCheck):
   def test_save(self):

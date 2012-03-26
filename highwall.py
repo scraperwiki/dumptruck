@@ -76,10 +76,7 @@ class Highwall:
       self.connection.commit()
 
   def __check_or_create_vars_table(self):
-    if self.__vars_table in self.show_tables():
-      pass #Do something
-    else:
-      self.__is_table(self.__vars_table)
+    try:
       # This is vulnerable to injection.
       self.cursor.execute("""
         CREATE TABLE `%s` (
@@ -87,6 +84,9 @@ class Highwall:
           value_blob BLOB,
           type TEXT
         );""" % self.__vars_table)
+    except:
+      raise
+    else:
       self.connection.commit()
 
   def execute(self, sql, *args, **kwargs):
@@ -152,7 +152,7 @@ class Highwall:
         #raise NotImplementedError("Pretend this alters the table to add the column.")
         self.__add_column(quote(table_name), key, PYTHON_SQLITE_TYPE_MAP[type(value)])
       except sqlite3.OperationalError, msg:
-        if str(msg) == 'duplicate column name: modelNumber':
+        if str(msg).split(':')[0] == 'duplicate column name':
           # The column is already there.
           pass
         else:
