@@ -93,7 +93,10 @@ class Highwall:
       return None
     else:
       colnames = [d[0] for d in self.cursor.description] 
-      return [dict(zip(colnames,row)) for row in rows]
+      rawdata = [dict(zip(colnames,row)) for row in rows]
+      #datetime.datetime.strptime(u'1990-03-30', '%Y-%m-%d').date()
+      #datetime.datetime.strptime(u'1990-03-30T00:00:00', '%Y-%m-%dT%H:%M:%S')
+      return rawdata
 
   def commit(self):
     "Commit database transactions."
