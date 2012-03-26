@@ -106,9 +106,9 @@ use json or pickle.
 ### Helpers
 Highwall provides specialized wrapper around some common commands.
 
-`Highwall.show_tables` returns a set of all of the tables in the database.
+`Highwall.tables` returns a set of all of the tables in the database.
 
-    h.show_tables()
+    h.tables()
 
 `Highwall.drop` drops a table.
 
@@ -123,7 +123,7 @@ For example, if the table `tools` does not exist, the following call will create
 `tools` with the columns `toolName` and `weight`, with the types `TEXT` and `INTEGER`,
 respectively, but will not insert the dictionary values ("jackhammer" and 58) into the table.
 
-    h.insert({"toolName":"jackhammer", "weight": 58}, "tools", create_only = True)
+    h.create_table({"toolName":"jackhammer", "weight": 58}, "tools")
 
 ### Indices
 
@@ -164,7 +164,7 @@ And this one deletes the index.
 
     h.execute('DROP INDEX tools_toolName_weight0')
 
-For more information on indices and, particularly, the `PRAGMA' commands, check
+For more information on indices and, particularly, the `PRAGMA` commands, check
 the [SQLite documentation]().
 
 ### Delaying commits
