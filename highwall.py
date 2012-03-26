@@ -94,8 +94,9 @@ class Highwall:
     else:
       colnames = [d[0] for d in self.cursor.description] 
       rawdata = [dict(zip(colnames,row)) for row in rows]
-      #datetime.datetime.strptime(u'1990-03-30', '%Y-%m-%d').date()
-      #datetime.datetime.strptime(u'1990-03-30T00:00:00', '%Y-%m-%dT%H:%M:%S')
+      # If I can figure out the column types, I can do this.
+      # datetime.datetime.strptime(u'1990-03-30', '%Y-%m-%d').date()
+      # datetime.datetime.strptime(u'1990-03-30T00:00:00', '%Y-%m-%dT%H:%M:%S')
       return rawdata
 
   def commit(self):
