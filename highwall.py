@@ -206,7 +206,6 @@ class Highwall:
       raise NameError("The Highwall variables table doesn't have a value for %s." % key)
     else:
       row = data[0]
-      print row
       if row.has_key('sql_type') and SQLITE_PYTHON_TYPE_MAP.has_key(row['sql_type']):
         cast = SQLITE_PYTHON_TYPE_MAP[row['sql_type']]
       else:
