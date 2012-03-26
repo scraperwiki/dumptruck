@@ -8,15 +8,22 @@ import datetime
 SQLITE_PYTHON_TYPE_MAP={
   u"text": unicode,
   u"integer": int,
+  u"bool": bool,
   u"real": float,
   u"date": datetime.date,
   u"datetime": datetime.datetime,
+  #u"null": ??
+  #BLOB: ??? The value is a blob of data, stored exactly as it was input.
 }
 
 PYTHON_SQLITE_TYPE_MAP={
   unicode: u"text",
   str: u"text",
+
   int: u"integer",
+  long: u"integer",
+  bool: u"boolean",
+
   float: u"real",
   datetime.date: u"date",
   datetime.datetime: u"datetime",
@@ -48,7 +55,7 @@ class Highwall:
 
     # Make sure it's a good table name
     if type(vars_table) not in [unicode, str]:
-      raise TypeError("auto_commit must be a string")
+      raise TypeError("vars_table must be a string")
     else:
       self.__vars_table = vars_table
 
@@ -118,10 +125,10 @@ class Highwall:
       try:
         # This is vulnerable to injection.
         if unique:
-          sql = "CREATE UNIQUE INDEX ? ON `%s` (`%s`)"
+          sql = "CREATE UNIQUE INDEX ? ON [%s] ([%s])"
         else:
-          sql = "CREATE INDEX ? ON `%s` (`%s`)"
-        self.execute(sql % (table_name, '`,`'.join(columns)), index_name+str(arbitrary_number))
+          sql = "CREATE INDEX ? ON [%s] ([%s])"
+        self.execute(sql % (table_name, '],['.join(columns)), index_name+str(arbitrary_number))
       except:
         arbitrary_number += 1
 
@@ -178,7 +185,7 @@ class Highwall:
     for row in conved_data:
       question_marks = ','.join('?'*len(row.keys()))
       # This is vulnerable to injection.
-      sql = "INSERT INTO `%s` (`%s`) VALUES (%s);" % (table_name, '`,`'.join(row.keys()), question_marks)
+      sql = "INSERT INTO [%s] ([%s]) VALUES (%s);" % (table_name, '],['.join(row.keys()), question_marks)
       self.execute(sql, row.values(), commit=False)
     self.commit()
 
@@ -232,9 +239,6 @@ class DataDump:
     self.__convdata()
     return self.data
 
-  class CouldNotJSONify(Exception):
-    pass
-
   def __remove_null(self):
     for key, value in self.data.items():
       if value == None:
@@ -261,6 +265,10 @@ class DataDump:
         raise ValueError('key must be string type')
       elif not re.match("[a-zA-Z0-9_\- ]+$", key):
         raise ValueError('key must be simple text')
+      elif key[0] == '[' and key[-1] == ']':
+        #Remove the brackets so we can add them back later.
+        self.data[key[1:-1]] = self.data[key]
+        del(self.data[key])
 
   def __convdata(self):
     #Based on scraperlibs

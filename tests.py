@@ -29,7 +29,7 @@ class TestGetVar(TestDb):
    self.assertEquals(self.h.get_var('DATE'),1329518937.92)
 
   def test_nonexisting_var(self):
-   self.assertRaises(Highwall.NameError,self.h.get_var,'nonexistant_var')
+   self.assertRaises(NameError,self.h.get_var,'nonexistant_var')
 
 class TestSaveVar(TestDb):
   def setUp(self):
@@ -98,20 +98,28 @@ class TestSaveInt(SaveAndCheck):
     , [(293,)]
     )
 
+class TestSaveWeirdTableName1(SaveAndCheck):
+  def test_save_int(self):
+    self.save_and_check(
+      {"modelNumber": 293}
+    , "This should-be a_valid.table+name!?"
+    , [(293,)]
+    )
+
+class TestSaveWeirdTableName2(SaveAndCheck):
+  def test_save(self):
+    self.save_and_check(
+      {"firstname":"Robert","lastname":"LeTourneau"}
+    , "[asoeu]"
+    , [(u'LeTourneau', u'Robert')]
+    )
+
 class TestSaveHyphen(SaveAndCheck):
   def test_save_int(self):
     self.save_and_check(
       {"model-number": 293}
     , "model-numbers"
     , [(293,)]
-    )
-
-class TestSaveWeirdTableName(SaveAndCheck):
-  def test_save(self):
-    self.save_and_check(
-      {"firstname":"Robert","lastname":"LeTourneau"}
-    , "[asoeu]"
-    , [(u'LeTourneau', u'Robert')]
     )
 
 class TestSaveString(SaveAndCheck):
