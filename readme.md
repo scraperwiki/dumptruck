@@ -130,7 +130,7 @@ respectively, but will not insert the dictionary values ("jackhammer" and 58) in
 #### Creating
 Highwall contains a special method for creating indices. To create an index,
 first create an empty table. (See "Creating empty tables" above.)
-Then, use the `Highwall.add_index` method.
+Then, use the `Highwall.create_index` method.
 
     h.create_index('tools', ['toolName'])
 
