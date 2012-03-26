@@ -72,7 +72,7 @@ class Highwall:
       # This is vulnerable to injection.
       self.cursor.execute("""
         CREATE TABLE `%s` (
-          %s %s
+          `%s` %s
         );""" % (table_name, k, PYTHON_SQLITE_TYPE_MAP[type(startdata[k])]))
       self.connection.commit()
 
@@ -186,7 +186,7 @@ class Highwall:
     for row in conved_data:
       question_marks = ','.join('?'*len(row.keys()))
       # This is vulnerable to injection.
-      sql = "INSERT INTO `%s` (%s) VALUES (%s);" % (table_name, ','.join(row.keys()), question_marks)
+      sql = "INSERT INTO `%s` (`%s`) VALUES (%s);" % (table_name, '`,`'.join(row.keys()), question_marks)
       self.execute(sql, row.values(), commit=False)
     self.commit()
 
