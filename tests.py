@@ -36,7 +36,7 @@ class TestDb(TestCase):
     self.cleanUp()
 
   def tearDown(self):
-    self.cleanUp()
+    pass #self.cleanUp()
 
   def cleanUp(self):
     "Clean up temporary files."
@@ -240,12 +240,20 @@ class TestSaveString(SaveAndCheck):
     , [(u'LeTourneau', u'Robert')]
     )
 
-class TestSave(SaveAndCheck):
+class TestSaveDate(SaveAndCheck):
   def test_save(self):
     self.save_and_check(
       {"birthday":datetime.datetime.strptime('1990-03-30', '%Y-%m-%d').date()}
     , "birthdays"
-    , [(u'1990-03-30')]
+    , [(u'1990-03-30',)]
+    )
+
+class TestSaveDateTime(SaveAndCheck):
+  def test_save(self):
+    self.save_and_check(
+      {"birthday":datetime.datetime.strptime('1990-03-30', '%Y-%m-%d')}
+    , "birthdays"
+    , [(u'1990-03-30T00:00:00',)]
     )
 
 class TestInvalidHighwallParams(TestDb):
