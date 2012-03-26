@@ -129,7 +129,7 @@ class Highwall:
     return {column[1]:column[2] for column in self.cursor.fetchall()}
 
   def __is_table(self,table_name):
-    return table_name in self.show_tables()
+    return table_name in self.tables()
 
   def __check_and_add_columns(self, table_name, converted_data_row):
     column_types = self.__column_types(table_name)
@@ -241,7 +241,7 @@ class Highwall:
 
     return self.insert(data, self.__vars_table, commit = commit)
 
-  def show_tables(self):
+  def tables(self):
     result = self.execute("SELECT name FROM sqlite_master WHERE TYPE='table'", commit = False)
     return set([row['name'] for row in result])
 

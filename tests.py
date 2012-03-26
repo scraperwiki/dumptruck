@@ -135,7 +135,7 @@ class TestShowTables(TestDb):
   def test_show_tables(self):
     shutil.copy('fixtures/landbank_branches.sqlite','test.db')
     h = Highwall(dbname = 'test.db')
-    self.assertSetEqual(h.show_tables(),set(['blocks','branches']))
+    self.assertSetEqual(h.tables(),set(['blocks','branches']))
 
 class TestCreateTable(TestDb):
   def test_create_table(self):
