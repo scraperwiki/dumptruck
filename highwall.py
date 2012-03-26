@@ -60,20 +60,22 @@ class Highwall:
       self.__vars_table = vars_table
 
   def __check_or_create_vars_table(self):
+    self.create_table(
+      {'name': '', 'sql_type': '', 'lang': '', 'lang_type': ''},
+      quote(self.__vars_table)
+    )
+
     try:
-      # This is vulnerable to injection.
-      self.cursor.execute("""
-        CREATE TABLE `%s` (
-          name TEXT,
-          value_blob BLOB,
-          sql_type TEXT,
-          lang TEXT,
-          lang_type TEXT
-        );""" % self.__vars_table)
+      self.execute('ALTER TABLE %s ADD COLUMN value_blob BLOB' % quote(self.__vars_table))
     except:
       raise
     else:
       self.connection.commit()
+
+    table_info = self.execute('PRAGMA table_info(%s)' % quote(self.__vars_table))
+    column_names_observed = set([column['name'] for column in table_info])
+    column_names_expected = set(['name', 'value_blob', 'sql_type', 'lang', 'lang_type'])
+    assert column_names_observed == column_names_expected, table_info
 
   def execute(self, sql, *args, **kwargs):
     """
@@ -147,7 +149,7 @@ class Highwall:
         except ValueError:
           raise TypeError("Data could not be converted to match the existing `%s` column type.")
 
-  def create_table(self, data, table_name, commit = True):
+  def create_table(self, data, table_name, commit = True, error_if_exists = False):
     "Create a table based on the data, but don't insert anything."
     converted_data = convert(data)
     startdata = converted_data[0]
@@ -164,7 +166,7 @@ class Highwall:
           %s %s
         );""" % (quote(table_name), quote(k), PYTHON_SQLITE_TYPE_MAP[type(startdata[k])]))
     except sqlite3.OperationalError, msg:
-      if not re.match(r'^table.+already exists$', str(msg)):
+      if (not re.match(r'^table.+already exists$', str(msg))) or (error_if_exists == True):
         raise
     else:
       self.connection.commit()
