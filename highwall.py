@@ -3,6 +3,7 @@ import sqlite3
 from copy import copy
 import re
 import datetime
+from convert import convert
 
 # Mappings between Python types and SQLite types
 SQLITE_PYTHON_TYPE_MAP={
@@ -176,7 +177,7 @@ class Highwall:
 
     self.__check_or_create_table(table_name, data[0])
 
-    conved_data = [DataDump(row).dump() for row in data]
+    conved_data = [convert(row) for row in data]
     for row in conved_data:
       self.__check_and_add_columns(table_name, row)
     
@@ -225,72 +226,3 @@ class Highwall:
   def drop(self, table_name, commit = True):
     # This is vulnerable to injection.
     return self.execute('DROP IF EXISTS `%s`;' % table_name, commit = commit)
-
-class DataDump:
-  "A data dictionary converter"
-  def __init__(self, data):
-    self.raw = data
-
-  def dump(self):
-    self.data = copy(self.raw)
-    self.__remove_null()
-    self.__checkdata()
-    self.__jsonify()
-    self.__convdata()
-    return self.data
-
-  def __remove_null(self):
-    for key, value in self.data.items():
-      if value == None:
-        del(self.data[key])
-
-  def __jsonify(self):
-    for key, value in self.data.items():
-      if type(value)==set:
-        # Convert sets to dicts
-        self.data[key] = dict(zip( list(value), [None]*len(value) ))
-
-      if type(value) in (list, dict):
-        try:
-          value = dumps(value)
-        except TypeError:
-          raise TypeError("The value for %s is a complex object that could not be dumped to JSON.")
-
-  def __checkdata(self):
-    #Based on scraperlibs
-    for key in self.data.keys():
-      if not key:
-        raise ValueError('key must not be blank')
-      elif type(key) not in (unicode, str):
-        raise ValueError('key must be string type')
-      elif not re.match("[a-zA-Z0-9_\- ]+$", key):
-        raise ValueError('key must be simple text')
-      elif key[0] == '[' and key[-1] == ']':
-        #Remove the brackets so we can add them back later.
-        self.data[key[1:-1]] = self.data[key]
-        del(self.data[key])
-
-  def __convdata(self):
-    #Based on scraperlibs
-    jdata = {}
-    for key, value in self.data.items():
-      if type(value) == datetime.date:
-        value = value.isoformat()
-      elif type(value) == datetime.datetime:
-        if value.tzinfo is None:
-          value = value.isoformat()
-        else:
-          value = value.astimezone(pytz.timezone('UTC')).isoformat()
-          assert "+00:00" in value
-          value = value.replace("+00:00", "")
-      elif value == None:
-        pass
-      elif type(value) == str:
-        try:
-          value = value.decode("utf-8")
-        except:
-          raise UnicodeEncodeError("Binary strings must be utf-8 encoded")
-      elif type(value) not in [int, bool, float, unicode, str]:
-        value = unicode(value)
-      jdata[key] = value
-    self.data = jdata
