@@ -226,9 +226,13 @@ class SaveAndSelect(TestDb):
     observed = dt.dump()[0]['foo']
     self.assertEqual(d, observed)
 
-class TestSaveLong(SaveAndSelect):
-  def test_save_long(self):
+class TestSaveLong1(SaveAndSelect):
+  def test_zeroes(self):
     self.save_and_select(100000000000000000000000000000000)
+
+class TestSaveLong2(SaveAndSelect):
+  def test_e(self):
+    self.save_and_select(1e+32)
 
 class TestSaveBigFloat(SaveAndSelect):
   def test_save_bigfloat(self):

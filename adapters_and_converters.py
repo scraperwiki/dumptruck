@@ -5,6 +5,13 @@ import datetime
 PICKLE_TYPES = [
 ]
 
+def register_big(module):
+    def adapt_long(val):
+        "Handle very large integers."
+        return float(val)
+
+    module.register_adapter(long, adapt_long)
+
 def register_pickle(module):
     def adapt_pickle(val):
         return pickle.dumps(val)
@@ -68,6 +75,7 @@ def register_dates(module):
     module.register_converter("datetime", convert_datetime)
 
 def register_adapters_and_converters(module):
+#   register_big(module)
     register_dates(module)
     register_json(module)
 #   register_pickle(module)
