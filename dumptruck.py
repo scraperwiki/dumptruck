@@ -33,6 +33,8 @@ PYTHON_SQLITE_TYPE_MAP={
   datetime.datetime: u"datetime",
 
   dict: u"json text",
+  list: u"json text",
+  set: u"jsonset text",
 }
 
 # Only for compatibility with scraperwiki;
@@ -185,7 +187,7 @@ class DumpTruck:
       self.__check_and_add_columns(table_name, row)
 
 
-  def insert(self, data, table_name, commit = True):
+  def insert(self, data, table_name = "dumptruck", commit = True):
     try:
       self.create_table(data, table_name)
     except:
@@ -252,6 +254,10 @@ class DumpTruck:
     result = self.execute("SELECT name FROM sqlite_master WHERE TYPE='table'", commit = False)
     return set([row['name'] for row in result])
 
-  def drop(self, table_name, commit = True):
-    # This is vulnerable to injection.
+  def drop(self, table_name = "dumptruck", commit = True):
+    "Drop a table."
     return self.execute('DROP IF EXISTS %s;' % quote(table_name), commit = commit)
+
+  def dump(self, table_name = "dumptruck", commit = True):
+    "Dump a table."
+    return self.execute('SELECT * FROM %s;' % quote(table_name), commit = commit)

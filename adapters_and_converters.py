@@ -2,23 +2,24 @@ from json import loads, dumps
 import datetime
 
 def register_json(module):
-    def adapt_json_list(val):
+    def adapt_json(val):
         return dumps(val)
 
-    def adapt_json_dict(val):
-        return dumps(val)
-
-    def adapt_json_set(val):
+    def adapt_jsonset(val):
         d = {k: None for k in val}
         return dumps(d)
 
     def convert_json(val):
         return loads(val)
 
-    module.register_adapter(list, adapt_json_list)
-    module.register_adapter(dict, adapt_json_dict)
-    module.register_adapter(set, adapt_json_set)
+    def convert_jsonset(val):
+        return set(loads(val).keys())
+
+    module.register_adapter(list, adapt_json)
+    module.register_adapter(dict, adapt_json)
+    module.register_adapter(set, adapt_jsonset)
     module.register_converter("json", convert_json)
+    module.register_converter("jsonset", convert_jsonset)
 
 def register_dates(module):
     def adapt_date(val):

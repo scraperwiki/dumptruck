@@ -210,12 +210,30 @@ class TestSaveDict(SaveAndCheck):
     , [(dumps(d),)]
     )
 
+  def test_save_fanciness(self):
+    d = {'1': datetime.datetime(2012, 3, 5)}
+    self.assertRaises(TypeError, lambda: self.save_and_check(
+      {"modelNumber": d}
+    , "model-numbers"
+    , [(dumps(d),)]
+    ))
+
+class TestSaveSet(SaveAndCheck):
+  def test_save_set(self):
+    d = set(["A", "B", "C"])
+    dt = DumpTruck()
+    dt.insert({"foo": d})
+
+    observed = dt.dump()[0]['foo']
+    self.assertSetEqual(d, observed)
+
 class TestSaveList(SaveAndCheck):
   def test_save_integers(self):
+    d = ["A", "B", "C"]
     self.save_and_check(
-      {"model-codes": ["A", "B", "C"]}
+      {"model-codes": d}
     , "models"
-    , [('{"A": null, "B": null, "C": null}',)]
+    , [(dumps(d),)]
     )
 
 class TestSaveTwice(SaveAndCheck):
