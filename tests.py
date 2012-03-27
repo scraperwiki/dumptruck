@@ -226,6 +226,15 @@ class SaveAndSelect(TestDb):
     observed = dt.dump()[0]['foo']
     self.assertEqual(d, observed)
 
+class TestSavePickle(SaveAndSelect):
+  def test_save_pickle(self):
+    import pickle
+    self.save_and_select(pickle.dumps(SaveAndSelect))
+
+class TestSaveLambda(SaveAndSelect):
+  def test_save_lambda(self):
+    self.save_and_select(lambda x: x^2)
+
 class TestSaveSet(SaveAndSelect):
   def test_save_set(self):
     self.save_and_select(set(["A", "B", "C"]))

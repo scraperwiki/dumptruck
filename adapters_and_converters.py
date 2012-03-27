@@ -1,19 +1,36 @@
-from json import loads, dumps
+import pickle
+import json
 import datetime
+
+PICKLE_TYPES = [
+  type(lambda: None),
+]
+
+def register_pickle(module):
+    def adapt_pickle(val):
+        return pickle.dumps(val)
+
+    def convert_pickle(val):
+        return pickle.loads(val)
+
+    for t in PICKLE_TYPES:
+        module.register_adapter(t, adapt_pickle)
+
+    module.register_converter("pickle", convert_pickle)
 
 def register_json(module):
     def adapt_json(val):
-        return dumps(val)
+        return json.dumps(val)
 
     def adapt_jsonset(val):
         d = {k: None for k in val}
-        return dumps(d)
+        return json.dumps(d)
 
     def convert_json(val):
-        return loads(val)
+        return json.loads(val)
 
     def convert_jsonset(val):
-        return set(loads(val).keys())
+        return set(json.loads(val).keys())
 
     module.register_adapter(list, adapt_json)
     module.register_adapter(tuple, adapt_json)
@@ -52,5 +69,6 @@ def register_dates(module):
     module.register_converter("datetime", convert_datetime)
 
 def register_adapters_and_converters(module):
-    register_json(module)
     register_dates(module)
+    register_json(module)
+    register_pickle(module)
