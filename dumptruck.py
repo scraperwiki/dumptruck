@@ -3,7 +3,7 @@ import sqlite3
 import re
 import datetime
 from convert import convert, quote
-from adapters_and_converters import register_adapters_and_converters
+from adapters_and_converters import register_adapters_and_converters, Pickle
 
 register_adapters_and_converters(sqlite3)
 del(register_adapters_and_converters)
@@ -27,8 +27,8 @@ PYTHON_SQLITE_TYPE_MAP={
   int: u"integer",
   long: u"integer",
   bool: u"boolean",
-
   float: u"real",
+
   datetime.date: u"date",
   datetime.datetime: u"datetime",
 
@@ -142,7 +142,8 @@ class DumpTruck:
     column_types = self.__column_types(table_name)
     for key,value in converted_data_row.items():
       try:
-        params = (quote(table_name), key, PYTHON_SQLITE_TYPE_MAP[type(value)])
+        column_type = "pickle text" if isinstance(value, Pickle) else PYTHON_SQLITE_TYPE_MAP[type(value)]
+        params = (quote(table_name), key, column_type)
         sql = 'ALTER TABLE %s ADD COLUMN %s %s ' % params
         self.execute(sql, commit = True)
       except sqlite3.OperationalError, msg:

@@ -2,8 +2,9 @@ import pickle
 import json
 import datetime
 
-PICKLE_TYPES = [
-]
+class Pickle:
+    def __init__(self, obj):
+        self.obj = obj
 
 def register_big(module):
     def adapt_long(val):
@@ -14,14 +15,12 @@ def register_big(module):
 
 def register_pickle(module):
     def adapt_pickle(val):
-        return pickle.dumps(val)
+        return pickle.dumps(val.obj)
 
     def convert_pickle(val):
         return pickle.loads(val)
 
-    for t in PICKLE_TYPES:
-        module.register_adapter(t, adapt_pickle)
-
+    module.register_adapter(Pickle, adapt_pickle)
     module.register_converter("pickle", convert_pickle)
 
 def register_json(module):
@@ -78,4 +77,4 @@ def register_adapters_and_converters(module):
 #   register_big(module)
     register_dates(module)
     register_json(module)
-#   register_pickle(module)
+    register_pickle(module)
