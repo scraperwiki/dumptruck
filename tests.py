@@ -226,6 +226,14 @@ class SaveAndSelect(TestDb):
     observed = dt.dump()[0]['foo']
     self.assertEqual(d, observed)
 
+class TestSaveLong(SaveAndSelect):
+  def test_save_long(self):
+    self.save_and_select(100000000000000000000000000000000)
+
+class TestSaveBigFloat(SaveAndSelect):
+  def test_save_bigfloat(self):
+    self.save_and_select(1.29839287397423984729387429837492374e+100)
+
 class TestSavePickle(SaveAndSelect):
   def test_save_pickle(self):
     import pickle
