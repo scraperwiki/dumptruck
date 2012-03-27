@@ -218,14 +218,17 @@ class TestSaveDict(SaveAndCheck):
     , [(dumps(d),)]
     ))
 
-class TestSaveSet(SaveAndCheck):
-  def test_save_set(self):
-    d = set(["A", "B", "C"])
+class SaveAndSelect(TestDb):
+  def save_and_select(self, d):
     dt = DumpTruck()
     dt.insert({"foo": d})
 
     observed = dt.dump()[0]['foo']
-    self.assertSetEqual(d, observed)
+    self.assertEqual(d, observed)
+
+class TestSaveSet(SaveAndSelect):
+  def test_save_set(self):
+    self.save_and_select(set(["A", "B", "C"]))
 
 class TestSaveList(SaveAndCheck):
   def test_save_integers(self):
@@ -269,18 +272,22 @@ class TestSaveWeirdTableName1(SaveAndCheck):
 class TestSaveWeirdTableName2(SaveAndCheck):
   def test_save(self):
     self.save_and_check(
-      {"firstname":"Robert","lastname":"LeTourneau"}
+      {"lastname":"LeTourneau"}
     , "`asoeu`"
-    , [(u'LeTourneau', u'Robert')]
+    , [(u'LeTourneau',)]
     )
 
 class TestSaveWeirdTableName3(SaveAndCheck):
   def test_save(self):
     self.save_and_check(
-      {"firstname":"Robert","lastname":"LeTourneau"}
+      {"lastname":"LeTourneau"}
     , "[asoeu]"
-    , [(u'LeTourneau', u'Robert')]
+    , [(u'LeTourneau',)]
     )
+
+class TestMultipleColumns(SaveAndSelect):
+  def test_save(self):
+    self.save_and_select({"firstname":"Robert","lastname":"LeTourneau"})
 
 class TestSaveHyphen(SaveAndCheck):
   def test_save_int(self):
@@ -293,9 +300,9 @@ class TestSaveHyphen(SaveAndCheck):
 class TestSaveString(SaveAndCheck):
   def test_save(self):
     self.save_and_check(
-      {"firstname":"Robert","lastname":"LeTourneau"}
+      {"lastname":"LeTourneau"}
     , "diesel-engineers"
-    , [(u'LeTourneau', u'Robert')]
+    , [(u'LeTourneau',)]
     )
 
 class TestSaveDate(SaveAndCheck):

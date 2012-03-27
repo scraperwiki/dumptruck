@@ -5,14 +5,9 @@ import datetime
 from json import loads, dumps
 
 QUOTEPAIRS = [
-  ('[', ']'),
-# ('"', '"'),
-# ('\'', '\''),
   ('`', '`'),
+  ('[', ']'),
 ]
-
-#QUOTECHARS = '\'"`'
-QUOTECHARS = '`'
 
 def convert(data):
   # Allow single rows to be dictionaries.
@@ -39,13 +34,9 @@ def quote(text):
       return text
 
   # If it's not quoted, try quoting
-  for qc in QUOTECHARS:
-    if qc not in text:
-      return qc + text + qc
-
-  #If the text has the quote characters, check for brackets.
-  if ']' not in text:
-    return '[' + text + ']'
+  for qp in QUOTEPAIRS:
+    if qp[1] not in text:
+      return qp[0] + text + qp[1]
 
   #Darn
   raise ValueError('The value "%s" is not quoted and contains too many quote characters to quote' % text)
