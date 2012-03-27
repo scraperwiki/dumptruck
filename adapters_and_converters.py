@@ -3,7 +3,6 @@ import json
 import datetime
 
 PICKLE_TYPES = [
-  type(lambda: None),
 ]
 
 def register_pickle(module):
@@ -71,4 +70,4 @@ def register_dates(module):
 def register_adapters_and_converters(module):
     register_dates(module)
     register_json(module)
-    register_pickle(module)
+#   register_pickle(module)
