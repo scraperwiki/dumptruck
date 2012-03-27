@@ -1,8 +1,7 @@
 DumpTruck
 ==============
 
-DumpTruck is an document-like interface to an SQLite database that lets you relax.
-It supports the following database formats.
+DumpTruck is an document-like interface to an SQLite database.
 
 Quick start
 ----------
