@@ -34,10 +34,9 @@ if it needs to.
 ### Retrieve
 Once the database contains data, you can retrieve them.
 
-    data = dt.execute('SELECT * FROM `diesel-engineers`')
+    data = dt.dump('diesel-engineers')
 
 The data come out as a list of dictionaries, with one dictionary per row.
-
 
 Slow start
 -------
@@ -89,6 +88,16 @@ so you can use bizarre table and column names, like `no^[hs!'e]?'sf_"&'`
 It would be cool if I can come up with a way for `dt.insert` to return
 the [rowid](http://www.sqlite.org/lang_createtable.html#rowid)(s) of the
 row(s) that are being saved. Dunno how annoying this would be....
+
+### Retrieving
+
+You can use normal SQL to retrieve data from the database.
+
+    data = dt.execute('SELECT * FROM `diesel-engineers`')
+
+The data come back as a list of dictionaries, one dictionary
+per row. They are coerced to different python types depending
+on their database types.
 
 ### Individual values
 It's often useful to be able to quickly and easily save one metadata value.
