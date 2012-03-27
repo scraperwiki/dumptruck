@@ -3,6 +3,10 @@ import sqlite3
 import re
 import datetime
 from convert import convert, quote
+from adapters_and_converters import register_adapters_and_converters
+
+register_adapters_and_converters(sqlite3)
+del(register_adapters_and_converters)
 
 # Mappings between Python types and SQLite types
 SQLITE_PYTHON_TYPE_MAP={
@@ -27,6 +31,8 @@ PYTHON_SQLITE_TYPE_MAP={
   float: u"real",
   datetime.date: u"date",
   datetime.datetime: u"datetime",
+
+  dict: u"text [json]",
 }
 
 # Only for compatibility with scraperwiki;
@@ -50,7 +56,7 @@ class DumpTruck:
     if type(dbname) not in [unicode, str]:
       raise TypeError("dbname must be a string")
     else:
-      self.connection=sqlite3.connect(dbname)
+      self.connection=sqlite3.connect(dbname, detect_types = sqlite3.PARSE_DECLTYPES)
       self.cursor=self.connection.cursor()
 
     # Make sure it's a good table name

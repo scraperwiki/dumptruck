@@ -1,4 +1,5 @@
 from unittest import TestCase, main
+from json import loads, dumps
 from dumptruck import DumpTruck
 from convert import quote
 import sqlite3
@@ -192,6 +193,23 @@ class SaveAndCheck(TestDb):
       self.assertListEqual(observed2, expected2)
       
 
+class TestSaveDict(SaveAndCheck):
+  def test_save_integers(self):
+    d = {1: "A", 2: "B", 3: "C"}
+    self.save_and_check(
+      {"modelNumber": d}
+    , "model-numbers"
+    , [(dumps(d),)]
+    )
+
+class TestSaveList(SaveAndCheck):
+  def test_save_integers(self):
+    self.save_and_check(
+      {"model-codes": ["A", "B", "C"]}
+    , "models"
+    , [('{"A": null, "B": null, "C": null}',)]
+    )
+
 class TestSaveTwice(SaveAndCheck):
   def test_save_twice(self):
     self.save_and_check(
@@ -267,7 +285,7 @@ class TestSaveDateTime(SaveAndCheck):
     self.save_and_check(
       {"birthday":datetime.datetime.strptime('1990-03-30', '%Y-%m-%d')}
     , "birthdays"
-    , [(u'1990-03-30T00:00:00',)]
+    , [(u'1990-03-30 00:00:00',)]
     )
 
 class TestInvalidDumpTruckParams(TestDb):

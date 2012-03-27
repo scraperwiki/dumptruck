@@ -2,6 +2,7 @@
 from copy import copy
 import re
 import datetime
+from json import loads, dumps
 
 def convert(data):
   # Allow single rows to be dictionaries.
@@ -15,7 +16,7 @@ def convert(data):
   except TypeError:
     raise TypeError('The data argument must be a dict or an iterable of dicts.')
 
-  data = [__convdata(__jsonify(__checkdata(__remove_null(row)))) for row in data]
+  data = [__jsonify(__checkdata(__remove_null(row))) for row in data]
 
   data_quoted = [{quote(k): v for k, v in row.items()} for row in data]
   return data_quoted
@@ -76,30 +77,4 @@ def __checkdata(data):
       raise ValueError('key must be string type')
 #   elif not re.match("[a-zA-Z0-9_\- ]+$", key):
 #     raise ValueError('key must be simple text')
-  return data
-
-def __convdata(data):
-  #Based on scraperlibs
-  jdata = {}
-  for key, value in data.items():
-    if type(value) == datetime.date:
-      value = value.isoformat()
-    elif type(value) == datetime.datetime:
-      if value.tzinfo is None:
-        value = value.isoformat()
-      else:
-        value = value.astimezone(pytz.timezone('UTC')).isoformat()
-        assert "+00:00" in value
-        value = value.replace("+00:00", "")
-    elif value == None:
-      pass
-    elif type(value) == str:
-      try:
-        value = value.decode("utf-8")
-      except:
-        raise UnicodeEncodeError("Binary strings must be utf-8 encoded")
-    elif type(value) not in [int, bool, float, unicode, str]:
-      value = unicode(value)
-    jdata[key] = value
-  data = jdata
   return data
