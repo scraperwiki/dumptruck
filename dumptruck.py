@@ -25,6 +25,10 @@ PYTHON_SQLITE_TYPE_MAP={
   set: u"jsonset text",
 }
 
+def get_column_type(obj):
+  "Decide the type of a column to contain an object."
+  return "pickle text" if isinstance(obj, Pickle) else PYTHON_SQLITE_TYPE_MAP[type(obj)]
+
 # Only for compatibility with scraperwiki;
 # we should use the SQLite names
 #SWVARIABLES_PYTHON_TYPE_MAP={
@@ -136,7 +140,7 @@ class DumpTruck:
     column_types = self.__column_types(table_name)
     for key,value in converted_data_row.items():
       try:
-        column_type = "pickle text" if isinstance(value, Pickle) else PYTHON_SQLITE_TYPE_MAP[type(value)]
+        column_type = get_column_type(value)
         params = (quote(table_name), key, column_type)
         sql = 'ALTER TABLE %s ADD COLUMN %s %s ' % params
         self.execute(sql, commit = True)
@@ -171,7 +175,7 @@ class DumpTruck:
       self.cursor.execute("""
         CREATE TABLE %s (
           %s %s
-        );""" % (quote(table_name), quote(k), PYTHON_SQLITE_TYPE_MAP[type(startdata[k])]))
+        );""" % (quote(table_name), quote(k), get_column_type(startdata[k])))
     except sqlite3.OperationalError, msg:
       if (not re.match(r'^table.+already exists$', str(msg))) or (error_if_exists == True):
         raise
@@ -218,7 +222,7 @@ class DumpTruck:
       self.execute('CREATE TABLE %s (`value` %s)' % (tmp, row['type']), commit = False)
 
       # This is ugly
-      self.execute('INSERT INTO %s (`value`) VALUES (%s)' % (tmp, row['value']), commit = False)
+      self.execute('INSERT INTO %s (`value`) VALUES (?)' % tmp, [row['value']], commit = False)
       value = self.dump(tmp)[0]['value']
       self.execute('DROP TABLE %s' % tmp, commit = False)
       self.commit()
@@ -231,13 +235,29 @@ class DumpTruck:
     # Check whether Highwall's variables table exists
     self.__check_or_create_vars_table()
 
-    data = {
-      "key": key,
-      "type": PYTHON_SQLITE_TYPE_MAP[type(value)],
-      "value":value,
-    }
+    column_type = get_column_type(value)
+    tmp = quote(self.__vars_table_tmp)
 
-    return self.insert(data, self.__vars_table, commit = commit)
+    self.execute('DROP TABLE IF EXISTS %s' % tmp, commit = False)
+
+    # This is vulnerable to injection
+    self.execute('CREATE TABLE %s (`value` %s)' % (tmp, column_type), commit = False)
+
+    # This is ugly
+    self.execute('INSERT INTO %s (`value`) VALUES (?)' % tmp, [value], commit = False)
+    p1 = (quote(self.__vars_table), tmp)
+    p2 = [key, column_type, value]
+    self.execute('''
+INSERT INTO %s (`key`, `type`, `value`)
+  SELECT
+    ? AS key,
+    ? AS type,
+    value
+  FROM %s
+  WHERE value = ?
+''' % p1, p2)
+    self.execute('DROP TABLE %s' % tmp, commit = False)
+    self.commit()
 
   def tables(self):
     result = self.execute("SELECT name FROM sqlite_master WHERE TYPE='table'", commit = False)
@@ -250,3 +270,4 @@ class DumpTruck:
   def dump(self, table_name = "dumptruck", commit = True):
     "Dump a table."
     return self.execute('SELECT * FROM %s;' % quote(table_name), commit = commit)
+

@@ -1,7 +1,6 @@
 from unittest import TestCase, main
 from json import loads, dumps
-from dumptruck import DumpTruck
-from convert import quote
+from dumptruck import DumpTruck, Pickle, quote
 import sqlite3
 import os, shutil
 import datetime
@@ -60,6 +59,25 @@ class TestDb(TestCase):
 #
 #  def test_nonexisting_var(self):
 #   self.assertRaises(NameError,self.h.get_var,'nonexistant_var')
+
+class SaveGetVar(TestDb):
+  def savegetvar(self, var):
+    h = DumpTruck(dbname = 'test.db')
+    h.save_var("weird", var)
+    self.assertEqual(h.get_var("weird"), var)
+    h.close()
+
+class TestSaveGetPickle(SaveGetVar):
+  def test_list(self):
+    self.savegetvar(Pickle({30: None}))
+
+class TestSaveGetList(SaveGetVar):
+  def test_list(self):
+    self.savegetvar([])
+
+class TestSaveGetDict(SaveGetVar):
+  def test_dict(self):
+    self.savegetvar({})
 
 class TestSaveVar(TestDb):
   def setUp(self):
