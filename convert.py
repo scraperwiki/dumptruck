@@ -4,6 +4,16 @@ import re
 import datetime
 from json import loads, dumps
 
+QUOTEPAIRS = [
+  ('[', ']'),
+# ('"', '"'),
+# ('\'', '\''),
+  ('`', '`'),
+]
+
+#QUOTECHARS = '\'"`'
+QUOTECHARS = '`'
+
 def convert(data):
   # Allow single rows to be dictionaries.
   if type(data)==dict:
@@ -16,20 +26,11 @@ def convert(data):
   except TypeError:
     raise TypeError('The data argument must be a dict or an iterable of dicts.')
 
-  data = [__checkdata(row) for row in data]
-
+  data = [checkdata(row) for row in data]
   data_quoted = [{quote(k): v for k, v in row.items()} for row in data]
   return data_quoted
 
 
-QUOTEPAIRS = [
-  ('[', ']'),
-# ('"', '"'),
-# ('\'', '\''),
-  ('`', '`'),
-]
-#QUOTECHARS = '\'"`'
-QUOTECHARS = '`'
 def quote(text):
   "Handle quote characters"
   # Look for quote characters. Keep the text as is if it's already quoted.
@@ -49,8 +50,7 @@ def quote(text):
   #Darn
   raise ValueError('The value "%s" is not quoted and contains too many quote characters to quote' % text)
 
-def __checkdata(data):
-  #Based on scraperlibs
+def checkdata(data):
   for key, value in data.items():
     if value == None:
       del(data[key])
@@ -71,4 +71,4 @@ def __checkdata(data):
 
 def assert_text(vals):
   if not set(map(type, vals)).issubset(set([str, unicode])):
-    raise ValueError("Non-text keys cannot be JSONified.")
+    raise TypeError("Non-text keys cannot be JSONified.")
