@@ -16,6 +16,7 @@ def register_json(module):
         return set(loads(val).keys())
 
     module.register_adapter(list, adapt_json)
+    module.register_adapter(tuple, adapt_json)
     module.register_adapter(dict, adapt_json)
     module.register_adapter(set, adapt_jsonset)
     module.register_converter("json", convert_json)
@@ -31,7 +32,7 @@ def register_dates(module):
     def convert_date(val):
         return datetime.date(*map(int, val.split("-")))
 
-    def convert_timestamp(val):
+    def convert_datetime(val):
         datepart, timepart = val.split(" ")
         year, month, day = map(int, datepart.split("-"))
         timepart_full = timepart.split(".")
@@ -48,7 +49,7 @@ def register_dates(module):
     module.register_adapter(datetime.date, adapt_date)
     module.register_adapter(datetime.datetime, adapt_datetime)
     module.register_converter("date", convert_date)
-    module.register_converter("datetime", convert_timestamp)
+    module.register_converter("datetime", convert_datetime)
 
 def register_adapters_and_converters(module):
     register_json(module)

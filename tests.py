@@ -230,6 +230,21 @@ class TestSaveSet(SaveAndSelect):
   def test_save_set(self):
     self.save_and_select(set(["A", "B", "C"]))
 
+class TestSaveBoolean(SaveAndCheck):
+  def test_save_true(self):
+    self.save_and_check(
+      {"a": True}
+    , "a"
+    , [(1,)]
+    )
+
+  def test_save_true(self):
+    self.save_and_check(
+      {"a": False}
+    , "a"
+    , [(0,)]
+    )
+
 class TestSaveList(SaveAndCheck):
   def test_save_integers(self):
     d = ["A", "B", "C"]
