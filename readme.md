@@ -13,7 +13,7 @@ feel more like document databases.
 
     # This doesn't actually work yet; this here so I don't forget
     # to put it in once I put it on PyPI once it's ready.
-    pip2 install highwall || pip install highwall
+    pip2 install dumptruck || pip install dumptruck
 
 ### Initialize
 
@@ -24,17 +24,17 @@ Open the database connection by initializing the a DumpTruck object
 ### Save
 The simplest `insert` call looks like this.
 
-    dt.insert({"firstname":"Thomas","lastname":"Levine"},"diesel-engineers")
+    dt.insert({"firstname":"Thomas","lastname":"Levine"})
 
 This saves a new row with "Thomas" in the "firstname" column and
-"Levine" in the "lastname" column. It uses the table "diesel-engineers"
-inside the database "highwall.db". It creates or alters the table
+"Levine" in the "lastname" column. It uses the table "dumptruck"
+inside the database "dumptruck.db". It creates or alters the table
 if it needs to.
 
 ### Retrieve
 Once the database contains data, you can retrieve them.
 
-    data = dt.dump('diesel-engineers')
+    data = dt.dump()
 
 The data come out as a list of dictionaries, with one dictionary per row.
 
@@ -50,11 +50,11 @@ you can use this.
 
 It actually takes up to three keyword arguments.
 
-    DumpTruck(dbname='highwall.db', auto_commit = True, vars_table = "_highwallvars")
+    DumpTruck(dbname='dumptruck.db', auto_commit = True, vars_table = "_dumptruckvars")
 
-* `dbname` is the database file to save to; the default is highwall.db.
+* `dbname` is the database file to save to; the default is dumptruck.db.
 * `vars_table` is the name of the table to use for `DumpTruck.get_var`
-and `DumpTruck.save_var`; default is `_highwallvars`. Set it to `None`
+and `DumpTruck.save_var`; default is `_dumptruckvars`. Set it to `None`
 to disable the get_var and save_var methods.
 * `auto_commit` is whether changes to the database should be automatically committed;
 if it is set to `False`, changes must be committed with the `commit` method
@@ -65,7 +65,14 @@ As discussed earlier, the simplest `insert` call looks like this.
 
     dt.insert({"firstname": "Thomas", "lastname": "Levine"})
 
-But you can also pass a list of dictionaries.
+#### Different tables
+By default, that saves to the table `dumptruck`. You can specify different table;
+this saves to the table `diesel-engineers`.
+
+    dt.insert({"firstname": "Thomas", "lastname": "Levine"}, "diesel-engineers")
+
+#### Multiple rows
+You can also pass a list of dictionaries.
 
     data=[
         {"firstname": "Thomas", "lastname": "Levine"},
@@ -73,6 +80,7 @@ But you can also pass a list of dictionaries.
     ]
     dt.insert(data)
 
+#### Complex objects
 You can even past nested structures; dictionaries,
 sets and lists will automatically be dumped to JSON.
 
@@ -107,7 +115,7 @@ For example, you can record which page the last run of a script managed to get u
     27 == dt.get_var('last_page')
 
 It's stored in a table that you can specify when initializing DumpTruck.
-If you don't specify one, it's stored in `_highwallvars`.
+If you don't specify one, it's stored in `_dumptruckvars`.
 
 If you want to save anything other than an int, float or string type,
 use json or pickle.
