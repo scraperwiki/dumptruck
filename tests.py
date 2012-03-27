@@ -231,9 +231,9 @@ class TestSavePickle(SaveAndSelect):
     import pickle
     self.save_and_select(pickle.dumps(SaveAndSelect))
 
-class TestSaveLambda(SaveAndSelect):
-  def test_save_lambda(self):
-    self.save_and_select(lambda x: x^2)
+#class TestSaveLambda(SaveAndSelect):
+#  def test_save_lambda(self):
+#    self.save_and_select(lambda x: x^2)
 
 class TestSaveSet(SaveAndSelect):
   def test_save_set(self):
