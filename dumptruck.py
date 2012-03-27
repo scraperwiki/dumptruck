@@ -8,18 +8,6 @@ from adapters_and_converters import register_adapters_and_converters, Pickle
 register_adapters_and_converters(sqlite3)
 del(register_adapters_and_converters)
 
-# Mappings between Python types and SQLite types
-SQLITE_PYTHON_TYPE_MAP={
-  u"text": unicode,
-  u"integer": int,
-  u"bool": bool,
-  u"real": float,
-  u"date": datetime.date,
-  u"datetime": datetime.datetime,
-  #u"null": ??
-  #BLOB: ??? The value is a blob of data, stored exactly as it was input.
-}
-
 PYTHON_SQLITE_TYPE_MAP={
   unicode: u"text",
   str: u"text",
@@ -46,7 +34,7 @@ PYTHON_SQLITE_TYPE_MAP={
 class DumpTruck:
   "A relaxing interface to SQLite"
 
-  def __init__(self, dbname = "dumptruck.db", vars_table = "_dumptruckvars", auto_commit = True):
+  def __init__(self, dbname = "dumptruck.db", vars_table = "_dumptruckvars", vars_table_tmp = "_dumptruckvarstmp", auto_commit = True):
     pass
     # Should database changes be committed automatically after each command?
     if type(auto_commit) != bool:
@@ -67,14 +55,20 @@ class DumpTruck:
     else:
       self.__vars_table = vars_table
 
+    # Make sure it's a good table name
+    if type(vars_table_tmp) not in [unicode, str]:
+      raise TypeError("vars_table_tmp must be a string")
+    else:
+      self.__vars_table_tmp = vars_table_tmp
+
   def __check_or_create_vars_table(self):
     self.create_table(
-      {'name': '', 'sql_type': '', 'lang': '', 'lang_type': ''},
+      {'key': '', 'type': ''},
       quote(self.__vars_table)
     )
 
     try:
-      self.execute('ALTER TABLE %s ADD COLUMN value_blob BLOB' % quote(self.__vars_table))
+      self.execute('ALTER TABLE %s ADD COLUMN value BLOB' % quote(self.__vars_table))
     except:
       raise
     else:
@@ -82,7 +76,7 @@ class DumpTruck:
 
     table_info = self.execute('PRAGMA table_info(%s)' % quote(self.__vars_table))
     column_names_observed = set([column['name'] for column in table_info])
-    column_names_expected = set(['name', 'value_blob', 'sql_type', 'lang', 'lang_type'])
+    column_names_expected = set(['key', 'type', 'value'])
     assert column_names_observed == column_names_expected, table_info
 
   def execute(self, sql, *args, **kwargs):
@@ -210,17 +204,26 @@ class DumpTruck:
 
   def get_var(self, key):
     "Retrieve one saved variable from the database."
-    # This is vulnerable to injection.
-    data = self.execute("SELECT * FROM %s WHERE `name` = ?" % quote(self.__vars_table), [key], commit = False)
+    vt = quote(self.__vars_table)
+    data = self.execute("SELECT * FROM %s WHERE `key` = ?" % vt, [key], commit = False)
     if data == []:
-      raise NameError("The Highwall variables table doesn't have a value for %s." % key)
+      raise NameError("The DumpTruck variables table doesn't have a value for %s." % key)
     else:
+      tmp = quote(self.__vars_table_tmp)
       row = data[0]
-      if row.has_key('sql_type') and SQLITE_PYTHON_TYPE_MAP.has_key(row['sql_type']):
-        cast = SQLITE_PYTHON_TYPE_MAP[row['sql_type']]
-      else:
-        raise TypeError("A Python type for '%s' could not be found." % row['type'])
-      return cast(row['value_blob'])
+
+      self.execute('DROP TABLE IF EXISTS %s' % tmp, commit = False)
+
+      # This is vulnerable to injection
+      self.execute('CREATE TABLE %s (`value` %s)' % (tmp, row['type']), commit = False)
+
+      # This is ugly
+      self.execute('INSERT INTO %s (`value`) VALUES (%s)' % (tmp, row['value']), commit = False)
+      value = self.dump(tmp)[0]['value']
+      self.execute('DROP TABLE %s' % tmp, commit = False)
+      self.commit()
+
+      return value
 
   def save_var(self, key, value, commit = True):
     "Save one variable to the database."
@@ -228,25 +231,10 @@ class DumpTruck:
     # Check whether Highwall's variables table exists
     self.__check_or_create_vars_table()
 
-    # Prepare for save
-    if type(value) in PYTHON_SQLITE_TYPE_MAP:
-      sqltype = PYTHON_SQLITE_TYPE_MAP[type(value)]
-      lang = None
-      langtype = None
-    elif type(value) in PYTHON_JSON_TYPE_MAP:
-      sqltype = None
-      langtype = PYTHON_JSON_TYPE_MAP[type(value)]
-      lang = 'json'
-    elif type(value) in PYTHON_PYTHON_TYPE_MAP:
-      sqltype = None
-      langtype = PYTHON_PYTHON_TYPE_MAP[type(value)]
-      lang = 'python'
-
-    #valuetype in ("json", "unicode", "str", &c)
     data = {
-      "name":key, "value_blob":value,
-      "sql_type":sqltype,
-      "lang": lang, "lang_type": langtype
+      "key": key,
+      "type": PYTHON_SQLITE_TYPE_MAP[type(value)],
+      "value":value,
     }
 
     return self.insert(data, self.__vars_table, commit = commit)

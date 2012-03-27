@@ -71,9 +71,9 @@ class TestSaveVar(TestDb):
     self.cursor=connection.cursor()
 
   def test_insert(self):
-    self.cursor.execute("SELECT name, value_blob, sql_type, lang, lang_type FROM `_dumptruckvars`")
+    self.cursor.execute("SELECT key, value, type FROM `_dumptruckvars`")
     observed = self.cursor.fetchall()
-    expected = [("birthday", "November 30, 1888", "text", None, None)]
+    expected = [("birthday", "November 30, 1888", "text",)]
     self.assertEqual(observed, expected)
 
   def test_has_some_index(self):
@@ -90,18 +90,18 @@ class TestSaveVar(TestDb):
     indices = self.cursor.fetchall()
 #   self.assertNotEqual(indices,[])
 
-class TestVars(TestDb):
+class DumpTruckVars(TestDb):
   def save(self, key, value):
     h = DumpTruck(dbname = 'test.db')
     h.save_var(key, value)
     h.close()
 
-  def check(self, key, value, sqltype, lang = None, langtype = None):
+  def check(self, key, value, sqltype):
     connection=sqlite3.connect('test.db')
     self.cursor=connection.cursor()
-    self.cursor.execute("SELECT name, value_blob, `sql_type`, `lang`, `lang_type` FROM `_dumptruckvars`")
+    self.cursor.execute("SELECT key, value, `type` FROM `_dumptruckvars`")
     observed = self.cursor.fetchall()
-    expected = [(key, value, sqltype, lang, langtype)]
+    expected = [(key, value, sqltype)]
     self.assertEqual(observed, expected)
 
   def get(self, key, value):
@@ -109,15 +109,12 @@ class TestVars(TestDb):
     self.assertEqual(h.get_var(key), value)
     h.close()
 
-  def save_check_get(self, key, valueIn, sqltype, lang = None, langtype = None, valueOut = None):
-    if valueOut == None:
-      valueOut = valueIn
+  def save_check_get(self, key, value, sqltype):
+    self.save(key, value)
+    self.check(key, value, sqltype)
+    self.get(key, value)
 
-    self.save(key, valueIn)
-    self.check(key, valueOut, sqltype, lang, langtype = langtype)
-    self.get(key, valueOut)
-
-class TestVarsSQL(TestVars):
+class TestVarsSQL(DumpTruckVars):
   def test_integer(self):
     self.save_check_get('foo', 42, 'integer')
 
