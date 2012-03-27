@@ -89,6 +89,24 @@ sets and lists will automatically be dumped to JSON.
     ]
     dt.insert(data)
 
+Your data will be stored as JSON. When you query it, it will
+come back as the original Python objects.
+
+And if you have some crazy object that can't be JSONified,
+you can use the dead-simple pickle interface.
+
+    # This fails
+    data = {"weirdthing": {range(100): None}
+    dt.insert(data)
+
+    # This works
+    from DumpTruck import Pickle
+    data = Pickle({"weirdthing": {range(100): None})
+    dt.insert(data)
+
+It automatically pickles and unpickles your complex object for you.
+
+#### Names
 Column names and table names automatically get quoted if you pass them without quotes,
 so you can use bizarre table and column names, like `no^[hs!'e]?'sf_"&'`
 
