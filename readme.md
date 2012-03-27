@@ -123,9 +123,13 @@ DumpTruck provides specialized wrapper around some common commands.
 
     dt.drop("diesel-engineers")
 
-`DumpTruck.dump` returns a csv of a particular table.
+`DumpTruck.dump` returns the entire particular table as a list of dictionaries.
 
     dt.dump("coal")
+
+It's equivalent to running this:
+
+    dt.execute('SELECT * from `coal`;')
 
 ### Creating empty tables
 When working with relational databases, one typically defines a schema
