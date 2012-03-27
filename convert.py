@@ -16,29 +16,10 @@ def convert(data):
   except TypeError:
     raise TypeError('The data argument must be a dict or an iterable of dicts.')
 
-  data = [__jsonify(__checkdata(__remove_null(row))) for row in data]
+  data = [__checkdata(row) for row in data]
 
   data_quoted = [{quote(k): v for k, v in row.items()} for row in data]
   return data_quoted
-
-def __remove_null(data):
-  for key, value in data.items():
-    if value == None:
-      del(data[key])
-  return data
-
-def __jsonify(data):
-  for key, value in data.items():
-    if type(value)==set:
-      # Convert sets to dicts
-      data[key] = dict(zip( list(value), [None]*len(value) ))
-
-    if type(value) in (list, dict):
-      try:
-        value = dumps(value)
-      except TypeError:
-        raise TypeError("The value for %s is a complex object that could not be dumped to JSON.")
-  return data
 
 
 QUOTEPAIRS = [
@@ -70,11 +51,24 @@ def quote(text):
 
 def __checkdata(data):
   #Based on scraperlibs
-  for key in data.keys():
-    if key in [None, '']:
+  for key, value in data.items():
+    if value == None:
+      del(data[key])
+
+    # Column names
+    elif key in [None, '']:
       raise ValueError('key must not be blank')
     elif type(key) not in (unicode, str):
       raise ValueError('key must be string type')
-#   elif not re.match("[a-zA-Z0-9_\- ]+$", key):
-#     raise ValueError('key must be simple text')
+
+    # JSON
+    elif type(value) == dict:
+      assert_text(value.keys())
+    elif type(value) in [list, set]:
+      assert_text(value)
+
   return data
+
+def assert_text(vals):
+  if not set(map(type, vals)).issubset(set([str, unicode])):
+    raise ValueError("Non-text keys cannot be JSONified.")

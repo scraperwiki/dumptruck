@@ -196,6 +196,14 @@ class SaveAndCheck(TestDb):
 class TestSaveDict(SaveAndCheck):
   def test_save_integers(self):
     d = {1: "A", 2: "B", 3: "C"}
+    self.assertRaises(ValueError, lambda: self.save_and_check(
+      {"modelNumber": d}
+    , "model-numbers"
+    , [(dumps(d),)]
+    ))
+
+  def test_save_text(self):
+    d = {'1': 'A', '2': 'B', '3': 'C'}
     self.save_and_check(
       {"modelNumber": d}
     , "model-numbers"

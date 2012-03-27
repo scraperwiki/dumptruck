@@ -32,7 +32,7 @@ PYTHON_SQLITE_TYPE_MAP={
   datetime.date: u"date",
   datetime.datetime: u"datetime",
 
-  dict: u"text [json]",
+  dict: u"json text",
 }
 
 # Only for compatibility with scraperwiki;
