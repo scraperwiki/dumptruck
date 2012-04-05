@@ -108,14 +108,13 @@ class DumpTruck:
 
   def create_index(self, table_name, columns, unique = False, **kwargs):
     "Create a unique index on the column(s) passed."
-    index_name = simplify(table_name) + '__' + '_'.join(map(simplify, columns))
+    index_name = 'dumptruck_' + simplify(table_name) + '__' + '_'.join(map(simplify, columns))
     if unique:
-      sql = "CREATE UNIQUE INDEX ? ON %s (%s)"
+      sql = "CREATE UNIQUE INDEX %s ON %s (%s)"
     else:
-      sql = "CREATE INDEX ? ON %s (%s)"
+      sql = "CREATE INDEX %s ON %s (%s)"
     params = (index_name, quote(table_name), ','.join(map(quote, columns)))
     self.execute(sql % params, **kwargs)
-
 
   def __column_types(self, table_name):
     # This is vulnerable to injection.
