@@ -2,7 +2,7 @@ import json
 import sqlite3
 import re
 import datetime
-from convert import convert, quote
+from convert import convert, quote, simplify
 from adapters_and_converters import register_adapters_and_converters, Pickle
 
 register_adapters_and_converters(sqlite3)
@@ -68,15 +68,13 @@ class DumpTruck:
   def __check_or_create_vars_table(self):
     self.create_table(
       {'key': '', 'type': ''},
-      quote(self.__vars_table)
+      quote(self.__vars_table),
+      commit = False
     )
+    sql = 'ALTER TABLE %s ADD COLUMN value BLOB' % quote(self.__vars_table)
+    self.execute(sql, commit = False)
 
-    try:
-      self.execute('ALTER TABLE %s ADD COLUMN value BLOB' % quote(self.__vars_table))
-    except:
-      raise
-    else:
-      self.connection.commit()
+    self.commit()
 
     table_info = self.execute('PRAGMA table_info(%s)' % quote(self.__vars_table))
     column_names_observed = set([column['name'] for column in table_info])
@@ -90,19 +88,15 @@ class DumpTruck:
     others build on.
     """
     self.cursor.execute(sql, *args)
-    rows =self.cursor.fetchall()
+    rows = self.cursor.fetchall()
 
-    if 'commit' in kwargs and kwargs['commit']:
-      self.commit()
+    self.__commit_if_necessary(kwargs)
 
     if None == self.cursor.description:
       return None
     else:
       colnames = [d[0] for d in self.cursor.description] 
       rawdata = [dict(zip(colnames,row)) for row in rows]
-      # If I can figure out the column types, I can do this.
-      # datetime.datetime.strptime(u'1990-03-30', '%Y-%m-%d').date()
-      # datetime.datetime.strptime(u'1990-03-30T00:00:00', '%Y-%m-%dT%H:%M:%S')
       return rawdata
 
   def commit(self):
@@ -112,23 +106,15 @@ class DumpTruck:
   def close(self):
     return self.connection.close()
 
-  def create_unique_index(table_name, columns):
-    self.create_index(table_name, columns, unique = True)
-
-  def create_index(table_name, columns, unique = False):
+  def create_index(self, table_name, columns, unique = False, **kwargs):
     "Create a unique index on the column(s) passed."
-    index_name = table_name + '__' + '_'.join(columns)
-    arbitrary_number = 0
-    while True:
-      try:
-        # This is vulnerable to injection.
-        if unique:
-          sql = "CREATE UNIQUE INDEX ? ON %s (%s)"
-        else:
-          sql = "CREATE INDEX ? ON %s (%s)"
-        self.execute(sql % (quote(table_name), ','.join(columns)), index_name+str(arbitrary_number))
-      except:
-        arbitrary_number += 1
+    index_name = simplify(table_name) + '__' + '_'.join(map(simplify, columns))
+    if unique:
+      sql = "CREATE UNIQUE INDEX ? ON %s (%s)"
+    else:
+      sql = "CREATE INDEX ? ON %s (%s)"
+    params = (index_name, quote(table_name), ','.join(map(quote, columns)))
+    self.execute(sql % params, **kwargs)
 
 
   def __column_types(self, table_name):
@@ -160,7 +146,7 @@ class DumpTruck:
         except ValueError:
           raise TypeError("Data could not be converted to match the existing `%s` column type.")
 
-  def create_table(self, data, table_name, commit = True, error_if_exists = False):
+  def create_table(self, data, table_name, error_if_exists = False, **kwargs):
     "Create a table based on the data, but don't insert anything."
     converted_data = convert(data)
     startdata = converted_data[0]
@@ -172,21 +158,21 @@ class DumpTruck:
 
     try:
       # This is vulnerable to injection.
-      self.cursor.execute("""
+      self.execute("""
         CREATE TABLE %s (
           %s %s
-        );""" % (quote(table_name), quote(k), get_column_type(startdata[k])))
+        );""" % (quote(table_name), quote(k), get_column_type(startdata[k])), commit = False)
     except sqlite3.OperationalError, msg:
       if (not re.match(r'^table.+already exists$', str(msg))) or (error_if_exists == True):
         raise
     else:
-      self.connection.commit()
+      self.commit()
 
     for row in converted_data:
       self.__check_and_add_columns(table_name, row)
 
 
-  def insert(self, data, table_name = "dumptruck", commit = True):
+  def insert(self, data, table_name = "dumptruck", **kwargs):
     try:
       self.create_table(data, table_name)
     except:
@@ -204,7 +190,12 @@ class DumpTruck:
       # This is vulnerable to injection.
       sql = "INSERT INTO %s (%s) VALUES (%s);" % (quote(table_name), ','.join(row.keys()), question_marks)
       self.execute(sql, row.values(), commit=False)
-    self.commit()
+
+    self.__commit_if_necessary(kwargs)
+
+  def __commit_if_necessary(self, kwargs):
+    if kwargs.get('commit', self.auto_commit):
+      self.commit()
 
   def get_var(self, key):
     "Retrieve one saved variable from the database."
@@ -225,11 +216,10 @@ class DumpTruck:
       self.execute('INSERT INTO %s (`value`) VALUES (?)' % tmp, [row['value']], commit = False)
       value = self.dump(tmp)[0]['value']
       self.execute('DROP TABLE %s' % tmp, commit = False)
-      self.commit()
 
       return value
 
-  def save_var(self, key, value, commit = True):
+  def save_var(self, key, value, **kwargs):
     "Save one variable to the database."
 
     # Check whether Highwall's variables table exists
@@ -257,17 +247,18 @@ INSERT INTO %s (`key`, `type`, `value`)
   WHERE value = ?
 ''' % p1, p2)
     self.execute('DROP TABLE %s' % tmp, commit = False)
-    self.commit()
+
+    self.__commit_if_necessary(kwargs)
 
   def tables(self):
     result = self.execute("SELECT name FROM sqlite_master WHERE TYPE='table'", commit = False)
     return set([row['name'] for row in result])
 
-  def drop(self, table_name = "dumptruck", commit = True):
+  def drop(self, table_name = "dumptruck", **kwargs):
     "Drop a table."
-    return self.execute('DROP IF EXISTS %s;' % quote(table_name), commit = commit)
+    return self.execute('DROP IF EXISTS %s;' % quote(table_name), **kwargs)
 
-  def dump(self, table_name = "dumptruck", commit = True):
+  def dump(self, table_name = "dumptruck"):
     "Dump a table."
-    return self.execute('SELECT * FROM %s;' % quote(table_name), commit = commit)
+    return self.execute('SELECT * FROM %s;' % quote(table_name))
 

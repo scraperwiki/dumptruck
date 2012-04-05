@@ -25,6 +25,8 @@ def convert(data):
   data_quoted = [{quote(k): v for k, v in row.items()} for row in data]
   return data_quoted
 
+def simplify(text):
+  return re.sub(r'[^a-zA-Z0-9]', '', text)
 
 def quote(text):
   "Handle quote characters"
