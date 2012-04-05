@@ -52,7 +52,7 @@ def checkdata(data):
     elif key in [None, '']:
       raise ValueError('key must not be blank')
     elif type(key) not in (unicode, str):
-      raise ValueError('key must be string type')
+      raise ValueError('The column name must be of unicode or str type. The column name ("%s") is of type %s. If this error doesn\'t make sense, try "unicode(\'%s\')".' % (key, type(key), key))
 
     # JSON
     elif type(value) == dict:
