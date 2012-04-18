@@ -18,7 +18,7 @@
 from distutils.core import setup
 import dumptruck
 
-setup(name='DumpTruck',
+setup(name='dumptruck',
       author='Thomas Levine',
       #author_email='perluette@thomaslevine.com',
       author_email='thomas@scraperwiki.com',
