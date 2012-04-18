@@ -218,7 +218,3 @@ Commit manually with the `commit` method.  For example:
     dt.insert({"name":"Bagger 293","manufacturer":"TAKRAF","height":95}, commit=False)
     dt.save_var('page_number', 42, commit=False)
     dt.commit()
-
-When you use `DumpTruck.index_info` or `DumpTruck.index_list`,
-your changes are automatically committed. If you need to delay the commits,
-you can use the underlying getter method, passing a `commit = True` keyword argument.
