@@ -22,8 +22,8 @@ setup(name='DumpTruck',
       author='Thomas Levine',
       author_email='thomas@scraperwiki.com',
       description='Relaxing interface to SQLite',
-      #url='https://github.com/tlevine/dumptruck',
-      url='http://hacks.thomaslevine.com/dumptruck',
+      url='https://github.com/tlevine/dumptruck',
+      #url='http://hacks.thomaslevine.com/dumptruck',
       classifiers=[
           'Intended Audience :: Developers',
           'Intended Audience :: Science/Research',
@@ -40,7 +40,7 @@ setup(name='DumpTruck',
 
       # From requests
       version=dumptruck.__version__,
-      long_description=open('README.md').read() + '\n\n' + open('HISTORY.md').read(),
+      #long_description=open('README.md').read() + '\n\n' + open('HISTORY.md').read(), #needs to be rst
       package_data={'': ['LICENSE']},
       license=open('LICENSE').read(),
      )
