@@ -36,7 +36,8 @@ class TestDb(TestCase):
     self.cleanUp()
 
   def tearDown(self):
-    pass #self.cleanUp()
+    #pass
+    self.cleanUp()
 
   def cleanUp(self):
     "Clean up temporary files."
