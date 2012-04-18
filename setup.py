@@ -20,8 +20,8 @@ from distutils.core import setup
 setup(name='DumpTruck',
       author='Thomas Levine',
       author_email='thomas@scraperwiki.com',
-      url='https://github.com/tlevine/dumptruck',
       description='Relaxing interface to SQLite',
+      #url='https://github.com/tlevine/dumptruck',
       url='http://hacks.thomaslevine.com/dumptruck',
       classifiers=[
           'Intended Audience :: Developers',
