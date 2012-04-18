@@ -39,8 +39,8 @@ setup(name='DumpTruck',
       packages=['dumptruck'],
 
       # From requests
-    version=dumptruck.__version__,
-    long_description=open('README.md').read() + '\n\n' + open('HISTORY.md').read(),
+      version=dumptruck.__version__,
+      long_description=open('README.md').read() + '\n\n' + open('HISTORY.md').read(),
       package_data={'': ['LICENSE']},
       license=open('LICENSE').read(),
      )
