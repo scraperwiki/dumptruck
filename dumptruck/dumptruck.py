@@ -1,6 +1,8 @@
 #!/usr/bin/env python2
 "Relaxing interface to SQLite"
 
+# Copyright 2012 Thomas Levine
+
 # This file is part of DumpTruck.
 
 # DumpTruck is free software: you can redistribute it and/or modify

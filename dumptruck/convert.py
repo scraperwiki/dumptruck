@@ -1,6 +1,8 @@
 #!/usr/bin/env python2
 "Convert a dictionary into a form ready to be inserted."
 
+# Copyright 2012 Thomas Levine
+
 # This file is part of DumpTruck.
 
 # DumpTruck is free software: you can redistribute it and/or modify
