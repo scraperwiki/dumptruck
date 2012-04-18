@@ -16,6 +16,7 @@
 # along with DumpTruck.  If not, see <http://www.gnu.org/licenses/>.
 
 from distutils.core import setup
+import dumptruck
 
 setup(name='DumpTruck',
       author='Thomas Levine',
@@ -38,7 +39,7 @@ setup(name='DumpTruck',
       packages=['dumptruck'],
 
       # From requests
-    version=requests.__version__,
+    version=dumptruck.__version__,
     long_description=open('README.md').read() + '\n\n' + open('HISTORY.md').read(),
       package_data={'': ['LICENSE']},
       license=open('LICENSE').read(),
