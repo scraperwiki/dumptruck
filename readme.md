@@ -1,7 +1,7 @@
 DumpTruck
 ==============
 
-DumpTruck is an document-like interface to an SQLite database.
+DumpTruck is an document-like interface to a SQLite database.
 
 Quick start
 ----------
