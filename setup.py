@@ -20,18 +20,19 @@ import dumptruck
 
 setup(name='DumpTruck',
       author='Thomas Levine',
+      #author_email='perluette@thomaslevine.com',
       author_email='thomas@scraperwiki.com',
       description='Relaxing interface to SQLite',
       url='https://github.com/tlevine/dumptruck',
       #url='http://hacks.thomaslevine.com/dumptruck',
-#     classifiers=[
-#         'Intended Audience :: Developers',
-#         'Intended Audience :: Science/Research',
-#         'License :: OSI Approved :: GNU Affero General Public License v3 or later (AGPLv3+)',
-#         'Programming Language :: Python :: 2.7',
-#         'Programming Language :: SQL',
-#         'Topic :: Database :: Front-Ends',
-#     ],
+      classifiers=[
+          'Intended Audience :: Developers',
+          'Intended Audience :: Science/Research',
+          'License :: OSI Approved :: GNU Affero General Public License v3 or later (AGPLv3+)',
+          'Programming Language :: Python :: 2.7',
+          'Programming Language :: SQL',
+          'Topic :: Database :: Front-Ends',
+      ],
       packages=['dumptruck'],
 
       # From requests
