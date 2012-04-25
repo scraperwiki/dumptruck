@@ -49,6 +49,11 @@ def simplify(text):
 
 def quote(text):
   'Handle quote characters'
+
+  # Convert to unicode.
+  if type(text) != unicode:
+    text = text.decode('utf-8')
+
   # Look for quote characters. Keep the text as is if it's already quoted.
   for qp in QUOTEPAIRS:
     if text[0] == qp[0] and text[-1] == qp[-1] and len(text) >= 2:

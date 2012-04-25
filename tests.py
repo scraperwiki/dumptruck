@@ -341,7 +341,7 @@ class TestSaveUnicodeKey(SaveAndCheck):
     , [('yes',)]
     )
 
-class TestSaveUnicodeTable(SaveAndCheck):
+class TestSaveUnicodeEncodedTable(SaveAndCheck):
   def test_save(self):
     self.save_and_check(
       {'England': 'yes'}
@@ -349,12 +349,28 @@ class TestSaveUnicodeTable(SaveAndCheck):
     , [('yes',)]
     )
 
-class TestSaveNonUnicodeWeirdKey(SaveAndCheck):
+class TestSaveUnicodeEncodedKey(SaveAndCheck):
   def test_save(self):
     self.save_and_check(
-      {'name': 'Super Digger', 'payload': 10, '英国': 'yes'}
-    , 'machines'
-    , [('Super Digger', 10, 'yes')]
+      {u'英国': 'yes'}
+    , 'country'
+    , [('yes',)]
+    )
+
+class TestSaveArbitrarilyEncodedTable(SaveAndCheck):
+  def test_save(self):
+    self.save_and_check(
+      {'England': 'yes'}
+    , '國家'
+    , [('yes',)]
+    )
+
+class TestSaveArbitrarilyEncodedTable(SaveAndCheck):
+  def test_save(self):
+    self.save_and_check(
+      {'England': 'yes'}
+    , '國家'
+    , [('yes',)]
     )
 
 class TestSaveWeirdTableName1(SaveAndCheck):
