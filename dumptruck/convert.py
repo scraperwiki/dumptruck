@@ -94,36 +94,40 @@ class dicti(dict):
   'Case-insensitive dictionary'
 
   def __setitem__(self, i, y):
-    return super(dicti, self).__setitem__(i.lower(), y)
+    return super(dicti, self).__setitem__(self._lower(i), y)
 
   def __getitem__(self, k):
-    return super(dicti, self).__getitem__(k.lower())
+    return super(dicti, self).__getitem__(self._lower(k))
 
   def __contains__(self, k):
-    return super(dicti, self).__contains__(k.lower())
+    return super(dicti, self).__contains__(self._lower(k))
 
   def get(self, k, *args, **kwargs):
-    return super(dicti, self).get(k.lower(), *args, **kwargs)
+    return super(dicti, self).get(self._lower(k), *args, **kwargs)
 
   def has_key(self, k):
-    return super(dicti, self).has_key(k.lower())
+    return super(dicti, self).has_key(self._lower(k))
 
   def pop(self, k, *args):
-    return super(dicti, self).pop(k.lower(), *args)
+    return super(dicti, self).pop(self._lower(k), *args)
 
   def setdefault(self, k, *args):
-    return super(dicti, self).setdefault(k.lower(), *args)
+    return super(dicti, self).setdefault(self._lower(k), *args)
 
-  def fromkeys(self, S, v = None):
-    for s in S:
-      try:
-        s = s.lower()
-      except AttributeError:
-        pass
-    return super(dicti, self).fromkeys(S, v)
+  @staticmethod
+  def fromkeys(S, v = None):
+    return super(dicti, self).fromkeys([self._lower(s) for s in S], v)
 
-# def __init__
-#   return super(dicti, self).
+  def __init__(self, zipper):
+    return self.fromkeys([z[0] for z in zipper], [z[1] for z in zipper])
+
+  @staticmethod
+  def _lower(key):
+    try:
+      key = key.lower()
+    except AttributeError:
+      pass
+    return key
 
 # def update
 #   return super(dicti, self).
