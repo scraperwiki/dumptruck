@@ -24,8 +24,8 @@ import datetime
 from json import loads, dumps
 
 QUOTEPAIRS = [
-  ('`', '`'),
-  ('[', ']'),
+  (u'`', u'`'),
+  (u'[', u']'),
 ]
 
 def convert(data):

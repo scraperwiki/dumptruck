@@ -341,14 +341,6 @@ class TestSaveUnicodeKey(SaveAndCheck):
     , [('yes',)]
     )
 
-class TestSaveUnicodeEncodedTable(SaveAndCheck):
-  def test_save(self):
-    self.save_and_check(
-      {'England': 'yes'}
-    , u'國家'
-    , [('yes',)]
-    )
-
 class TestSaveUnicodeEncodedKey(SaveAndCheck):
   def test_save(self):
     self.save_and_check(
@@ -357,11 +349,19 @@ class TestSaveUnicodeEncodedKey(SaveAndCheck):
     , [('yes',)]
     )
 
-class TestSaveArbitrarilyEncodedTable(SaveAndCheck):
+class TestSaveUnicodeEncodedTable(SaveAndCheck):
   def test_save(self):
     self.save_and_check(
       {'England': 'yes'}
-    , '國家'
+    , u'國家'
+    , [('yes',)]
+    )
+
+class TestSaveArbitrarilyEncodedKey(SaveAndCheck):
+  def test_save(self):
+    self.save_and_check(
+      {u'英国': 'yes'}
+    , 'country'
     , [('yes',)]
     )
 
