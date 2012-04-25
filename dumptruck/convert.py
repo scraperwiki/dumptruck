@@ -1,5 +1,5 @@
 #!/usr/bin/env python2
-"Convert a dictionary into a form ready to be inserted."
+'Convert a dictionary into a form ready to be inserted.'
 
 # Copyright 2012 Thomas Levine
 
@@ -48,7 +48,7 @@ def simplify(text):
   return re.sub(r'[^a-zA-Z0-9]', '', text)
 
 def quote(text):
-  "Handle quote characters"
+  'Handle quote characters'
   # Look for quote characters. Keep the text as is if it's already quoted.
   for qp in QUOTEPAIRS:
     if text[0] == qp[0] and text[-1] == qp[-1] and len(text) >= 2:
@@ -60,7 +60,7 @@ def quote(text):
       return qp[0] + text + qp[1]
 
   #Darn
-  raise ValueError('The value "%s" is not quoted and contains too many quote characters to quote' % text)
+  raise ValueError(u'The value "%s" is not quoted and contains too many quote characters to quote' % text)
 
 def checkdata(data):
   for key, value in data.items():
@@ -71,7 +71,7 @@ def checkdata(data):
     elif key in [None, '']:
       raise ValueError('key must not be blank')
     elif type(key) not in (unicode, str):
-      raise ValueError('The column name must be of unicode or str type. The column name ("%s") is of type %s. If this error doesn\'t make sense, try "unicode(\'%s\')".' % (key, type(key), key))
+      raise ValueError(u'The column name must be of unicode or str type. The column name ("%s") is of type %s. If this error doesn\'t make sense, try "unicode(\'%s\')".' % (key, type(key), key))
 
     # JSON
     elif type(value) == dict:
@@ -83,4 +83,4 @@ def checkdata(data):
 
 def assert_text(vals):
   if not set(map(type, vals)).issubset(set([str, unicode])):
-    raise TypeError("Non-text keys cannot be JSONified.")
+    raise TypeError('Non-text keys cannot be JSONified.')

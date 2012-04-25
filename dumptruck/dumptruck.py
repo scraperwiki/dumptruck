@@ -129,7 +129,7 @@ class DumpTruck:
 
   def create_index(self, table_name, columns, if_not_exists = True, unique = False, **kwargs):
     'Create a unique index on the column(s) passed.'
-    index_name = 'dumptruck_' + simplify(table_name) + '__' + '_'.join(map(simplify, columns))
+    index_name = u'dumptruck_' + simplify(table_name) + u'__' + u'_'.join(map(simplify, columns))
     if unique:
       sql = u'CREATE UNIQUE INDEX %s ON %s (%s)'
     else:

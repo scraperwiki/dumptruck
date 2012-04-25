@@ -1,5 +1,5 @@
 #!/usr/bin/env python2
-"SQLite adapter and converter functions"
+'SQLite adapter and converter functions'
 
 # Copyright 2012 Thomas Levine
 
@@ -28,7 +28,7 @@ class Pickle:
 
 def register_big(module):
     def adapt_long(val):
-        "Handle very large integers."
+        'Handle very large integers.'
         return float(val)
 
     module.register_adapter(long, adapt_long)
@@ -41,7 +41,7 @@ def register_pickle(module):
         return pickle.loads(val)
 
     module.register_adapter(Pickle, adapt_pickle)
-    module.register_converter("pickle", convert_pickle)
+    module.register_converter('pickle', convert_pickle)
 
 def register_json(module):
     def adapt_json(val):
@@ -61,24 +61,24 @@ def register_json(module):
     module.register_adapter(tuple, adapt_json)
     module.register_adapter(dict, adapt_json)
     module.register_adapter(set, adapt_jsonset)
-    module.register_converter("json", convert_json)
-    module.register_converter("jsonset", convert_jsonset)
+    module.register_converter('json', convert_json)
+    module.register_converter('jsonset', convert_jsonset)
 
 def register_dates(module):
     def adapt_date(val):
         return val.isoformat()
 
     def adapt_datetime(val):
-        return val.isoformat(" ")
+        return val.isoformat(' ')
 
     def convert_date(val):
-        return datetime.date(*map(int, val.split("-")))
+        return datetime.date(*map(int, val.split('-')))
 
     def convert_datetime(val):
-        datepart, timepart = val.split(" ")
-        year, month, day = map(int, datepart.split("-"))
-        timepart_full = timepart.split(".")
-        hours, minutes, seconds = map(int, timepart_full[0].split(":"))
+        datepart, timepart = val.split(' ')
+        year, month, day = map(int, datepart.split('-'))
+        timepart_full = timepart.split('.')
+        hours, minutes, seconds = map(int, timepart_full[0].split(':'))
         if len(timepart_full) == 2:
             microseconds = int(timepart_full[1])
         else:
@@ -90,8 +90,8 @@ def register_dates(module):
 
     module.register_adapter(datetime.date, adapt_date)
     module.register_adapter(datetime.datetime, adapt_datetime)
-    module.register_converter("date", convert_date)
-    module.register_converter("datetime", convert_datetime)
+    module.register_converter('date', convert_date)
+    module.register_converter('datetime', convert_datetime)
 
 def register_adapters_and_converters(module):
 #   register_big(module)
