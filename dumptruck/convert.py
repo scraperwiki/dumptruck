@@ -108,11 +108,11 @@ class dicti(dict):
   def has_key(self, k):
     return super(dicti, self).has_key(k.lower())
 
-  def pop(self, k, *args, **kwargs):
-    return super(dicti, self).pop(k.lower(), *args, **kwargs)
+  def pop(self, k, *args):
+    return super(dicti, self).pop(k.lower(), *args)
 
-  def setdefault(self, k, *args, **kwargs):
-    return super(dicti, self).setdefault(k.lower(), *args, **kwargs)
+  def setdefault(self, k, *args):
+    return super(dicti, self).setdefault(k.lower(), *args)
 
   def fromkeys(self, S, v = None):
     for s in S:
