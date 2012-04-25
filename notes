@@ -38,5 +38,9 @@ Out[14]:
 [{'cid': 5, 'name': u'Street_Address', 'seqno': 0},
  {'cid': 2, 'name': u'Telephone', 'seqno': 1}]
 
+
+# Unicode
+http://farmdev.com/talks/unicode/
+
 # Send a new version to PyPI
 python setup.py register sdist upload
