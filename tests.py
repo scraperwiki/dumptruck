@@ -20,7 +20,7 @@
 
 from unittest import TestCase, main
 from json import loads, dumps
-from dumptruck import DumpTruck, Pickle, quote
+from dumptruck import DumpTruck, Pickle, quote, dicti
 import sqlite3
 import os, shutil
 import datetime
@@ -477,3 +477,63 @@ class TestParamsDefaults(TestDb):
 
 if __name__ == '__main__':
   main()
+
+
+class BaseTestDictI(TestCase):
+  'Test the case-insensitive dictionary'
+
+  def assertCaseInsensitive(self, method, kwargs_lower, kwargs_upper):
+    d_lower = dicti()
+    d_upper = dicti()
+    di_lower = dicti()
+    di_upper = dicti()
+
+    d_lower_return = getattr(dict, method)(d, **kwargs_lower)
+    d_upper_return = getattr(dict, method)(d, **kwargs_upper)
+    di_lower_return = getattr(dicti, method)(di_lower, **kwargs_lower)
+    di_upper_return = getattr(dicti, method)(di_upper, **kwargs_upper)
+
+    # The case-insensitive dictionaries should match the lowercase dictionary
+    self.assertDictEqual(d_lower, di_lower)
+    self.assertDictEqual(d_lower, di_upper)
+    self.assertDictEqual(d_lower_return, di_lower_return)
+    self.assertDictEqual(d_lower_return, di_upper_return)
+
+    # The case-insensitive dictionaries should match each other
+    self.assertDictEqual(di_lower, di_upper)
+    self.assertEqual(di_lower_return, di_upper_return)
+
+  def test__setitem__(self, i, y):
+    pass
+
+  def test__getitem__(self, k):
+    return super(dicti, self).__getitem__(k.lower())
+
+  def test__contains__(self, k):
+    return super(dicti, self).__contains__(k.lower())
+
+  def testget(self, k, *args, **kwargs):
+    return super(dicti, self).get(k.lower(), *args, **kwargs)
+
+  def testhas_key(self, k):
+    return super(dicti, self).has_key(k.lower())
+
+  def testpop(self, k, *args, **kwargs):
+    return super(dicti, self).pop(k.lower(), *args, **kwargs)
+
+  def testsetdefault(self, k, *args, **kwargs):
+    return super(dicti, self).setdefault(k.lower(), *args, **kwargs)
+
+  def testfromkeys(self, S, v = None):
+    for s in S:
+      try:
+        s = s.lower()
+      except AttributeError:
+        pass
+    return super(dicti, self).fromkeys(S, v)
+
+# def test__init__
+#   return super(dicti, self).
+
+# def testupdate
+#   return super(dicti, self).

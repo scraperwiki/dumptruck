@@ -23,7 +23,7 @@ import json
 import sqlite3
 import re
 import datetime
-from convert import convert, quote, simplify
+from convert import convert, quote, simplify, dicti
 from adapters_and_converters import register_adapters_and_converters, Pickle
 
 register_adapters_and_converters(sqlite3)
