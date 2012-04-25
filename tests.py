@@ -337,6 +337,14 @@ class TestSaveUnicodeKey(SaveAndCheck):
   def test_save(self):
     self.save_and_check(
       {u"英国": "yes"}
+    , u"country"
+    , [("yes",)]
+    )
+
+class TestSaveUnicodeTable(SaveAndCheck):
+  def test_save(self):
+    self.save_and_check(
+      {u"England": "yes"}
     , u"國家"
     , [("yes",)]
     )
