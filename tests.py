@@ -84,8 +84,8 @@ class TestDb(TestCase):
 class SaveGetVar(TestDb):
   def savegetvar(self, var):
     h = DumpTruck(dbname = 'test.db')
-    h.save_var("weird", var)
-    self.assertEqual(h.get_var("weird"), var)
+    h.save_var(u'weird', var)
+    self.assertEqual(h.get_var(u'weird'), var)
     h.close()
 
 class TestSaveGetPickle(SaveGetVar):
@@ -103,16 +103,16 @@ class TestSaveGetDict(SaveGetVar):
 class TestSaveVar(TestDb):
   def setUp(self):
     self.cleanUp()
-    h = DumpTruck(dbname = 'test.db')
-    h.save_var("birthday","November 30, 1888")
+    h = DumpTruck(dbname = u'test.db')
+    h.save_var(u'birthday', u'November 30, 1888')
     h.close()
-    connection=sqlite3.connect('test.db')
+    connection=sqlite3.connect(u'test.db')
     self.cursor=connection.cursor()
 
   def test_insert(self):
-    self.cursor.execute("SELECT key, value, type FROM `_dumptruckvars`")
+    self.cursor.execute(u'SELECT key, value, type FROM `_dumptruckvars`')
     observed = self.cursor.fetchall()
-    expected = [("birthday", "November 30, 1888", "text",)]
+    expected = [(u'birthday', u'November 30, 1888', u'text',)]
     self.assertEqual(observed, expected)
 
   def test_has_some_index(self):
@@ -125,26 +125,26 @@ class TestSaveVar(TestDb):
 
     This pragma returns one row for each index associated with the given table. Columns of the result set include the index name and a flag to indicate whether or not the index is UNIQUE.
     """
-    self.cursor.execute("PRAGMA index_list(_dumptruckvars)")
+    self.cursor.execute(u'PRAGMA index_list(_dumptruckvars)')
     indices = self.cursor.fetchall()
 #   self.assertNotEqual(indices,[])
 
 class DumpTruckVars(TestDb):
   def save(self, key, value):
-    h = DumpTruck(dbname = 'test.db')
+    h = DumpTruck(dbname = u'test.db')
     h.save_var(key, value)
     h.close()
 
   def check(self, key, value, sqltype):
-    connection=sqlite3.connect('test.db')
+    connection=sqlite3.connect(u'test.db')
     self.cursor=connection.cursor()
-    self.cursor.execute("SELECT key, value, `type` FROM `_dumptruckvars`")
+    self.cursor.execute(u'SELECT key, value, `type` FROM `_dumptruckvars`')
     observed = self.cursor.fetchall()
     expected = [(key, value, sqltype)]
     self.assertEqual(observed, expected)
 
   def get(self, key, value):
-    h = DumpTruck(dbname = 'test.db')
+    h = DumpTruck(dbname = u'test.db')
     self.assertEqual(h.get_var(key), value)
     h.close()
 
@@ -155,7 +155,7 @@ class DumpTruckVars(TestDb):
 
 class TestVarsSQL(DumpTruckVars):
   def test_integer(self):
-    self.save_check_get('foo', 42, 'integer')
+    self.save_check_get(u'foo', 42, u'integer')
 
 #class TestVarsJSON(TestVars):
 #  def test_list(self):
@@ -170,9 +170,9 @@ class TestVarsSQL(DumpTruckVars):
 
 class TestSelect(TestDb):
   def test_select(self):
-    shutil.copy('fixtures/landbank_branches.sqlite','.')
-    h = DumpTruck(dbname='landbank_branches.sqlite')
-    data_observed = h.execute("SELECT * FROM `branches` WHERE Fax is not null ORDER BY Fax LIMIT 3;")
+    shutil.copy(u'fixtures/landbank_branches.sqlite', u'.')
+    h = DumpTruck(dbname = u'landbank_branches.sqlite')
+    data_observed = h.execute(u'SELECT * FROM `branches` WHERE Fax is not null ORDER BY Fax LIMIT 3;')
     data_expected = [{'town': u'\r\nCenturion', 'date_scraped': 1327791915.618461, 'Fax': u' (012) 312 3647', 'Tel': u' (012) 686 0500', 'address_raw': u'\r\n420 Witch Hazel Ave\n\r\nEcopark\n\r\nCenturion\n\r\n0001\n (012) 686 0500\n (012) 312 3647', 'blockId': 14, 'street-address': None, 'postcode': u'\r\n0001', 'address': u'\r\n420 Witch Hazel Ave\n\r\nEcopark\n\r\nCenturion\n\r\n0001', 'branchName': u'Head Office'}, {'town': u'\r\nCenturion', 'date_scraped': 1327792245.787187, 'Fax': u' (012) 312 3647', 'Tel': u' (012) 686 0500', 'address_raw': u'\r\n420 Witch Hazel Ave\n\r\nEcopark\n\r\nCenturion\n\r\n0001\n (012) 686 0500\n (012) 312 3647', 'blockId': 14, 'street-address': u'\r\n420 Witch Hazel Ave\n\r\nEcopark', 'postcode': u'\r\n0001', 'address': u'\r\n420 Witch Hazel Ave\n\r\nEcopark\n\r\nCenturion\n\r\n0001', 'branchName': u'Head Office'}, {'town': u'\r\nMiddelburg', 'date_scraped': 1327791915.618461, 'Fax': u' (013) 282 6558', 'Tel': u' (013) 283 3500', 'address_raw': u'\r\n184 Jan van Riebeeck Street\n\r\nMiddelburg\n\r\n1050\n (013) 283 3500\n (013) 282 6558', 'blockId': 17, 'street-address': None, 'postcode': u'\r\n1050', 'address': u'\r\n184 Jan van Riebeeck Street\n\r\nMiddelburg\n\r\n1050', 'branchName': u'Middelburg'}]
     self.assertListEqual(data_observed, data_expected)
     os.remove('landbank_branches.sqlite')
@@ -211,14 +211,14 @@ class SaveAndCheck(TestDb):
     # Observe with pysqlite
     connection=sqlite3.connect('test.db')
     cursor=connection.cursor()
-    cursor.execute("SELECT * FROM %s" % tableOut)
+    cursor.execute(u'SELECT * FROM %s' % tableOut)
     observed1 = cursor.fetchall()
     connection.close()
 
     if twice:
       # Observe with DumpTruck
       h = DumpTruck(dbname = 'test.db')
-      observed2 = h.execute('SELECT * FROM %s' % tableOut)
+      observed2 = h.execute(u'SELECT * FROM %s' % tableOut)
       h.close()
  
       #Check
@@ -334,6 +334,14 @@ class TestSaveInt(SaveAndCheck):
     )
 
 class TestSaveUnicodeKey(SaveAndCheck):
+  def test_save(self):
+    self.save_and_check(
+      {u"英国": "yes"}
+    , u"國家"
+    , [("yes",)]
+    )
+
+class TestSaveNonUnicodeWeirdKey(SaveAndCheck):
   def test_save(self):
     self.save_and_check(
       {"name": "Super Digger", "payload": 10, "英国": "yes"}
