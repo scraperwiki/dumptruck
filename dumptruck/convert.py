@@ -89,3 +89,41 @@ def checkdata(data):
 def assert_text(vals):
   if not set(map(type, vals)).issubset(set([str, unicode])):
     raise TypeError('Non-text keys cannot be JSONified.')
+
+class dicti(dict):
+  'Case-insensitive dictionary'
+
+  def __setitem__(self, i, y):
+    return super(dicti, self).__setitem__(i.lower(), y)
+
+  def __getitem__(self, k):
+    return super(dicti, self).__getitem__(k.lower())
+
+  def __contains__(self, k):
+    return super(dicti, self).__contains__(k.lower())
+
+  def get(self, k, *args, **kwargs):
+    return super(dicti, self).get(k.lower(), *args, **kwargs)
+
+  def has_key(self, k):
+    return super(dicti, self).has_key(k.lower())
+
+  def pop(self, k, *args, **kwargs):
+    return super(dicti, self).pop(k.lower(), *args, **kwargs)
+
+  def setdefault(self, k, *args, **kwargs):
+    return super(dicti, self).setdefault(k.lower(), *args, **kwargs)
+
+  def fromkeys(self, S, v = None):
+    for s in S:
+      try:
+        s = s.lower()
+      except AttributeError:
+        pass
+    return super(dicti, self).fromkeys(S, v)
+
+# def __init__
+#   return super(dicti, self).
+
+# def update
+#   return super(dicti, self).
