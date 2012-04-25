@@ -1,4 +1,5 @@
 #!/usr/bin/env python2
+# -*- encoding: utf-8 -*-
 "Relaxing interface to SQLite"
 
 # Copyright 2012 Thomas Levine

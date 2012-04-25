@@ -1,4 +1,5 @@
 #!/usr/bin/env python2
+# -*- encoding: utf-8 -*-
 
 # Copyright 2012 Thomas Levine
 
@@ -330,6 +331,14 @@ class TestSaveInt(SaveAndCheck):
       {"modelNumber": 293}
     , "model-numbers"
     , [(293,)]
+    )
+
+class TestSaveUnicodeKey(SaveAndCheck):
+  def test_save(self):
+    self.save_and_check(
+      {"name": "Super Digger", "payload": 10, "英国": "yes"}
+    , "machines"
+    , [("Super Digger", 10, "yes")]
     )
 
 class TestSaveWeirdTableName1(SaveAndCheck):
