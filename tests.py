@@ -44,7 +44,7 @@ class TestQuote(TestCase):
     self.assertQuote('no^[hs!\'e]?\'sf_"&\'', '`no^[hs!\'e]?\'sf_"&\'`')
 
 class TestQuoteError(TestCase):
-  "Unquotables should raise a particular ValueError."
+  'Unquotables should raise a particular ValueError.'
   def assertQuoteError(self, textIn):
     self.assertRaises(ValueError, lambda: quote(textIn))
 
@@ -60,7 +60,7 @@ class TestDb(TestCase):
     self.cleanUp()
 
   def cleanUp(self):
-    "Clean up temporary files."
+    'Clean up temporary files.'
     for filename in ('test.db', 'dumptruck.db'):
       try:
         os.remove(filename)
@@ -73,7 +73,7 @@ class TestDb(TestCase):
 #class TestGetVar(TestDb):
 #  def setUp(self):
 #    self.cleanUp()
-#    self.h = DumpTruck(dbname = 'fixtures/absa-dumptruckvars.sqlite',vars_table="swvariables")
+#    self.h = DumpTruck(dbname = 'fixtures/absa-dumptruckvars.sqlite',vars_table='swvariables')
 #
 #  def test_existing_var(self):
 #   self.assertEquals(self.h.get_var('DATE'),1329518937.92)
@@ -116,7 +116,7 @@ class TestSaveVar(TestDb):
     self.assertEqual(observed, expected)
 
   def test_has_some_index(self):
-    """
+    '''
     PRAGMA index_info(index-name);
 
     This pragma returns one row each column in the named index. The first column of the result is the rank of the column within the index. The second column of the result is the rank of the column within the table. The third column of output is the name of the column being indexed.
@@ -124,7 +124,7 @@ class TestSaveVar(TestDb):
     PRAGMA index_list(table-name);
 
     This pragma returns one row for each index associated with the given table. Columns of the result set include the index name and a flag to indicate whether or not the index is UNIQUE.
-    """
+    '''
     self.cursor.execute(u'PRAGMA index_list(_dumptruckvars)')
     indices = self.cursor.fetchall()
 #   self.assertNotEqual(indices,[])
@@ -186,12 +186,12 @@ class TestShowTables(TestDb):
 class TestCreateTable(TestDb):
   def test_create_table(self):
     h = DumpTruck(dbname = 'test.db')
-    h.create_table({"foo": 0, "bar": 1, "baz": 2}, 'zombies')
+    h.create_table({'foo': 0, 'bar': 1, 'baz': 2}, 'zombies')
     h.close()
 
     connection=sqlite3.connect('test.db')
     cursor=connection.cursor()
-    cursor.execute("SELECT foo, bar, baz FROM zombies")
+    cursor.execute('SELECT foo, bar, baz FROM zombies')
     observed = cursor.fetchall()
     connection.close()
 
@@ -231,33 +231,33 @@ class SaveAndCheck(TestDb):
 
 class TestSaveDict(SaveAndCheck):
   def test_save_integers(self):
-    d = {1: "A", 2: "B", 3: "C"}
+    d = {1: 'A', 2: 'B', 3: 'C'}
     self.assertRaises(TypeError, lambda: self.save_and_check(
-      {"modelNumber": d}
-    , "model-numbers"
+      {'modelNumber': d}
+    , 'model-numbers'
     , [(dumps(d),)]
     ))
 
   def test_save_text(self):
     d = {'1': 'A', '2': 'B', '3': 'C'}
     self.save_and_check(
-      {"modelNumber": d}
-    , "model-numbers"
+      {'modelNumber': d}
+    , 'model-numbers'
     , [(dumps(d),)]
     )
 
   def test_save_fanciness(self):
     d = {'1': datetime.datetime(2012, 3, 5)}
     self.assertRaises(TypeError, lambda: self.save_and_check(
-      {"modelNumber": d}
-    , "model-numbers"
+      {'modelNumber': d}
+    , 'model-numbers'
     , [(dumps(d),)]
     ))
 
 class SaveAndSelect(TestDb):
   def save_and_select(self, d):
     dt = DumpTruck()
-    dt.insert({"foo": d})
+    dt.insert({'foo': d})
 
     observed = dt.dump()[0]['foo']
     self.assertEqual(d, observed)
@@ -285,42 +285,42 @@ class TestSavePickle(SaveAndSelect):
 
 class TestSaveSet(SaveAndSelect):
   def test_save_set(self):
-    self.save_and_select(set(["A", "B", "C"]))
+    self.save_and_select(set(['A', 'B', 'C']))
 
 class TestSaveBoolean(SaveAndCheck):
   def test_save_true(self):
     self.save_and_check(
-      {"a": True}
-    , "a"
+      {'a': True}
+    , 'a'
     , [(1,)]
     )
 
   def test_save_true(self):
     self.save_and_check(
-      {"a": False}
-    , "a"
+      {'a': False}
+    , 'a'
     , [(0,)]
     )
 
 class TestSaveList(SaveAndCheck):
   def test_save_integers(self):
-    d = ["A", "B", "C"]
+    d = ['A', 'B', 'C']
     self.save_and_check(
-      {"model-codes": d}
-    , "models"
+      {'model-codes': d}
+    , 'models'
     , [(dumps(d),)]
     )
 
 class TestSaveTwice(SaveAndCheck):
   def test_save_twice(self):
     self.save_and_check(
-      {"modelNumber": 293}
-    , "model-numbers"
+      {'modelNumber': 293}
+    , 'model-numbers'
     , [(293,)]
     )
     self.save_and_check(
-      {"modelNumber": 293}
-    , "model-numbers"
+      {'modelNumber': 293}
+    , 'model-numbers'
     , [(293,), (293,)]
     , twice = False
     )
@@ -328,97 +328,97 @@ class TestSaveTwice(SaveAndCheck):
 class TestSaveInt(SaveAndCheck):
   def test_save(self):
     self.save_and_check(
-      {"modelNumber": 293}
-    , "model-numbers"
+      {'modelNumber': 293}
+    , 'model-numbers'
     , [(293,)]
     )
 
 class TestSaveUnicodeKey(SaveAndCheck):
   def test_save(self):
     self.save_and_check(
-      {u"英国": "yes"}
-    , "country"
-    , [("yes",)]
+      {u'英国': 'yes'}
+    , 'country'
+    , [('yes',)]
     )
 
 class TestSaveUnicodeTable(SaveAndCheck):
   def test_save(self):
     self.save_and_check(
-      {"England": "yes"}
-    , u"國家"
-    , [("yes",)]
+      {'England': 'yes'}
+    , u'國家'
+    , [('yes',)]
     )
 
 class TestSaveNonUnicodeWeirdKey(SaveAndCheck):
   def test_save(self):
     self.save_and_check(
-      {"name": "Super Digger", "payload": 10, "英国": "yes"}
-    , "machines"
-    , [("Super Digger", 10, "yes")]
+      {'name': 'Super Digger', 'payload': 10, '英国': 'yes'}
+    , 'machines'
+    , [('Super Digger', 10, 'yes')]
     )
 
 class TestSaveWeirdTableName1(SaveAndCheck):
   def test_save(self):
     self.save_and_check(
-      {"modelNumber": 293}
-    , "This should-be a_valid.table+name!?"
+      {'modelNumber': 293}
+    , 'This should-be a_valid.table+name!?'
     , [(293,)]
     )
 
 class TestSaveWeirdTableName2(SaveAndCheck):
   def test_save(self):
     self.save_and_check(
-      {"lastname":"LeTourneau"}
-    , "`asoeu`"
+      {'lastname':'LeTourneau'}
+    , '`asoeu`'
     , [(u'LeTourneau',)]
     )
 
 class TestSaveWeirdTableName3(SaveAndCheck):
   def test_save(self):
     self.save_and_check(
-      {"lastname":"LeTourneau"}
-    , "[asoeu]"
+      {'lastname':'LeTourneau'}
+    , '[asoeu]'
     , [(u'LeTourneau',)]
     )
 
 class TestMultipleColumns(SaveAndSelect):
   def test_save(self):
-    self.save_and_select({"firstname":"Robert","lastname":"LeTourneau"})
+    self.save_and_select({'firstname': 'Robert', 'lastname': 'LeTourneau'})
 
 class TestSaveHyphen(SaveAndCheck):
   def test_save_int(self):
     self.save_and_check(
-      {"model-number": 293}
-    , "model-numbers"
+      {'model-number': 293}
+    , 'model-numbers'
     , [(293,)]
     )
 
 class TestSaveString(SaveAndCheck):
   def test_save(self):
     self.save_and_check(
-      {"lastname":"LeTourneau"}
-    , "diesel-engineers"
+      {'lastname': 'LeTourneau'}
+    , 'diesel-engineers'
     , [(u'LeTourneau',)]
     )
 
 class TestSaveDate(SaveAndCheck):
   def test_save(self):
     self.save_and_check(
-      {"birthday":datetime.datetime.strptime('1990-03-30', '%Y-%m-%d').date()}
-    , "birthdays"
+      {'birthday':datetime.datetime.strptime('1990-03-30', '%Y-%m-%d').date()}
+    , 'birthdays'
     , [(u'1990-03-30',)]
     )
 
 class TestSaveDateTime(SaveAndCheck):
   def test_save(self):
     self.save_and_check(
-      {"birthday":datetime.datetime.strptime('1990-03-30', '%Y-%m-%d')}
-    , "birthdays"
+      {'birthday':datetime.datetime.strptime('1990-03-30', '%Y-%m-%d')}
+    , 'birthdays'
     , [(u'1990-03-30 00:00:00',)]
     )
 
 class TestInvalidDumpTruckParams(TestDb):
-  "Invalid parameters should raise appropriate errors."
+  'Invalid parameters should raise appropriate errors.'
 
   def test_auto_commit(self):
     for value in (None,3,'uaoeu',set([3]),[]):
@@ -439,10 +439,10 @@ class TestInvalidDumpTruckParams(TestDb):
 class TestDumpTruckParams(TestDb):
   def test_params(self):
     self.assertFalse(os.path.isfile('test.db'))
-    h = DumpTruck(dbname='test.db',auto_commit=False,vars_table="baz")
+    h = DumpTruck(dbname='test.db',auto_commit=False,vars_table='baz')
     self.assertTrue(os.path.isfile('test.db'))
 #   self.assertEqual(h.auto_commit, False)
-#   self.assertEqual(h.__vars_table, "baz")
+#   self.assertEqual(h.__vars_table, 'baz')
 
 class TestParamsDefaults(TestDb):
   def test_params(self):
@@ -450,7 +450,7 @@ class TestParamsDefaults(TestDb):
     h = DumpTruck()
     self.assertTrue(os.path.isfile('dumptruck.db'))
 #   self.assertEqual(h.auto_commit, True)
-#   self.assertEqual(h.__vars_table, "_dumptruckvars")
+#   self.assertEqual(h.__vars_table, '_dumptruckvars')
 
 if __name__ == '__main__':
   main()
