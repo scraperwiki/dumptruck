@@ -1,0 +1,46 @@
+
+In [5]: h.execute("PRAGMA table_info(swvariables)",commit = False)
+Out[5]: 
+[{'cid': 0,
+  'dflt_value': None,
+  'name': u'value_blob',
+  'notnull': 0,
+  'pk': 0,
+  'type': u'blob'},
+ {'cid': 1,
+  'dflt_value': None,
+  'name': u'type',
+  'notnull': 0,
+  'pk': 0,
+  'type': u'text'},
+ {'cid': 2,
+  'dflt_value': None,
+  'name': u'name',
+  'notnull': 0,
+  'pk': 0,
+  'type': u'text'}]
+
+In [6]: h.execute("PRAGMA index_list(swvariables)",commit = False)
+Out[6]: [{'name': u'swvariables_index0', 'seq': 0, 'unique': 1}]
+
+In [7]: h.execute("PRAGMA index_info(swvariables_index0)",commit = False)
+Out[7]: [{'cid': 2, 'name': u'name', 'seqno': 0}]
+
+
+
+In [12]: h.execute("create index  abc on branches (Street_Address, Telephone)")
+
+In [13]: h.execute("PRAGMA index_list(branches)")
+Out[13]: [{'name': u'abc', 'seq': 0, 'unique': 0}]
+
+In [14]: h.execute("PRAGMA index_info(abc)")
+Out[14]: 
+[{'cid': 5, 'name': u'Street_Address', 'seqno': 0},
+ {'cid': 2, 'name': u'Telephone', 'seqno': 1}]
+
+
+# Unicode
+http://farmdev.com/talks/unicode/
+
+# Send a new version to PyPI
+python setup.py register sdist upload
