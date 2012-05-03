@@ -50,9 +50,9 @@ def simplify(text):
 def quote(text):
   'Handle quote characters'
 
-# # Convert to unicode.
-# if type(text) != unicode:
-#   text = text.decode('utf-8')
+  # Convert to unicode. (The database will do this again too.)
+  if type(text) != unicode:
+    text = text.decode('utf-8')
 
   # Look for quote characters. Keep the text as is if it's already quoted.
   for qp in QUOTEPAIRS:
