@@ -223,7 +223,7 @@ class SaveAndCheck(TestDb):
  
       #Check
       expected1 = dataOut
-      expected2 = [dataIn] if type(dataIn) == dict else dataIn
+      expected2 = [dataIn] if type(dataIn) in (dict, dicti) else dataIn
  
       self.assertListEqual(observed1, expected1)
       self.assertListEqual(observed2, expected2)
@@ -476,143 +476,13 @@ class TestParamsDefaults(TestDb):
 #   self.assertEqual(h.auto_commit, True)
 #   self.assertEqual(h.__vars_table, '_dumptruckvars')
 
+class TestSaveDicti(SaveAndCheck):
+  def test_save(self):
+    self.save_and_check(
+      dicti({'birthday':datetime.datetime.strptime('1990-03-30', '%Y-%m-%d').date()})
+    , 'birthdays'
+    , [(u'1990-03-30',)]
+    )
+
 if __name__ == '__main__':
   main()
-
-
-class BaseTestDictI(TestCase):
-  'Test the case-insensitive dictionary'
-
-  def assertCaseInsensitive(self, method, args_lower, args_upper):
-    if map(type, [args_lower, args_upper]) == [list, list]:
-      d_lower_return = getattr(dict, method)(self.d_lower, *args_lower)
-      d_upper_return = getattr(dict, method)(self.d_upper, *args_upper)
-      di_lower_return = getattr(dicti, method)(self.di_lower, *args_lower)
-      di_upper_return = getattr(dicti, method)(self.di_upper, *args_upper)
-    else:
-      raise TypeError('Both args arguments must be the lists.')
-
-    # The case-insensitive dictionaries should match the lowercase dictionary
-    self.assertDictEqual(self.d_lower, self.di_lower)
-    self.assertDictEqual(self.d_lower, self.di_upper)
-    self.assertDictEqual(self.d_lower_return, self.di_lower_return)
-    self.assertDictEqual(self.d_lower_return, self.di_upper_return)
-
-    # The case-insensitive dictionaries should match each other
-    self.assertDictEqual(self.di_lower, self.di_upper)
-    self.assertEqual(self.di_lower_return, self.di_upper_return)
-
-  def empty(self):
-    self.d_lower = dict()
-    self.d_upper = dict()
-    self.di_lower = dicti()
-    self.di_upper = dicti()
-
-  def reset(self):
-    self.d_lower = dict([(self.k_lower, self.v)])
-    self.d_upper = dict([(self.k_upper, self.v)])
-    self.di_lower = dicti([(self.k_lower, self.v)])
-    self.di_upper = dicti([(self.k_upper, self.v)])
-
-  def reset_switched(self):
-    'Only the case-insensitive dictionaries should be switched.'
-    self.d_lower = dict([(self.k_lower, self.v)])
-    self.d_upper = dict([(self.k_upper, self.v)])
-    self.di_lower = dicti([(self.k_upper, self.v)])
-    self.di_upper = dicti([(self.k_lower, self.v)])
-
-  def test__setitem__(self):
-    self.empty()
-    args_lower = [self.k_lower, self.v]
-    args_upper = [self.k_upper, self.v]
-    self.assertCaseInsensitive('__setitem__',
-      args_lower, args_upper
-    )
-
-  def test__getitem__(self):
-    self.reset()
-    args_lower = [self.k_lower]
-    args_upper = [self.k_upper]
-    self.assertCaseInsensitive('__getitem__',
-      args_lower, args_upper
-    )
-
-  def test__contains__(self):
-    self.reset()
-    args_lower = [self.k_lower]
-    args_upper = [self.k_upper]
-    self.assertCaseInsensitive('__contains__',
-      args_lower, args_upper
-    )
-
-  def testget(self):
-    self.reset()
-    args_lower = [self.k_lower]
-    args_upper = [self.k_upper]
-    self.assertCaseInsensitive('__get__',
-      args_lower, args_upper
-    )
-
-    self.empty()
-    args_lower = [self.k_lower, self.v]
-    args_upper = [self.k_upper, self.v]
-    self.assertCaseInsensitive('__get__',
-      args_lower, args_upper
-    )
-
-  def testhas_key(self):
-    self.reset_switched()
-    args_lower = [self.k_lower]
-    args_upper = [self.k_upper]
-    self.assertCaseInsensitive('has_key',
-      args_lower, args_upper
-    )
-
-  def testpop(self):
-    self.reset()
-    args_lower = [self.k_lower]
-    args_upper = [self.k_upper]
-    self.assertCaseInsensitive('pop',
-      args_lower, args_upper
-    )
-
-    self.empty()
-    args_lower = [self.k_lower, self.v]
-    args_upper = [self.k_upper, self.v]
-    self.assertCaseInsensitive('pop',
-      args_lower, args_upper
-    )
-
-  def testsetdefault(self):
-    self.reset()
-    args_lower = [self.k_lower]
-    args_upper = [self.k_upper]
-    self.assertCaseInsensitive('setdefault',
-      args_lower, args_upper
-    )
-
-    self.empty()
-    args_lower = [self.k_lower, self.v]
-    args_upper = [self.k_upper, self.v]
-    self.assertCaseInsensitive('setdefault',
-      args_lower, args_upper
-    )
-
-  def testfromkeys(self):
-    self.empty()
-    args_lower = [[self.k_lower], self.v]
-    args_upper = [[self.k_upper], self.v]
-    self.assertCaseInsensitive('fromkeys',
-      args_lower, args_upper
-    )
-
-# def test__init__
-#   return super(dicti, self).
-
-# def testupdate
-#   return super(dicti, self).
-
-class TestDictIStr(BaseTestDictI):
-  k_upper = 'CASE'
-  k_lower = 'case'
-  v = 'Case'

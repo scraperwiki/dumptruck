@@ -30,17 +30,32 @@ QUOTEPAIRS = [
 
 def convert(data):
   # Allow single rows to be dictionaries.
-  if type(data)==dict:
+  try:
+    data.items
+  except AttributeError:
+    # It is a dictionary
+    pass
+  else:
+    # It is not a dictionary
     data = [data]
 
   # http://stackoverflow.com/questions/1952464/
   # in-python-how-do-i-determine-if-a-variable-is-iterable
   try:
-    set([ type(e) for e in data])==set([dict])
+    [e for e in data]
   except TypeError:
-    raise TypeError('The data argument must be a dict or an iterable of dicts.')
+    raise TypeError(
+      'The data argument must be a mapping (like a dict) '
+      'or an iterable of mappings.'
+    )
 
-  data = [checkdata(row) for row in data]
+  for row in data:
+    for key, value in row.items():
+      if value == None:
+        del(data[key])
+
+    checkdata(row)
+
   data_quoted = [{quote(k): v for k, v in row.items()} for row in data]
   return data_quoted
 
@@ -50,7 +65,7 @@ def simplify(text):
 def quote(text):
   'Handle quote characters'
 
-  # Convert to unicode. (The database will do this again too.)
+  # Convert to unicode.
   if type(text) != unicode:
     text = text.decode('utf-8')
 
@@ -69,11 +84,8 @@ def quote(text):
 
 def checkdata(data):
   for key, value in data.items():
-    if value == None:
-      del(data[key])
-
     # Column names
-    elif key in [None, '']:
+    if key in [None, '']:
       raise ValueError('key must not be blank')
     elif type(key) not in (unicode, str):
       raise ValueError(u'The column name must be of unicode or str type. The column name ("%s") is of type %s. If this error doesn\'t make sense, try "unicode(\'%s\')".' % (key, type(key), key))
@@ -83,8 +95,6 @@ def checkdata(data):
       assert_text(value.keys())
     elif type(value) in [list, set]:
       assert_text(value)
-
-  return data
 
 def assert_text(vals):
   if not set(map(type, vals)).issubset(set([str, unicode])):
