@@ -17,7 +17,7 @@ So `dt.execute('select foo from bar', datastructure = zip)` would return
         [('key1', 'value1'), ('key2', 'value2')]
     ]
 
-and `dt.insert([('hattype', 'hardhat'), ('color', 'pink')]) would be
+and `dt.insert([('hattype', 'hardhat'), ('color', 'pink')])` would be
 equivalent to `dt.insert(dict([('hattype', 'hardhat'), ('color', 'pink')]))`.
 
 Make `Pickle` work properly.
