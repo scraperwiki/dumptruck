@@ -23,6 +23,7 @@ import json
 import sqlite3
 import re
 import datetime
+from dicti import dicti
 from convert import convert, quote, simplify, dicti
 from adapters_and_converters import register_adapters_and_converters, Pickle
 
@@ -117,7 +118,7 @@ class DumpTruck:
       return None
     else:
       colnames = [d[0] for d in self.cursor.description] 
-      rawdata = [dict(zip(colnames,row)) for row in rows]
+      rawdata = [dicti(zip(colnames,row)) for row in rows]
       return rawdata
 
   def commit(self):
