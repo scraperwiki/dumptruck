@@ -436,9 +436,10 @@ class TestSaveDateTime(SaveAndCheck):
 class TestCaseInsensitivity(TestDb):
   def test_select(self):
     dt = DumpTruck(dbname=':memory:',auto_commit=False,vars_table='baz')
-    dt.execute('CREATE TABLE foo (bar TEXT);')
-    case_insensitive_dict = dt.execute('select "UPPER" AS "CASE" from foo')[0]
-    self.assertEqual(case_insensitive_dict['case'], case_insensitive_dict['CASE'])
+    dt.execute('CREATE TABLE foo (thecase TEXT);')
+    dt.execute('INSERT INTO foo (thecase) VALUES ("UPPER");')
+    case_insensitive_dict = dt.execute('select * from foo')[0]
+    self.assertEqual(case_insensitive_dict['thecase'], case_insensitive_dict['theCASE'])
 
 class TestInvalidDumpTruckParams(TestDb):
   'Invalid parameters should raise appropriate errors.'

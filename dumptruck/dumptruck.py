@@ -117,7 +117,7 @@ class DumpTruck:
     if None == self.cursor.description:
       return None
     else:
-      colnames = [d[0] for d in self.cursor.description] 
+      colnames = [d[0].decode('utf-8') for d in self.cursor.description] 
       rawdata = [dicti(zip(colnames,row)) for row in rows]
       return rawdata
 
