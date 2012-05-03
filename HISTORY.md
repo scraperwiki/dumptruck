@@ -20,6 +20,10 @@ So `dt.execute('select foo from bar', datastructure = zip)` would return
 and `dt.insert([('hattype', 'hardhat'), ('color', 'pink')]) would be
 equivalent to `dt.insert(dict([('hattype', 'hardhat'), ('color', 'pink')]))`.
 
+Make `Pickle` work properly.
+
+Allow very long numbers to be inserted.
+
 Version 0.0.2
 -----
 
