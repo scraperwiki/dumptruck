@@ -34,13 +34,12 @@ def register_big(module):
     module.register_adapter(long, adapt_long)
 
 def register_unicode(module):
-    def adapt_text(val):
+    def text(val):
         return val.decode('utf-8')
 
-    module.register_adapter(unicode, adapt_text)
-    module.register_adapter(str, adapt_text)
-#   module.register_converter('text', text)
-#   module.register_converter('text', text)
+    module.register_adapter(unicode, text)
+    module.register_adapter(str, text)
+    module.register_converter('text', text)
 
 def register_pickle(module):
     def adapt_pickle(val):
@@ -95,7 +94,6 @@ def register_dates(module):
 
         val = datetime.datetime(year, month, day, hours, minutes, seconds, microseconds)
         return val
-
 
     module.register_adapter(datetime.date, adapt_date)
     module.register_adapter(datetime.datetime, adapt_datetime)
