@@ -24,7 +24,7 @@ import sqlite3
 import re
 import datetime
 from dicti import dicti
-from convert import convert, quote, simplify, dicti
+from convert import convert, quote, simplify
 from adapters_and_converters import register_adapters_and_converters, Pickle
 
 register_adapters_and_converters(sqlite3)

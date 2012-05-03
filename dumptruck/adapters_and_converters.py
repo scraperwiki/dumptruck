@@ -33,6 +33,15 @@ def register_big(module):
 
     module.register_adapter(long, adapt_long)
 
+def register_unicode(module):
+    def adapt_text(val):
+        return val.decode('utf-8')
+
+    module.register_adapter(unicode, adapt_text)
+    module.register_adapter(str, adapt_text)
+#   module.register_converter('text', text)
+#   module.register_converter('text', text)
+
 def register_pickle(module):
     def adapt_pickle(val):
         return pickle.dumps(val.obj)
@@ -98,3 +107,4 @@ def register_adapters_and_converters(module):
     register_dates(module)
     register_json(module)
     register_pickle(module)
+    register_unicode(module)
