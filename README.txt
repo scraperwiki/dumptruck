@@ -160,6 +160,12 @@ respectively, but will not insert the dictionary values ("jackhammer" and 58) in
 
     dt.create_table({"toolName":"jackhammer", "weight": 58}, "tools")
 
+If you are concerned about the order of the tables, pass a list of tuples.
+
+    dt.create_table([("toolName", "jackhammer"), ("weight", 58)], "tools")
+
+The columns will be created in the specified order.
+
 ### Indices
 
 #### Creating
@@ -179,9 +185,7 @@ You can also specify multi-column indices.
     dt.create_index('tools', ['toolName', 'weight'])
 
 DumpTruck names these indices according to the names of the relevant table and columns.
-The index created in the previous example might be named `tools_toolName_weight0`.
-The 0 is an arbitrary number that is changed in case the index name would otherwise
-be the same as the name of an existing index.
+The index created in the previous example might be named `dt__tools_toolName_weight`.
 
 #### Other index manipulation
 DumpTruck does not implement special methods for viewing or removing indices, but here
@@ -191,13 +195,13 @@ The following command lists indices on the `tools` table.
 
     dt.execute('PRAGMA index_list(tools)')
 
-The following command gives more information about the index named `tools_toolName_weight0`.
+The following command gives more information about the index named `dt__tools_toolName_weight`.
 
-    dt.execute('PRAGMA index_list(tools_toolName_weight0)')
+    dt.execute('PRAGMA index_info(dt__tools_toolName_weight)')
 
 And this one deletes the index.
 
-    dt.execute('DROP INDEX tools_toolName_weight0')
+    dt.execute('DROP INDEX dt__tools_toolName_weight')
 
 For more information on indices and, particularly, the `PRAGMA` commands, check
 the [SQLite documentation]().
