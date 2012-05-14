@@ -31,7 +31,8 @@ Once the database contains data, you can retrieve them.
 
     data = dt.dump()
 
-The data come out as a list of dictionaries, with one dictionary per row.
+The data come out as a list of dictionaries with case-insensitive keys
+([dictis](http://pypi.python.org/pypi/dicti)), with one dictionary per row.
 
 Slow start
 -------
