@@ -292,6 +292,10 @@ class TestSaveNested(SaveAndSelect):
     d = {'1': 1}
     self.save_and_select({'modelNumber': d})
 
+class TestSaveNone(SaveAndSelect):
+  def test_save_nested(self):
+    self.save_and_select({'modelNumber': None})
+
 class TestSaveEmptyDict(SaveAndSelect):
   def test_empty_dict(self):
     self.save_and_select({})

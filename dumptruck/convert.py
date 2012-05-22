@@ -51,7 +51,7 @@ def convert(data):
   for row in data:
     for key, value in row.items():
       if value == None:
-        del(data[key])
+        del(row[key])
 
     checkdata(row)
 
