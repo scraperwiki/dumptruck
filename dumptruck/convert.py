@@ -97,5 +97,5 @@ def checkdata(data):
       assert_text(value)
 
 def assert_text(vals):
-  if not set(map(type, vals)).issubset(set([str, unicode])):
+  if not (vals == [] or set(map(type, vals)).issubset(set([str, unicode]))):
     raise TypeError('Non-text keys cannot be JSONified.')

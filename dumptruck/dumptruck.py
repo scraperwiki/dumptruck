@@ -100,7 +100,7 @@ class DumpTruck:
 
     table_info = self.execute(u'PRAGMA table_info(%s)' % quote(self.__vars_table))
     column_names_observed = set([column['name'] for column in table_info])
-    column_names_expected = set(['key', 'type', 'value'])
+    column_names_expected = {'key', 'type', 'value'}
     assert column_names_observed == column_names_expected, table_info
 
   def execute(self, sql, *args, **kwargs):

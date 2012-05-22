@@ -21,6 +21,7 @@
 from unittest import TestCase, main
 from json import loads, dumps
 from dumptruck import DumpTruck, Pickle, quote, dicti
+from dumptruck.convert import assert_text
 import sqlite3
 import os, shutil
 import datetime
@@ -229,15 +230,6 @@ class SaveAndCheck(TestDb):
  
       self.assertListEqual(observed1, expected1)
       self.assertListEqual(observed2, expected2)
-      
-
-class TestSaveEmptyDict(SaveAndCheck):
-  def test_empty_dict(self):
-    self.save_and_select({})
-
-class TestSaveEmptyList(SaveAndCheck):
-  def test_empty_list(self):
-    self.save_and_select([])
 
 class TestSaveDict(SaveAndCheck):
   def test_save_integers(self):
@@ -271,6 +263,14 @@ class SaveAndSelect(TestDb):
 
     observed = dt.dump()[0]['foo']
     self.assertEqual(d, observed)
+
+class TestSaveEmptyDict(SaveAndSelect):
+  def test_empty_dict(self):
+    self.save_and_select({})
+
+class TestSaveEmptyList(SaveAndSelect):
+  def test_empty_list(self):
+    self.save_and_select([])
 
 class TestSaveLong1(SaveAndSelect):
   def test_zeroes(self):
@@ -493,6 +493,16 @@ class TestSaveDicti(SaveAndCheck):
     , 'birthdays'
     , [(u'1990-03-30',)]
     )
+
+class TestAssertText(TestCase):
+  def test_empty(self):
+    assert_text([])
+    assert_text(['aoeuaeou', 'euaoeuaoeu'])
+    assert_text([u'aoeuaeou', 'euaoeuaoeu'])
+    assert_text([u'aoeuaeou', u'euaoeuaoeu'])
+    self.assertRaises(TypeError, lambda: assert_text([3]))
+    self.assertRaises(TypeError, lambda: assert_text(['u', 3]))
+    self.assertRaises(TypeError, lambda: assert_text([u'u', 3]))
 
 if __name__ == '__main__':
   main()
