@@ -83,6 +83,32 @@ class TestDb(TestCase):
 #  def test_nonexisting_var(self):
 #   self.assertRaises(NameError,self.h.get_var,'nonexistant_var')
 
+
+class TestDump(TestDb):
+  def test_drop_nonexistant(self):
+    self.assertRaises(sqlite3.OperationError, h.dump)
+
+  def test_save(self):
+    h = DumpTruck(dbname = '/tmp/test.db')
+    data = {'firstname': 'Robert', 'lastname': 'LeTourneau'}
+    h.insert(data, 'foo')
+    self.assertEqual(data, h.dump('foo'))
+    h.close()
+
+class TestDrop(TestDb):
+  def test_drop_nonexistant(self):
+    self.assertRaises(sqlite3.OperationError, h.drop)
+
+  def test_drop_nonexistant_if_exists(self):
+    self.assertRaises(sqlite3.OperationError, lambda: h.drop(if_exists = True))
+
+  def test_save(self):
+    h = DumpTruck(dbname = '/tmp/test.db')
+    h.insert({'firstname': 'Robert', 'lastname': 'LeTourneau'}, 'foo')
+    h.drop('foo')
+    self.assertEqual(h.tables(), {})
+    h.close()
+
 class SaveGetVar(TestDb):
   def savegetvar(self, var):
     h = DumpTruck(dbname = '/tmp/test.db')
