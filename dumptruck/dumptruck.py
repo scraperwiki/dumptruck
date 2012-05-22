@@ -280,9 +280,9 @@ INSERT INTO %s (`key`, `type`, `value`)
     result = self.execute(u'SELECT name FROM sqlite_master WHERE TYPE="table"', commit = False)
     return set([row['name'] for row in result])
 
-  def drop(self, table_name = 'dumptruck', **kwargs):
+  def drop(self, table_name = 'dumptruck', if_exists = False, **kwargs):
     'Drop a table.'
-    return self.execute(u'DROP IF EXISTS %s;' % quote(table_name), **kwargs)
+    return self.execute(u'DROP TABLE %s %s;' % ('IF EXISTS' if if_exists else '', quote(table_name)), **kwargs)
 
   def dump(self, table_name = 'dumptruck'):
     'Dump a table.'
