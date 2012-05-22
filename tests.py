@@ -25,6 +25,8 @@ import sqlite3
 import os, shutil
 import datetime
 
+DB_FILE = '/tmp/test.db'
+
 class TestQuote(TestCase):
   def assertQuote(self, textIn, textOut):
     self.assertEqual(quote(textIn), textOut)
@@ -61,7 +63,7 @@ class TestDb(TestCase):
 
   def cleanUp(self):
     'Clean up temporary files.'
-    for filename in ('test.db', 'dumptruck.db'):
+    for filename in ('/tmp/test.db', 'dumptruck.db'):
       try:
         os.remove(filename)
       except OSError as e:
@@ -83,7 +85,7 @@ class TestDb(TestCase):
 
 class SaveGetVar(TestDb):
   def savegetvar(self, var):
-    h = DumpTruck(dbname = 'test.db')
+    h = DumpTruck(dbname = '/tmp/test.db')
     h.save_var(u'weird', var)
     self.assertEqual(h.get_var(u'weird'), var)
     h.close()
@@ -103,10 +105,10 @@ class TestSaveGetDict(SaveGetVar):
 class TestSaveVar(TestDb):
   def setUp(self):
     self.cleanUp()
-    h = DumpTruck(dbname = u'test.db')
+    h = DumpTruck(dbname = u'/tmp/test.db')
     h.save_var(u'birthday', u'November 30, 1888')
     h.close()
-    connection=sqlite3.connect(u'test.db')
+    connection=sqlite3.connect(u'/tmp/test.db')
     self.cursor=connection.cursor()
 
   def test_insert(self):
@@ -131,12 +133,12 @@ class TestSaveVar(TestDb):
 
 class DumpTruckVars(TestDb):
   def save(self, key, value):
-    h = DumpTruck(dbname = u'test.db')
+    h = DumpTruck(dbname = u'/tmp/test.db')
     h.save_var(key, value)
     h.close()
 
   def check(self, key, value, sqltype):
-    connection=sqlite3.connect(u'test.db')
+    connection=sqlite3.connect(u'/tmp/test.db')
     self.cursor=connection.cursor()
     self.cursor.execute(u'SELECT key, value, `type` FROM `_dumptruckvars`')
     observed = self.cursor.fetchall()
@@ -144,7 +146,7 @@ class DumpTruckVars(TestDb):
     self.assertEqual(observed, expected)
 
   def get(self, key, value):
-    h = DumpTruck(dbname = u'test.db')
+    h = DumpTruck(dbname = u'/tmp/test.db')
     self.assertEqual(h.get_var(key), value)
     h.close()
 
@@ -179,17 +181,17 @@ class TestSelect(TestDb):
 
 class TestShowTables(TestDb):
   def test_show_tables(self):
-    shutil.copy('fixtures/landbank_branches.sqlite','test.db')
-    h = DumpTruck(dbname = 'test.db')
+    shutil.copy('fixtures/landbank_branches.sqlite','/tmp/test.db')
+    h = DumpTruck(dbname = '/tmp/test.db')
     self.assertSetEqual(h.tables(),set(['blocks','branches']))
 
 class TestCreateTable(TestDb):
   def test_create_table(self):
-    h = DumpTruck(dbname = 'test.db')
+    h = DumpTruck(dbname = '/tmp/test.db')
     h.create_table({'foo': 0, 'bar': 1, 'baz': 2}, 'zombies')
     h.close()
 
-    connection=sqlite3.connect('test.db')
+    connection=sqlite3.connect('/tmp/test.db')
     cursor=connection.cursor()
     cursor.execute('SELECT foo, bar, baz FROM zombies')
     observed = cursor.fetchall()
@@ -204,12 +206,12 @@ class SaveAndCheck(TestDb):
       tableOut = quote(tableIn)
 
     # Insert
-    h = DumpTruck(dbname = 'test.db')
+    h = DumpTruck(dbname = '/tmp/test.db')
     h.insert(dataIn, tableIn)
     h.close()
 
     # Observe with pysqlite
-    connection=sqlite3.connect('test.db')
+    connection=sqlite3.connect('/tmp/test.db')
     cursor=connection.cursor()
     cursor.execute(u'SELECT * FROM %s' % tableOut)
     observed1 = cursor.fetchall()
@@ -217,7 +219,7 @@ class SaveAndCheck(TestDb):
 
     if twice:
       # Observe with DumpTruck
-      h = DumpTruck(dbname = 'test.db')
+      h = DumpTruck(dbname = '/tmp/test.db')
       observed2 = h.execute(u'SELECT * FROM %s' % tableOut)
       h.close()
  
@@ -228,6 +230,14 @@ class SaveAndCheck(TestDb):
       self.assertListEqual(observed1, expected1)
       self.assertListEqual(observed2, expected2)
       
+
+class TestSaveEmptyDict(SaveAndCheck):
+  def test_empty_dict(self):
+    self.save_and_select({})
+
+class TestSaveEmptyList(SaveAndCheck):
+  def test_empty_list(self):
+    self.save_and_select([])
 
 class TestSaveDict(SaveAndCheck):
   def test_save_integers(self):
@@ -462,9 +472,9 @@ class TestInvalidDumpTruckParams(TestDb):
 
 class TestDumpTruckParams(TestDb):
   def test_params(self):
-    self.assertFalse(os.path.isfile('test.db'))
-    h = DumpTruck(dbname='test.db',auto_commit=False,vars_table='baz')
-    self.assertTrue(os.path.isfile('test.db'))
+    self.assertFalse(os.path.isfile('/tmp/test.db'))
+    h = DumpTruck(dbname='/tmp/test.db',auto_commit=False,vars_table='baz')
+    self.assertTrue(os.path.isfile('/tmp/test.db'))
 #   self.assertEqual(h.auto_commit, False)
 #   self.assertEqual(h.__vars_table, 'baz')
 
