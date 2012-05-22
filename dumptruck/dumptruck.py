@@ -19,7 +19,6 @@
 # You should have received a copy of the GNU Affero Public License
 # along with DumpTruck.  If not, see <http://www.gnu.org/licenses/>.
 
-import json
 import sqlite3
 import re
 import datetime
@@ -109,7 +108,10 @@ class DumpTruck:
     This is sort of the foundational method that most of the
     others build on.
     '''
-    self.cursor.execute(sql, *args)
+    try:
+      self.cursor.execute(sql, *args)
+    except sqlite3.InterfaceError, msg:
+      raise sqlite3.InterfaceError(unicode(msg) + '\nTry converting types or pickling.')
     rows = self.cursor.fetchall()
 
     self.__commit_if_necessary(kwargs)

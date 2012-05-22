@@ -21,7 +21,6 @@
 from copy import copy
 import re
 import datetime
-from json import loads, dumps
 
 QUOTEPAIRS = [
   (u'`', u'`'),
@@ -89,13 +88,3 @@ def checkdata(data):
       raise ValueError('key must not be blank')
     elif type(key) not in (unicode, str):
       raise ValueError(u'The column name must be of unicode or str type. The column name ("%s") is of type %s. If this error doesn\'t make sense, try "unicode(\'%s\')".' % (key, type(key), key))
-
-    # JSON
-    elif type(value) == dict:
-      assert_text(value.keys())
-    elif type(value) in [list, set]:
-      assert_text(value)
-
-def assert_text(vals):
-  if not (vals == [] or set(map(type, vals)).issubset(set([str, unicode]))):
-    raise TypeError('Non-text keys cannot be JSONified.')

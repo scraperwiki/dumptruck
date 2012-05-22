@@ -19,9 +19,8 @@
 # along with DumpTruck.  If not, see <http://www.gnu.org/licenses/>.
 
 from unittest import TestCase, main
-from json import loads, dumps
+from demjson import encode, decode
 from dumptruck import DumpTruck, Pickle, quote, dicti
-from dumptruck.convert import assert_text
 import sqlite3
 import os, shutil
 import datetime
@@ -231,31 +230,6 @@ class SaveAndCheck(TestDb):
       self.assertListEqual(observed1, expected1)
       self.assertListEqual(observed2, expected2)
 
-class TestSaveDict(SaveAndCheck):
-  def test_save_integers(self):
-    d = {1: 'A', 2: 'B', 3: 'C'}
-    self.assertRaises(TypeError, lambda: self.save_and_check(
-      {'modelNumber': d}
-    , 'model-numbers'
-    , [(dumps(d),)]
-    ))
-
-  def test_save_text(self):
-    d = {'1': 'A', '2': 'B', '3': 'C'}
-    self.save_and_check(
-      {'modelNumber': d}
-    , 'model-numbers'
-    , [(dumps(d),)]
-    )
-
-  def test_save_fanciness(self):
-    d = {'1': datetime.datetime(2012, 3, 5)}
-    self.assertRaises(TypeError, lambda: self.save_and_check(
-      {'modelNumber': d}
-    , 'model-numbers'
-    , [(dumps(d),)]
-    ))
-
 class SaveAndSelect(TestDb):
   def save_and_select(self, d):
     dt = DumpTruck()
@@ -263,6 +237,31 @@ class SaveAndSelect(TestDb):
 
     observed = dt.dump()[0]['foo']
     self.assertEqual(d, observed)
+
+class TestSaveNestedDate(SaveAndSelect):
+  def test_save_nested_date(self):
+    d = {'1': datetime.datetime(2012, 3, 5).date()}
+    self.assertRaises(sqlite3.InterfaceError, lambda: self.save_and_select({'modelNumber': d}))
+
+class TestSaveNestedDatetime(SaveAndSelect):
+  def test_save_nested_datetime(self):
+    d = {'1': datetime.datetime(2012, 3, 5)}
+    self.assertRaises(sqlite3.InterfaceError, lambda: self.save_and_select({'modelNumber': d}))
+
+class TestSaveDictIntegers(SaveAndSelect):
+  def test_save_integers(self):
+    d = {1: 'A', 2: 'B', 3: 'C'}
+    self.save_and_select({'modelNumber': d})
+
+class TestSaveDict(SaveAndSelect):
+  def test_save_text(self):
+    d = {'1': 'A', '2': 'B', '3': 'C'}
+    self.save_and_select({'modelNumber': d})
+
+class TestSaveNested(SaveAndSelect):
+  def test_save_nested(self):
+    d = {'1': 1}
+    self.save_and_select({'modelNumber': d})
 
 class TestSaveEmptyDict(SaveAndSelect):
   def test_empty_dict(self):
@@ -318,7 +317,7 @@ class TestSaveList(SaveAndCheck):
     self.save_and_check(
       {'model-codes': d}
     , 'models'
-    , [(dumps(d),)]
+    , [(encode(d),)]
     )
 
 class TestSaveTwice(SaveAndCheck):
@@ -493,16 +492,6 @@ class TestSaveDicti(SaveAndCheck):
     , 'birthdays'
     , [(u'1990-03-30',)]
     )
-
-class TestAssertText(TestCase):
-  def test_empty(self):
-    assert_text([])
-    assert_text(['aoeuaeou', 'euaoeuaoeu'])
-    assert_text([u'aoeuaeou', 'euaoeuaoeu'])
-    assert_text([u'aoeuaeou', u'euaoeuaoeu'])
-    self.assertRaises(TypeError, lambda: assert_text([3]))
-    self.assertRaises(TypeError, lambda: assert_text(['u', 3]))
-    self.assertRaises(TypeError, lambda: assert_text([u'u', 3]))
 
 if __name__ == '__main__':
   main()
