@@ -86,11 +86,12 @@ class TestDb(TestCase):
 
 class TestDump(TestDb):
   def test_drop_nonexistant(self):
+    h = DumpTruck(dbname = '/tmp/test.db')
     self.assertRaises(sqlite3.OperationalError, h.dump)
 
   def test_save(self):
     h = DumpTruck(dbname = '/tmp/test.db')
-    data = {'firstname': 'Robert', 'lastname': 'LeTourneau'}
+    data = [{'firstname': 'Robert', 'lastname': 'LeTourneau'}]
     h.insert(data, 'foo')
     self.assertEqual(data, h.dump('foo'))
     h.close()
@@ -108,7 +109,7 @@ class TestDrop(TestDb):
     h = DumpTruck(dbname = '/tmp/test.db')
     h.insert({'firstname': 'Robert', 'lastname': 'LeTourneau'}, 'foo')
     h.drop('foo')
-    self.assertEqual(h.tables(), set())
+    self.assertEqual(h.tables(), set([]))
     h.close()
 
 class SaveGetVar(TestDb):

@@ -63,7 +63,7 @@ def register_json(module):
         return demjson.decode(val, strict = True)
 
     def convert_jsonset(val):
-        return set(demjson.decode(val).keys(), strict = True)
+        return set(demjson.decode(val, strict = True).keys())
 
     module.register_adapter(list, adapt_json)
     module.register_adapter(tuple, adapt_json)
