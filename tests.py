@@ -229,6 +229,14 @@ class TestCreateTable(TestDb):
     expected = []
     self.assertListEqual(observed, expected)
 
+class SaveCheckSelect(TestDb):
+  '''
+  Save the value to the database,
+  assert that it is stored as we expect,
+  then retrieve it and assert that
+  came out the same as it went in.
+  '''
+
 class SaveAndCheck(TestDb):
   def save_and_check(self, dataIn, tableIn, dataOut, tableOut = None, twice = True):
     if tableOut == None:
