@@ -27,10 +27,13 @@ Allow very long numbers to be inserted.
 Version 0.0.2
 -----
 
-Add support for unicode table names.
+I added support for unicode table names.
 
 `DumpTruck.execute` returns data as lists of [dictis](dicti)
 instead of dicts.
+
+I fixed a few bugs that I noticed while scraping notices on
+[wetland projects](https://github.com/tlevine/wetlands)
 
 Version 0.0.1 (April 2012)
 -----
