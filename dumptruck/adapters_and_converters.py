@@ -39,6 +39,7 @@ def register_unicode(module):
 
     module.register_adapter(unicode, text)
     module.register_adapter(str, text)
+    module.register_converter('TEXT', text)
     module.register_converter('text', text)
 
 def register_pickle(module):
@@ -49,6 +50,7 @@ def register_pickle(module):
         return pickle.loads(val)
 
     module.register_adapter(Pickle, adapt_pickle)
+    module.register_converter('PICKLE', convert_pickle)
     module.register_converter('pickle', convert_pickle)
 
 def register_json(module):
@@ -70,7 +72,9 @@ def register_json(module):
     module.register_adapter(dict, adapt_json)
     module.register_adapter(set, adapt_jsonset)
     module.register_converter('json', convert_json)
+    module.register_converter('JSON', convert_json)
     module.register_converter('jsonset', convert_jsonset)
+    module.register_converter('JSONSET', convert_jsonset)
 
 def register_dates(module):
     def adapt_date(val):
@@ -97,7 +101,9 @@ def register_dates(module):
 
     module.register_adapter(datetime.date, adapt_date)
     module.register_adapter(datetime.datetime, adapt_datetime)
+    module.register_converter('DATE', convert_date)
     module.register_converter('date', convert_date)
+    module.register_converter('DATETIME', convert_datetime)
     module.register_converter('datetime', convert_datetime)
 
 def register_adapters_and_converters(module):
