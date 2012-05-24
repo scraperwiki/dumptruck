@@ -8,7 +8,8 @@ of the last row inserted row of the last row being inserted.
 * http://ubuntuforums.org/showthread.php?t=933254
 * http://www.sqlite.org/c3ref/last_insert_rowid.html
 
-The temporary variables table is a virtual table.
+`DumpTruck.{get,save}_var` uses a a virtual table instead of a hacked
+temporary real table that is created and deleted every time.
 
 Add support for the zip data structure to `.execute` and `.insert`.
 So `dt.execute('select foo from bar', datastructure = zip)` would return
@@ -24,7 +25,9 @@ Make `Pickle` work properly.
 
 Allow very long numbers to be inserted.
 
-Version 0.0.2
+`DumpTruck.create_index` adds a `NOT NULL` constraint if a unique index is created.
+
+Version 0.0.2 (May 2012)
 -----
 
 I added support for unicode table names.
