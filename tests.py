@@ -534,5 +534,16 @@ class TestSaveDicti(SaveAndCheck):
     , [(u'1990-03-30',)]
     )
 
+class TestZip(TestDb):
+  def test_save(self):
+    dt = DumpTruck(dbname = DB_FILE)
+    dt.insert([('foo': 'bar')], 'baz', structure = zip)
+    self.assertDictEqual(dt.execute('select * from baz')[0], {'foo': 'bar'})
+
+  def test_retrieve(self):
+    dt = DumpTruck(dbname = DB_FILE)
+    dt.insert([{'a': 'b'}], 'c')
+    self.assertEqual(dt.execute('select * from c', structure = zip)[0], ('a', 'b'))
+
 if __name__ == '__main__':
   main()
