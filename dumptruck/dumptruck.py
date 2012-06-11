@@ -150,7 +150,7 @@ class DumpTruck:
 
   def __check_and_add_columns(self, table_name, converted_data_row):
     column_types = self.__column_types(table_name)
-    for key,value in converted_data_row.items():
+    for key,value in converted_data_row:
       try:
         column_type = get_column_type(value)
         params = (quote(table_name), key, column_type)
@@ -204,6 +204,7 @@ class DumpTruck:
     except:
       raise
 
+    # Turn it into a list of zips.
     converted_data = convert(data)
 
     for row in converted_data:
@@ -212,10 +213,14 @@ class DumpTruck:
     # .keys() and .items() are in the same order
     # http://www.python.org/dev/peps/pep-3106/
     for row in converted_data:
-      question_marks = ','.join('?'*len(row.keys()))
+      keys = [pair[0] for pair in row]
+      values = [pair[1] for pair in row]
+
+      question_marks = ','.join('?'*len(keys))
+
       # This is vulnerable to injection.
-      sql = u'INSERT INTO %s (%s) VALUES (%s);' % (quote(table_name), ','.join(row.keys()), question_marks)
-      self.execute(sql, row.values(), commit=False)
+      sql = u'INSERT INTO %s (%s) VALUES (%s);' % (quote(table_name), ','.join(keys), question_marks)
+      self.execute(sql, values, commit=False)
 
     self.__commit_if_necessary(kwargs)
 
