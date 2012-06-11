@@ -28,34 +28,49 @@ QUOTEPAIRS = [
 ]
 
 def convert(data):
-  # Allow single rows to be dictionaries.
-  try:
-    data.items
-  except AttributeError:
-    # It is a dictionary
-    pass
-  else:
-    # It is not a dictionary
+
+  if set(dir(data)).issuperset(dir(dict)):
+    # It is a single dictionary
     data = [data]
 
-  # http://stackoverflow.com/questions/1952464/
-  # in-python-how-do-i-determine-if-a-variable-is-iterable
-  try:
-    [e for e in data]
-  except TypeError:
-    raise TypeError(
-      'The data argument must be a mapping (like a dict) '
-      'or an iterable of mappings.'
-    )
+  else:
+    # http://stackoverflow.com/questions/1952464/
+    # in-python-how-do-i-determine-if-a-variable-is-iterable
+    try:
+      [e for e in data]
+    except TypeError:
+      raise TypeError(
+        'The data argument must be a mapping (like a dict), '
+        'an iterable of pairs or an iterable either of those.'
+      )
+  
+    # Is it a single zip?
+    datadirs = set([dir(subdata) for subdata in data])
+    if len(datadirs) == 1 && set(list(datadirs)[0]).issuperset(dir(tuple)):
+      #It is a single zip
+      data = [data]
 
+  data_quoted = []
   for row in data:
+    try:
+      # Is it a dict?
+      row.keys
+    except:
+      # If it's not a dict (and thus is a zip), record the key order
+      # and convert to a dict.
+      keys = [pair[0] for pair in row]
+      row = dict(row)
+    else:
+      # If it is a dict, choose an arbitrary order
+      keys = row.keys()
+
     for key, value in row.items():
       if value == None:
         del(row[key])
 
     checkdata(row)
-
-  data_quoted = [{quote(k): v for k, v in row.items()} for row in data]
+    values = [row[k] for k in keys]
+    data_quoted.append(zip([quote(k) for k in keys], values))
   return data_quoted
 
 def simplify(text):
