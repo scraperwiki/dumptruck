@@ -535,10 +535,15 @@ class TestSaveDicti(SaveAndCheck):
     )
 
 class TestZip(TestDb):
-  def test_save(self):
+  def test_save1(self):
     dt = DumpTruck(dbname = DB_FILE)
-    dt.insert([('foo': 'bar')], 'baz', structure = zip)
-    self.assertDictEqual(dt.execute('select * from baz')[0], {'foo': 'bar'})
+    dt.insert([('foo', 'bar')], 'baz1', structure = zip)
+    self.assertDictEqual(dt.execute('select * from baz1')[0], {'foo': 'bar'})
+
+  def test_save2(self):
+    dt = DumpTruck(dbname = DB_FILE)
+    dt.insert([[('foo', 'bar')]], 'baz2', structure = zip)
+    self.assertDictEqual(dt.execute('select * from baz2')[0], {'foo': 'bar'})
 
   def test_retrieve(self):
     dt = DumpTruck(dbname = DB_FILE)
