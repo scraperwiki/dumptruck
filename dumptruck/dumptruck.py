@@ -175,7 +175,7 @@ class DumpTruck:
   def create_table(self, data, table_name, error_if_exists = False, **kwargs):
     'Create a table based on the data, but don\'t insert anything.'
     converted_data = convert(data)
-    startdata = converted_data[0]
+    startdata = dict(converted_data[0])
 
     # Select a non-null item
     for k, v in startdata.items():

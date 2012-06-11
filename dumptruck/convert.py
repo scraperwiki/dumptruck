@@ -45,8 +45,8 @@ def convert(data):
       )
   
     # Is it a single zip?
-    datadirs = set([dir(subdata) for subdata in data])
-    if len(datadirs) == 1 && set(list(datadirs)[0]).issuperset(dir(tuple)):
+    datadirs = set(['|'.join(dir(subdata)) for subdata in data])
+    if len(datadirs) == 1 and set(list(datadirs)[0]).issuperset(dir(tuple)):
       #It is a single zip
       data = [data]
 
