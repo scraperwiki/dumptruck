@@ -19,26 +19,27 @@ from distutils.core import setup
 import dumptruck
 
 setup(name='dumptruck',
-      author='Thomas Levine',
-      #author_email='perluette@thomaslevine.com',
-      author_email='thomas@scraperwiki.com',
-      description='Relaxing interface to SQLite',
-      url='https://github.com/tlevine/dumptruck',
-      #url='http://hacks.thomaslevine.com/dumptruck',
-      classifiers=[
-          'Intended Audience :: Developers',
-          'Intended Audience :: Science/Research',
-          'License :: OSI Approved :: GNU Affero General Public License v3 or later (AGPLv3+)',
-          'Programming Language :: Python :: 2.7',
-          'Programming Language :: SQL',
-          'Topic :: Database :: Front-Ends',
-      ],
-      packages=['dumptruck'],
+    author='Thomas Levine',
+    #author_email='perluette@thomaslevine.com',
+    author_email='thomas@scraperwiki.com',
+    description='Relaxing interface to SQLite',
+    url='https://github.com/tlevine/dumptruck',
+    #url='http://hacks.thomaslevine.com/dumptruck',
+    classifiers=[
+        'Intended Audience :: Developers',
+        'Intended Audience :: Science/Research',
+        'License :: OSI Approved :: GNU Affero General Public License v3 or later (AGPLv3+)',
+        'Programming Language :: Python :: 2.7',
+        'Programming Language :: SQL',
+        'Topic :: Database :: Front-Ends',
+    ],
+    packages=['dumptruck'],
 
-      # From requests
-      version=dumptruck.__version__,
-      #long_description=open('README.md').read() + '\n\n' + open('HISTORY.md').read(), #needs to be rst
-      #package_data={'': ['LICENSE']},
-      #license=open('LICENSE').read(),
-      license='AGPL',
-     )
+    # From requests
+    version=dumptruck.__version__,
+    #long_description=open('README.md').read() + '\n\n' + open('HISTORY.md').read(), #needs to be rst
+    #package_data={'': ['LICENSE']},
+    #license=open('LICENSE').read(),
+    license='AGPL',
+    install_requires = open('requirements.txt').read().split('\n')[:-1],
+)
