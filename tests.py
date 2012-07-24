@@ -83,6 +83,13 @@ class TestDb(TestCase):
 #  def test_nonexisting_var(self):
 #   self.assertRaises(NameError,self.h.get_var,'nonexistant_var')
 
+class TestQuoting(TestDb):
+  def test_question_mark(self):
+    dt = DumpTruck(dbname = '/tmp/test.db')
+    dt.execute('CREATE TABLE foo (bar TEXT)')
+    dt.execute('INSERT INTO foo(bar) VALUES (?)', ['baz'])
+    observed = [row['bar'] for row in dt.execute('SELECT bar from foo')]
+    self.assertListEqual(observed, ['baz'])
 
 class TestDump(TestDb):
   def test_drop_nonexistant(self):
