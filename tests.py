@@ -18,9 +18,10 @@
 # You should have received a copy of the GNU Affero Public License
 # along with DumpTruck.  If not, see <http://www.gnu.org/licenses/>.
 
+from collections import OrderedDict
 from unittest import TestCase, main
 from demjson import encode, decode
-from dumptruck import DumpTruck, Pickle, quote, dicti
+from dumptruck import DumpTruck, Pickle, quote
 import sqlite3
 import os, shutil
 import datetime
@@ -269,7 +270,7 @@ class SaveAndCheck(TestDb):
  
       #Check
       expected1 = dataOut
-      expected2 = [dataIn] if type(dataIn) in (dict, dicti) else dataIn
+      expected2 = [dataIn] if type(dataIn) in (dict, OrderedDict) else dataIn
  
       self.assertListEqual(observed1, expected1)
       self.assertListEqual(observed2, expected2)
@@ -490,14 +491,6 @@ class TestSaveDateTime(SaveAndCheck):
     , [(u'1990-03-30 00:00:00',)]
     )
 
-class TestCaseInsensitivity(TestDb):
-  def test_select(self):
-    dt = DumpTruck(dbname=':memory:',auto_commit=False,vars_table='baz')
-    dt.execute('CREATE TABLE foo (thecase TEXT);')
-    dt.execute('INSERT INTO foo (thecase) VALUES ("UPPER");')
-    case_insensitive_dict = dt.execute('select * from foo')[0]
-    self.assertEqual(case_insensitive_dict['thecase'], case_insensitive_dict['theCASE'])
-
 class TestInvalidDumpTruckParams(TestDb):
   'Invalid parameters should raise appropriate errors.'
 
@@ -532,30 +525,6 @@ class TestParamsDefaults(TestDb):
     self.assertTrue(os.path.isfile('dumptruck.db'))
 #   self.assertEqual(h.auto_commit, True)
 #   self.assertEqual(h.__vars_table, '_dumptruckvars')
-
-class TestSaveDicti(SaveAndCheck):
-  def test_save(self):
-    self.save_and_check(
-      dicti({'birthday':datetime.datetime.strptime('1990-03-30', '%Y-%m-%d').date()})
-    , 'birthdays'
-    , [(u'1990-03-30',)]
-    )
-
-class TestZip(TestDb):
-  def test_save1(self):
-    dt = DumpTruck(dbname = DB_FILE)
-    dt.insert([('foo', 'bar')], 'baz1', structure = zip)
-    self.assertDictEqual(dt.execute('select * from baz1')[0], {'foo': 'bar'})
-
-  def test_save2(self):
-    dt = DumpTruck(dbname = DB_FILE)
-    dt.insert([[('foo', 'bar')]], 'baz2', structure = zip)
-    self.assertDictEqual(dt.execute('select * from baz2')[0], {'foo': 'bar'})
-
-  def test_retrieve(self):
-    dt = DumpTruck(dbname = DB_FILE)
-    dt.insert([{'a': 'b'}], 'c')
-    self.assertEqual(dt.execute('select * from c', structure = zip)[0], ('a', 'b'))
 
 if __name__ == '__main__':
   main()

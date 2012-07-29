@@ -22,7 +22,7 @@
 import sqlite3
 import re
 import datetime
-from dicti import dicti
+from collections import OrderedDict
 from convert import convert, quote, simplify
 from adapters_and_converters import register_adapters_and_converters, Pickle
 
@@ -120,7 +120,7 @@ class DumpTruck:
       return None
     else:
       colnames = [d[0].decode('utf-8') for d in self.cursor.description] 
-      rawdata = [dicti(zip(colnames,row)) for row in rows]
+      rawdata = [OrderedDict(zip(colnames,row)) for row in rows]
       return rawdata
 
   def commit(self):
