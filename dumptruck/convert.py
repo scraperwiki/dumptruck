@@ -47,15 +47,8 @@ def convert(data):
 
   data_quoted = []
   for row in data:
-    keys = row.keys()
-
-    for key, value in row.items():
-      if value == None:
-        del(row[key])
-
     checkdata(row)
-    values = [row[k] for k in keys]
-    data_quoted.append(zip([quote(k) for k in keys], values))
+    data_quoted.append(zip([quote(k) for k in row.keys()], row.values()))
   return data_quoted
 
 def simplify(text):

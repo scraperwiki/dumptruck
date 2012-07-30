@@ -174,28 +174,39 @@ class DumpTruck:
 
   def create_table(self, data, table_name, error_if_exists = False, **kwargs):
     'Create a table based on the data, but don\'t insert anything.'
+
+    if len(data) == 0:
+      raise ValueError('Data must contain at least one row.')
+
     converted_data = convert(data)
+
+    if len(converted_data) == 0:
+      raise ValueError('First data row must contain at least one column.')
+
     startdata = dict(converted_data[0])
 
+    v = None
     # Select a non-null item
     for k, v in startdata.items():
       if v != None:
         break
 
-    try:
-      # This is vulnerable to injection.
-      self.execute(u'''
-        CREATE TABLE %s (
-          %s %s
-        );''' % (quote(table_name), quote(k), get_column_type(startdata[k])), commit = False)
-    except sqlite3.OperationalError, msg:
-      if (not re.match(r'^table.+already exists$', str(msg))) or (error_if_exists == True):
-        raise
-    else:
-      self.commit()
-
-    for row in converted_data:
-      self.__check_and_add_columns(table_name, row)
+    # Do nothing if all items are null.
+    if v != None:
+      try:
+        # This is vulnerable to injection.
+        self.execute(u'''
+          CREATE TABLE %s (
+            %s %s
+          );''' % (quote(table_name), quote(k), get_column_type(startdata[k])), commit = False)
+      except sqlite3.OperationalError, msg:
+        if (not re.match(r'^table.+already exists$', str(msg))) or (error_if_exists == True):
+          raise
+      else:
+        self.commit()
+ 
+      for row in converted_data:
+        self.__check_and_add_columns(table_name, row)
 
 
   def insert(self, data, table_name = 'dumptruck', **kwargs):
