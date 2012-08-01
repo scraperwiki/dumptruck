@@ -565,7 +565,7 @@ class TestNull(SaveAndCheck):
     self.assertEqual(c, 1)
 
   def test_empty_row_create_table(self):
-    "The first row must have a non-null value so the schema can be defined."
+    "The schema row must have a non-null value."
     dt = DumpTruck(dbname = '/tmp/test.db')
     with self.assertRaises(ValueError):
       dt.create_table({}, 'two')
