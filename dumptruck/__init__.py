@@ -24,5 +24,5 @@ __title__ = 'dumptruck'
 __version__ = '0.0.3'
 #__build__ = 0x001101
 __author__ = 'Thomas Levine'
-__license__ = 'AGPL'
+__license__ = 'GPL'
 __copyright__ = 'Copyright 2012 Thomas Levine'
