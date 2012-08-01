@@ -126,7 +126,7 @@ class TestIndices(TestDb):
     dt.execute('create table pineapple (bar integer, baz integer);')
     dt.create_index(['bar', 'baz'], 'pineapple')
 
-    self.assertRaises(OperationalError):
+    with self.assertRaises(sqlite3.OperationalError):
       dt.create_index(['bar', 'baz'], 'pineapple')
 
   def test_create_if_not_exists(self):
@@ -141,9 +141,12 @@ class TestIndices(TestDb):
     dt = DumpTruck(dbname = '/tmp/test.db')
     dt.execute('create table watermelon (bar integer, baz integer);')
     dt.create_index(['bar', 'baz'], 'watermelon', unique = True)
+    observed = dt.execute('PRAGMA index_info(watermelon_bar_baz)')
 
     # Indexness
-    observed = dt.execute('PRAGMA index_info(watermelon_bar_baz)')
+    self.assertIsNotNone(observed)
+
+    # Indexed columns
     expected = [
       {u'seqno': 0, u'cid': 0, u'name': u'bar'},
       {u'seqno': 1, u'cid': 1, u'name': u'baz'},
@@ -164,9 +167,12 @@ class TestIndices(TestDb):
     dt = DumpTruck(dbname = '/tmp/test.db')
     dt.execute('create table tomato (bar integer, baz integer);')
     dt.create_index(['bar', 'baz'], 'tomato')
+    observed = dt.execute('PRAGMA index_info(tomato_bar_baz)')
 
     # Indexness
-    observed = dt.execute('PRAGMA index_info(tomato_bar_baz)')
+    self.assertIsNotNone(observed)
+
+    # Indexed columns
     expected = [
       {u'seqno': 0, u'cid': 0, u'name': u'bar'},
       {u'seqno': 1, u'cid': 1, u'name': u'baz'},
