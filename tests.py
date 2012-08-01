@@ -540,5 +540,76 @@ class TestParamsDefaults(TestDb):
 #   self.assertEqual(h.auto_commit, True)
 #   self.assertEqual(h.__vars_table, '_dumptruckvars')
 
+class TestNull(SaveAndCheck):
+  def test_create_table(self):
+    "The first row must have a non-null value so the schema can be defined."
+    dt = DumpTruck(dbname = '/tmp/test.db')
+    with self.assertRaises(ValueError):
+      dt.create_table({'foo': None, 'bar': None}, 'one')
+    dt.close()
+
+  def test_first_insert(self):
+    "The first row must have a non-null value so the schema can be defined."
+    dt = DumpTruck(dbname = '/tmp/test.db')
+    with self.assertRaises(ValueError):
+      dt.insert({'foo': None, 'bar': None}, 'two')
+    dt.close()
+
+  def test_second_insert(self):
+    "Inserting a second row that is all null adds an empty row."
+    dt = DumpTruck(dbname = '/tmp/test.db')
+    dt.create_table({'foo': 'uhtnh', 'bar': 'aoue'}, 'three')
+    dt.insert({'foo': None, 'bar': None}, 'three')
+    dt.close()
+    c = dt.execute('select count(*) as c from three')[0]['c']
+    self.assertEqual(c, 1)
+
+  def test_empty_row_create_table(self):
+    "The first row must have a non-null value so the schema can be defined."
+    dt = DumpTruck(dbname = '/tmp/test.db')
+    with self.assertRaises(ValueError):
+      dt.create_table({}, 'two')
+    dt.close()
+
+  def test_empty_row_first_insert(self):
+    "The first row must have a non-null value so the schema can be defined."
+    dt = DumpTruck(dbname = '/tmp/test.db')
+    with self.assertRaises(ValueError):
+      dt.insert({}, 'two')
+    dt.close()
+
+  def test_empty_row_second_insert(self):
+    "An empty row acts like any other row."
+    dt = DumpTruck(dbname = '/tmp/test.db')
+    dt.create_table({'foo': 'uhtnh', 'bar': 'aoue'}, 'nine')
+    dt.insert({}, 'nine')
+    c = dt.execute('select count(*) as c from nine')[0]['c']
+    dt.close()
+    self.assertEqual(c, 1)
+
+  def test_no_rows_create_table(self):
+    "The insert must have a row so the schema can be defined."
+    dt = DumpTruck(dbname = '/tmp/test.db')
+    with self.assertRaises(ValueError):
+      dt.create_table([], 'two')
+    dt.close()
+
+  def test_no_rows_first_insert(self):
+    "Nothing happens if no rows are inserted to a table that isn't there."
+    dt = DumpTruck(dbname = '/tmp/test.db')
+    dt.insert([], 'ninety')
+    c = dt.execute('select count(*) as c from ninety')[0]['c']
+    dt.close()
+    self.assertEqual(c, 0)
+
+  def test_no_rows_second_insert(self):
+    "Nothing happens if no rows are inserted to a table that is there."
+    dt = DumpTruck(dbname = '/tmp/test.db')
+    dt.create_table({'foo': 'uhtnh', 'bar': 'aoue'}, 'ninety')
+    dt.insert([], 'ninety')
+    c = dt.execute('select count(*) as c from ninety')[0]['c']
+    dt.close()
+    self.assertEqual(c, 0)
+
 if __name__ == '__main__':
   main()
