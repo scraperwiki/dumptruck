@@ -15,7 +15,8 @@ Make `Pickle` work properly.
 
 Allow very long numbers to be inserted.
 
-`DumpTruck.create_index` adds a `NOT NULL` constraint if a unique index is created.
+`DumpTruck.create_index` adds a `NOT NULL` constraint on the column if a unique
+index is created.
 
 Version 0.0.3 (August 2012)
 ----
