@@ -259,9 +259,7 @@ class DumpTruck:
     self.__commit_if_necessary(kwargs)
 
     # Return rowids as a list?
-    try:
-      [e for e in data]
-    except TypeError:
+    if hasattr(data, 'keys'):
       return rowids[0]
     else:
       return rowids
