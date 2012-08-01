@@ -11,25 +11,40 @@ of the last row inserted row of the last row being inserted.
 `DumpTruck.{get,save}_var` uses a a virtual table instead of a hacked
 temporary real table that is created and deleted every time.
 
-Add support for the zip data structure to `.execute` and `.insert`.
-So `dt.execute('select foo from bar', datastructure = zip)` would return
-
-    [
-        [('key1', 'value1'), ('key2', 'value2')]
-    ]
-
-and `dt.insert([('hattype', 'hardhat'), ('color', 'pink')])` would be
-equivalent to `dt.insert(dict([('hattype', 'hardhat'), ('color', 'pink')]))`.
-
 Make `Pickle` work properly.
 
 Allow very long numbers to be inserted.
 
 `DumpTruck.create_index` adds a `NOT NULL` constraint if a unique index is created.
 
+Version 0.0.3 (August 2012)
+----
+### Remove dicti
+I decided that database column case-insensitivity did not need to extend into
+Python, so `dicti` has been removed, and things have been adjusted accordingly.
+
+### Ordered Dictionaries
+`DumpTruck.execute` now returns a `collections.OrderedDict` for each row rather
+than a `dict` for each row. Also, order is respected on insert, so you can pass
+OrderedDicts to `DumpTruck.insert` or `DumpTruck.create_table` to specify
+column order.
+
+### Index creation syntax
+Previously, indices were created with
+
+    DumpTruck.create_index(table_name, column_names)
+
+This order was chosen to match SQL syntax. It has been changed to
+
+    DumpTruck.create_index(column_names, table_name)
+
+to match the syntax for `DumpTruck.insert`.
+
+### Handling NULL values
+Null value handling has been documented and tweaked.
+
 Version 0.0.2 (May 2012)
 -----
-
 I added support for unicode table names.
 
 `DumpTruck.execute` returns data as lists of [dictis](dicti)

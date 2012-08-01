@@ -107,6 +107,33 @@ It automatically pickles and unpickles your complex object for you.
 Column names and table names automatically get quoted if you pass them without quotes,
 so you can use bizarre table and column names, like `no^[hs!'e]?'sf_"&'`
 
+#### Null values
+`None` dictionary values are always equivalent to non-existance of the key.
+That is, these insert commands are equivalent.
+
+    dt = DumpTruck()
+    dt.insert({ u'foo': 8, u'bar': None})
+    dt.insert({ u'foo': 8})
+
+Passing an empty dictionary creates a new row with all NULL values.
+
+    # These all create a row with all NULL values.
+    dt.insert({})
+    dt.insert([{}])
+    dt.insert({u'potato': None})
+
+More precisely, they set the values to the default values via this SQL.
+
+    INSERT INTO foo DEFAULT VALUES
+
+Passing an empty list to `insert` inserts zero rows (rather than one);
+this command does nothing.
+
+    dt.insert([])
+
+You can pass zero rows or empty rows to `DumpTruck.insert`, but you'll get an
+error if you try passing them to `DumpTruck.create_table`.
+
 ### Retrieving
 
 You can use normal SQL to retrieve data from the database.
