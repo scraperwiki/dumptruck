@@ -176,7 +176,7 @@ class DumpTruck:
     'Create a table based on the data, but don\'t insert anything.'
 
     converted_data = convert(data)
-    if len(converted_data) == 0:
+    if len(converted_data) == 0 or converted_data[0] == []:
       raise ValueError(u'You passed no sample values, or all the values you passed were null.')
     else:
       startdata = OrderedDict(converted_data[0])
@@ -218,13 +218,10 @@ class DumpTruck:
         u'You passed no sample values, or all the values you passed were null.'
       }
 
-      if table_name in self.tables():
+      if table_name in self.tables() and msg in msgs:
         pass
       else:
-        if msg in msgs:
-          return 
-        else:
-          pass
+        raise
     except:
       raise
 
