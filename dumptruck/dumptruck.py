@@ -209,6 +209,10 @@ class DumpTruck:
 
 
   def insert(self, data, table_name = 'dumptruck', **kwargs):
+    # Skip if empty
+    if len(data) == 0 and not hasattr(data, 'keys'):
+      return []
+
     try:
       self.create_table(data, table_name, error_if_exists = True)
     except ValueError, msg_raw:
