@@ -712,7 +712,7 @@ class TestRowId(TestDb):
   def test_one(self):
     dt = DumpTruck(dbname = '/tmp/test.db')
     rowid = dt.insert({u'foo': 8})
-    self.assertEqual(rowid, [1])
+    self.assertEqual(rowid, 1)
 
   def test_many(self):
     dt = DumpTruck(dbname = '/tmp/test.db')

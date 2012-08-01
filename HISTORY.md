@@ -1,13 +1,6 @@
 Future
 ------------
 
-`dt.insert` returns the
-the [rowid](http://www.sqlite.org/lang_createtable.html#rowid)
-of the last row inserted row of the last row being inserted.
-
-* http://ubuntuforums.org/showthread.php?t=933254
-* http://www.sqlite.org/c3ref/last_insert_rowid.html
-
 `DumpTruck.{get,save}_var` uses a a virtual table instead of a hacked
 temporary real table that is created and deleted every time.
 
@@ -43,6 +36,16 @@ to match the syntax for `DumpTruck.insert`.
 
 ### Handling NULL values
 Null value handling has been documented and tweaked.
+
+### RowId
+`dt.insert` returns the
+the [rowid](http://www.sqlite.org/lang_createtable.html#rowid)
+of the last row inserted row of the last row being inserted.
+
+These webpages were helpful.
+
+* http://ubuntuforums.org/showthread.php?t=933254
+* http://www.sqlite.org/c3ref/last_insert_rowid.html
 
 Version 0.0.2 (May 2012)
 -----

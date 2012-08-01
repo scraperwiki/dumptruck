@@ -257,7 +257,14 @@ class DumpTruck:
       rowids.append(self.execute('SELECT last_insert_rowid()')[0]['last_insert_rowid()'])
 
     self.__commit_if_necessary(kwargs)
-    return rowids
+
+    # Return rowids as a list?
+    try:
+      [e for e in data]
+    except TypeError:
+      return rowids[0]
+    else:
+      return rowids
 
   def __commit_if_necessary(self, kwargs):
     if kwargs.get('commit', self.auto_commit):

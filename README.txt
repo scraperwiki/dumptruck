@@ -26,6 +26,15 @@ This saves a new row with "Thomas" in the "firstname" column and
 inside the database "dumptruck.db". It creates or alters the table
 if it needs to.
 
+If you insert one row, `DumpTruck.insert` returns the rowid of the row.
+
+    dt.insert({"foo", "bar"}, "new-table") == 1
+
+If you insert many rows, `DumpTruck.insert` returns a list of the rowids of the
+new rows.
+
+    dt.insert([{"foo", "one"}, {"foo", "two"}], "new-table") == [2, 3]
+
 ### Retrieve
 Once the database contains data, you can retrieve them.
 
