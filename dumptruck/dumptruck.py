@@ -237,6 +237,9 @@ class DumpTruck:
     
     # .keys() and .items() are in the same order
     # http://www.python.org/dev/peps/pep-3106/
+
+    # rowid of inserted rows
+    rowids = []
     for row in converted_data:
       keys = [pair[0] for pair in row]
       values = [pair[1] for pair in row]
@@ -251,7 +254,10 @@ class DumpTruck:
         sql = u'INSERT INTO %s DEFAULT VALUES;' % quote(table_name) 
         self.execute(sql, commit=False)
 
+      rowids.append(self.execute('SELECT last_insert_rowid()')[0]['last_insert_rowid()'])
+
     self.__commit_if_necessary(kwargs)
+    return rowids
 
   def __commit_if_necessary(self, kwargs):
     if kwargs.get('commit', self.auto_commit):

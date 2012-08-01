@@ -708,5 +708,16 @@ class TestNull(SaveAndCheck):
     dt.close()
     self.assertEqual(c, 0)
 
+class TestRowId(TestDb):
+  def test_one(self):
+    dt = DumpTruck(dbname = '/tmp/test.db')
+    rowid = dt.insert({u'foo': 8})
+    self.assertEqual(rowid, [1])
+
+  def test_many(self):
+    dt = DumpTruck(dbname = '/tmp/test.db')
+    rowid = dt.insert([{u'foo': 8}, {u'bar': 5}])
+    self.assertEqual(rowid, [1, 2])
+
 if __name__ == '__main__':
   main()
