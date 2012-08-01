@@ -194,10 +194,11 @@ class DumpTruck:
     if v != None:
       try:
         # This is vulnerable to injection.
-        self.execute(u'''
+        sql = u'''
           CREATE TABLE %s %s (
             %s %s
-          );''' % (if_not_exists, quote(table_name), quote(k), get_column_type(startdata[k])), commit = False)
+          );''' % (if_not_exists, quote(table_name), quote(k), get_column_type(startdata[k]))
+        self.execute(sql, commit = False)
       except:
         raise
       else:

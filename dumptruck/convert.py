@@ -56,6 +56,9 @@ def convert(data):
       if value == None:
         del(row[key])
 
+    if len(set([k.lower() for k in row.keys()])) != len(row.keys()):
+      raise ValueError(u'You passed the same column name twice. (Column names are insensitive to case.)')
+
     data_quoted.append(zip([quote(k) for k in row.keys()], row.values()))
   return data_quoted
 

@@ -545,12 +545,12 @@ class TestCaseInsensitivity(TestDb):
   def test_bad_create_table(self):
     dt = DumpTruck(dbname = '/tmp/test.db')
     with self.assertRaises(ValueError):
-      dt.create_table({'a': 'b', 'A': 'B'})
+      dt.create_table({'a': 'b', 'A': 'B'}, 'foo')
 
   def test_bad_insert(self):
     dt = DumpTruck(dbname = '/tmp/test.db')
     with self.assertRaises(ValueError):
-      dt.insert({'a': 'b', 'A': 'B'})
+      dt.create_table({'a': 'b', 'A': 'B'}, 'foo')
 
 class TestNull(SaveAndCheck):
   def test_create_table(self):
