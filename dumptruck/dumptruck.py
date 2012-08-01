@@ -130,7 +130,7 @@ class DumpTruck:
   def close(self):
     return self.connection.close()
 
-  def create_index(self, table_name, columns, if_not_exists = True, unique = False, **kwargs):
+  def create_index(self, columns, table_name, if_not_exists = True, unique = False, **kwargs):
     'Create a unique index on the column(s) passed.'
     index_name = u'dumptruck_' + simplify(table_name) + u'__' + u'_'.join(map(simplify, columns))
     if unique:

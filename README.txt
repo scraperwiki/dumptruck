@@ -31,8 +31,8 @@ Once the database contains data, you can retrieve them.
 
     data = dt.dump()
 
-The data come out as a list of dictionaries with case-insensitive keys
-([dictis](http://pypi.python.org/pypi/dicti)), with one dictionary per row.
+The data come out as a list of ordered dictionaries,
+with one dictionary per row.
 
 Slow start
 -------
@@ -160,9 +160,9 @@ respectively, but will not insert the dictionary values ("jackhammer" and 58) in
 
     dt.create_table({"toolName":"jackhammer", "weight": 58}, "tools")
 
-If you are concerned about the order of the tables, pass a list of tuples.
+If you are concerned about the order of the tables, pass an OrderedDict.
 
-    dt.create_table([("toolName", "jackhammer"), ("weight", 58)], "tools")
+    dt.create_table(OrderedDict([("toolName", "jackhammer"), ("weight", 58)]), "tools")
 
 The columns will be created in the specified order.
 
@@ -173,16 +173,16 @@ DumpTruck contains a special method for creating indices. To create an index,
 first create an empty table. (See "Creating empty tables" above.)
 Then, use the `DumpTruck.create_index` method.
 
-    dt.create_index('tools', ['toolName'])
+    dt.create_index(['toolName'], 'tools')
 
 This will create a non-unique index on the column `tool`. To create a unique
 index, use the keyword argument `unique = True`.
 
-    dt.create_index('tools', ['toolName'], unique = True)
+    dt.create_index(['toolName'], 'tools', unique = True)
 
 You can also specify multi-column indices.
 
-    dt.create_index('tools', ['toolName', 'weight'])
+    dt.create_index(['toolName', 'weight'], 'tools')
 
 DumpTruck names these indices according to the names of the relevant table and columns.
 The index created in the previous example might be named `dt__tools_toolName_weight`.

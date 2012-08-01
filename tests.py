@@ -120,6 +120,69 @@ class TestDrop(TestDb):
     self.assertEqual(h.tables(), set([]))
     h.close()
 
+class TestIndices(TestDb):
+  def test_create_if_exists(self):
+    dt = DumpTruck(dbname = '/tmp/test.db')
+    dt.execute('create table pineapple (bar integer, baz integer);')
+    dt.create_index(['bar', 'baz'], 'pineapple')
+
+    self.assertRaises(OperationalError):
+      dt.create_index(['bar', 'baz'], 'pineapple')
+
+  def test_create_if_not_exists(self):
+    dt = DumpTruck(dbname = '/tmp/test.db')
+    dt.execute('create table mango (bar integer, baz integer);')
+    dt.create_index(['bar', 'baz'], 'mango')
+
+    # This should not raise an error.
+    dt.create_index(['bar', 'baz'], 'mango', if_not_exists = True)
+
+  def test_unique(self):
+    dt = DumpTruck(dbname = '/tmp/test.db')
+    dt.execute('create table watermelon (bar integer, baz integer);')
+    dt.create_index(['bar', 'baz'], 'watermelon', unique = True)
+
+    # Indexness
+    observed = dt.execute('PRAGMA index_info(watermelon_bar_baz)')
+    expected = [
+      {u'seqno': 0, u'cid': 0, u'name': u'bar'},
+      {u'seqno': 1, u'cid': 1, u'name': u'baz'},
+    ]
+    self.assertListEqual(observed, expected)
+
+    # Uniqueness
+    indices = dt.execute('PRAGMA index_list(watermelon)')
+    for index in indices:
+      if index[u'name'] == u'watermelon_bar_baz':
+        break
+    else:
+      index = {}
+
+    self.assertEqual(index[u'unique'], 1)
+
+  def test_non_unique(self):
+    dt = DumpTruck(dbname = '/tmp/test.db')
+    dt.execute('create table tomato (bar integer, baz integer);')
+    dt.create_index(['bar', 'baz'], 'tomato')
+
+    # Indexness
+    observed = dt.execute('PRAGMA index_info(tomato_bar_baz)')
+    expected = [
+      {u'seqno': 0, u'cid': 0, u'name': u'bar'},
+      {u'seqno': 1, u'cid': 1, u'name': u'baz'},
+    ]
+    self.assertListEqual(observed, expected)
+
+    # Uniqueness
+    indices = dt.execute('PRAGMA index_list(tomato)')
+    for index in indices:
+      if index[u'name'] == u'tomato_bar_baz':
+        break
+    else:
+      index = {}
+
+    self.assertEqual(index[u'unique'], 0)
+
 class SaveGetVar(TestDb):
   def savegetvar(self, var):
     h = DumpTruck(dbname = '/tmp/test.db')
