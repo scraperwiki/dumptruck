@@ -188,7 +188,7 @@ class DumpTruck:
     else:
       v = None
 
-    if_not_exists = u'IF NOT EXISTS' if error_if_exists else u''
+    if_not_exists = u'' if error_if_exists else u'IF NOT EXISTS'
 
     # Do nothing if all items are null.
     if v != None:

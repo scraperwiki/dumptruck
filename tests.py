@@ -237,6 +237,17 @@ class TestCreateTable(TestDb):
     expected = []
     self.assertListEqual(observed, expected)
 
+  def test_if_not_exists(self):
+    dt = DumpTruck(dbname = '/tmp/test.db')
+    dt.create_table({'foo': 'bar'}, 'baz')
+    dt.create_table({'foo': 'bar'}, 'baz', error_if_exists = False)
+
+  def test_if_not_exists(self):
+    dt = DumpTruck(dbname = '/tmp/test.db')
+    dt.create_table({'foo': 'bar'}, 'baz')
+    with self.assertRaises(sqlite3.OperationalError):
+      dt.create_table({'foo': 'bar'}, 'baz', error_if_exists = True)
+
 class SaveCheckSelect(TestDb):
   '''
   Save the value to the database,
