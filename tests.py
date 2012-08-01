@@ -540,6 +540,18 @@ class TestParamsDefaults(TestDb):
 #   self.assertEqual(h.auto_commit, True)
 #   self.assertEqual(h.__vars_table, '_dumptruckvars')
 
+class TestCaseInsensitivity(TestDb):
+  "Insertions with two keys of the same case are not allowed."
+  def test_bad_create_table(self):
+    dt = DumpTruck(dbname = '/tmp/test.db')
+    with self.assertRaises(ValueError):
+      dt.create_table({'a': 'b', 'A': 'B'})
+
+  def test_bad_insert(self):
+    dt = DumpTruck(dbname = '/tmp/test.db')
+    with self.assertRaises(ValueError):
+      dt.insert({'a': 'b', 'A': 'B'})
+
 class TestNull(SaveAndCheck):
   def test_create_table(self):
     "The first row must have a non-null value so the schema can be defined."
