@@ -242,11 +242,17 @@ class TestCreateTable(TestDb):
     dt.create_table({'foo': 'bar'}, 'baz')
     dt.create_table({'foo': 'bar'}, 'baz', error_if_exists = False)
 
+  def test_if_exists(self):
+    dt = DumpTruck(dbname = '/tmp/test.db')
+    dt.create_table({'foo': 'bar'}, 'zort')
+    with self.assertRaises(sqlite3.OperationalError):
+      dt.create_table({'foo': 'bar'}, 'zort', error_if_exists = True)
+
+class TestCreateTableOnInsert(TestDb):
   def test_if_not_exists(self):
     dt = DumpTruck(dbname = '/tmp/test.db')
-    dt.create_table({'foo': 'bar'}, 'baz')
-    with self.assertRaises(sqlite3.OperationalError):
-      dt.create_table({'foo': 'bar'}, 'baz', error_if_exists = True)
+    dt.insert({'foo': 'bar'}, 'baz')
+    dt.insert({'foo': 'bar'}, 'baz')
 
 class SaveCheckSelect(TestDb):
   '''
