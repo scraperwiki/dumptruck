@@ -572,8 +572,8 @@ class TestNull(SaveAndCheck):
     dt = DumpTruck(dbname = '/tmp/test.db')
     dt.create_table({'foo': 'uhtnh', 'bar': 'aoue'}, 'three')
     dt.insert({'foo': None, 'bar': None}, 'three')
-    dt.close()
     c = dt.execute('select count(*) as c from three')[0]['c']
+    dt.close()
     self.assertEqual(c, 1)
 
   def test_empty_row_create_table(self):
@@ -610,9 +610,8 @@ class TestNull(SaveAndCheck):
     "Nothing happens if no rows are inserted to a table that isn't there."
     dt = DumpTruck(dbname = '/tmp/test.db')
     dt.insert([], 'ninety')
-    c = dt.execute('select count(*) as c from ninety')[0]['c']
+    self.assertSetEqual(dt.tables(), set())
     dt.close()
-    self.assertEqual(c, 0)
 
   def test_no_rows_second_insert(self):
     "Nothing happens if no rows are inserted to a table that is there."

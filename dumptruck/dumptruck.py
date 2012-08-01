@@ -175,33 +175,31 @@ class DumpTruck:
   def create_table(self, data, table_name, error_if_exists = False, **kwargs):
     'Create a table based on the data, but don\'t insert anything.'
 
-    if len(data) == 0:
-      raise ValueError('Data must contain at least one row.')
-
     converted_data = convert(data)
-
     if len(converted_data) == 0:
-      raise ValueError('First data row must contain at least one column.')
+      raise ValueError(u'You passed no sample values, or all the values you passed were null.')
+    else:
+      startdata = OrderedDict(converted_data[0])
 
-    startdata = dict(converted_data[0])
-
-    v = None
     # Select a non-null item
     for k, v in startdata.items():
       if v != None:
         break
+    else:
+      v = None
+
+    if_not_exists = u'IF NOT EXISTS' if error_if_exists else u''
 
     # Do nothing if all items are null.
     if v != None:
       try:
         # This is vulnerable to injection.
         self.execute(u'''
-          CREATE TABLE %s (
+          CREATE TABLE %s %s (
             %s %s
-          );''' % (quote(table_name), quote(k), get_column_type(startdata[k])), commit = False)
-      except sqlite3.OperationalError, msg:
-        if (not re.match(r'^table.+already exists$', str(msg))) or (error_if_exists == True):
-          raise
+          );''' % (if_not_exists, quote(table_name), quote(k), get_column_type(startdata[k])), commit = False)
+      except:
+        raise
       else:
         self.commit()
  
@@ -211,7 +209,22 @@ class DumpTruck:
 
   def insert(self, data, table_name = 'dumptruck', **kwargs):
     try:
-      self.create_table(data, table_name)
+      self.create_table(data, table_name, error_if_exists = True)
+    except ValueError, msg_raw:
+      msg = unicode(msg_raw)
+      msgs = {
+        u'Data must contain at least one row.',
+        u'First data row must contain at least one column.',
+        u'You passed no sample values, or all the values you passed were null.'
+      }
+
+      if table_name in self.tables():
+        pass
+      else:
+        if msg in msgs:
+          return 
+        else:
+          pass
     except:
       raise
 
@@ -227,11 +240,15 @@ class DumpTruck:
       keys = [pair[0] for pair in row]
       values = [pair[1] for pair in row]
 
-      question_marks = ','.join('?'*len(keys))
-
       # This is vulnerable to injection.
-      sql = u'INSERT INTO %s (%s) VALUES (%s);' % (quote(table_name), ','.join(keys), question_marks)
-      self.execute(sql, values, commit=False)
+      if len(keys) > 0:
+        question_marks = ','.join('?'*len(keys))
+        sql = u'INSERT INTO %s (%s) VALUES (%s);' % (quote(table_name), ','.join(keys), question_marks)
+        self.execute(sql, values, commit=False)
+
+      else:
+        sql = u'INSERT INTO %s DEFAULT VALUES;' % quote(table_name) 
+        self.execute(sql, commit=False)
 
     self.__commit_if_necessary(kwargs)
 
