@@ -127,7 +127,7 @@ class TestIndices(TestDb):
     dt.create_index(['bar', 'baz'], 'pineapple')
 
     with self.assertRaises(sqlite3.OperationalError):
-      dt.create_index(['bar', 'baz'], 'pineapple')
+      dt.create_index(['bar', 'baz'], 'pineapple', if_not_exists = False)
 
   def test_create_if_not_exists(self):
     dt = DumpTruck(dbname = '/tmp/test.db')
