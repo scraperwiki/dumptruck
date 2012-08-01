@@ -399,6 +399,14 @@ class TestSaveUnicodeKey(SaveAndCheck):
     , [('yes',)]
     )
 
+class TestOrderedDict(SaveAndCheck):
+  def test_save(self):
+    self.save_and_check(
+      OrderedDict([(u'first_column', 3), (u'second_column', 8)])
+    , 'baz'
+    , [(3, 8 )]
+    )
+
 class TestSaveUnicodeEncodedKey(SaveAndCheck):
   def test_save(self):
     self.save_and_check(
