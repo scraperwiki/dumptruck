@@ -1,6 +1,9 @@
 Future
 ------------
 
+`DumpTruck.execute` can return a generator or a list; previously, it only
+returned a list.
+
 `DumpTruck.{get,save}_var` uses a a virtual table instead of a hacked
 temporary real table that is created and deleted every time.
 
