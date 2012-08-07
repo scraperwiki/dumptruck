@@ -4,8 +4,7 @@ Future
 `DumpTruck.execute` can return a generator or a list; previously, it only
 returned a list.
 
-`DumpTruck.{get,save}_var` uses a a virtual table instead of a hacked
-temporary real table that is created and deleted every time.
+`DumpTruck.{get,save}_var` uses less of a hack for the table that it creates and deletes.
 
 Make `Pickle` work properly.
 
@@ -13,6 +12,10 @@ Allow very long numbers to be inserted.
 
 `DumpTruck.create_index` adds a `NOT NULL` constraint on the column if a unique
 index is created.
+
+Version 0.0.4 (August 2012)
+----
+Fix dependency crap.
 
 Version 0.0.3 (August 2012)
 ----
