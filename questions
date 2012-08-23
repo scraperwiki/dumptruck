@@ -1,0 +1,68 @@
+aidanhs: ah tlevine, I need a change to dumptruck
+10:15 a.m. 
+dragon: I've sent an email, but no reply yet.
+10:15 a.m. 
+aidanhs: let me see if I can figure out a pull request on github
+10:16 a.m. 
+tlevine: hah aidanhs we can also test cgi scripts with something like
+10:17 a.m. 
+tlevine: os.environ['QUERY_STRING']='q=SELECT+foo+FROM+baz'
+10:17 a.m. 
+aidanhs: oh cool, that's handy
+10:17 a.m. 
+tlevine: i can't stand pull requests on github
+10:20 a.m. 
+aidanhs: awww, I guess you could just copy+paste it to your local repo and commit it then
+10:21 a.m. 
+aidanhs: I had a brief poke around the tmux session, but I couldn't find a local dumptruck repo
+10:27 a.m. 
+tlevine: i could just add your ssh key
+10:27 a.m. 
+tlevine: oh now i see it
+10:28 a.m. 
+tlevine: why don't you just use self.connection.set_authorizer(authorizer_callback)?
+10:32 a.m. 
+aidanhs: ...that's on line 110?
+10:32 a.m. 
+aidanhs: I don't quite understand the question
+10:33 a.m. 
+aidanhs: oooh, you're saying I should directly edit the dumptruck properties
+10:33 a.m. 
+aidanhs: and not bother adding a function to dumptruck
+10:34 a.m. 
+aidanhs: ok yeah, that's a better way
+
+
+10:18:13 <aidanhs> (quirks listed at https://github.com/scraperwiki/scraperwiki_local)
+10:26:31 <dragon> tlevine: a few gotcha's for dumptruck...
+10:26:44 <dragon> The error if you're reading to a db that doesn't exist is very misleading
+10:27:12 <dragon> also, why is getting a cursor .cursor as opposed to .cursor() like sqlite3?
+10:29:16 <dragon> aidanhs: cheers :)
+10:30:04 <tlevine> dragon, it's .cursor because it's the cursor that is currently in use
+10:30:11 <tlevine> you can get the other with .connection.cursor()
+10:30:20 <tlevine> let's add this and all of your other questions about dumptruck to the docs
+10:34:08 <tlevine> ehg zarino drj11 let's have a flashy web thing to change your default editor http://chainsaw.thomaslevine.com/IMG_7397.JPG
+10:37:18 <tlevine> In [3]: dt=dumptruck.DumpTruck()
+10:37:18 <tlevine> 
+10:37:18 <tlevine> In [4]: dt.
+10:37:18 <tlevine> dt.auto_commit   dt.commit        dt.create_index  dt.cursor        dt.dump          dt.get_var       dt.save_var      
+10:37:18 <tlevine> dt.close         dt.connection    dt.create_table  dt.drop          dt.execute       dt.insert        dt.tables        
+10:37:18 <tlevine> 
+10:37:18 <tlevine> In [4]: dt.connection.c
+10:37:18 <tlevine> dt.connection.close             dt.connection.create_aggregate  dt.connection.create_function   
+10:37:18 <tlevine> dt.connection.commit            dt.connection.create_collation  dt.connection.cursor            
+10:37:18 <tlevine> 
+10:37:18 <tlevine> In [4]: dt.connection.cursor()
+10:37:18 <tlevine> Out[4]: <sqlite3.Cursor at 0x16ebdc0>
+10:37:18 <tlevine> 
+10:37:18 <tlevine> In [5]: dt.connection.cursor()
+10:37:18 <tlevine> Out[5]: <sqlite3.Cursor at 0x16ebea0>
+10:37:18 <tlevine> 
+10:37:18 <tlevine> In [6]: dt.connection.cursor()
+10:37:18 <tlevine> Out[6]: <sqlite3.Cursor at 0x16ebf10>
+10:37:18 <tlevine> 
+10:37:18 <tlevine> In [7]: dt.connection.cursor()
+10:37:18 <tlevine> Out[7]: <sqlite3.Cursor at 0x16ebf80>
+10:37:18 <tlevine> 
+10:37:18 <tlevine> In [8]: dt.connection.cursor()
+10:37:18 <tlevine> Out[8]: <sqlite3.Cursor at 0x16ebe30>
