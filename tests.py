@@ -381,6 +381,9 @@ class TestSaveNestedDatetime(SaveAndSelect):
 
 class TestSaveDictIntegers(SaveAndSelect):
   def test_save_integers(self):
+    # This test is tricky - according to JSON spec
+    # you may only have strings as keys of a dict,
+    # so python json cannot handle it natively...
     d = {1: 'A', 2: 'B', 3: 'C'}
     self.save_and_select({'modelNumber': d})
 
