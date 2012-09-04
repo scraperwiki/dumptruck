@@ -21,7 +21,7 @@
 from dumptruck import *
 
 __title__ = 'dumptruck'
-__version__ = '0.0.4'
+__version__ = '0.0.5'
 #__build__ = 0x001101
 __author__ = 'Thomas Levine'
 __license__ = 'GPL'
