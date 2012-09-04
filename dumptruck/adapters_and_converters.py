@@ -19,7 +19,7 @@
 # along with DumpTruck.  If not, see <http://www.gnu.org/licenses/>.
 
 import pickle
-import demjson
+import json
 import datetime
 
 class Pickle:
@@ -55,17 +55,17 @@ def register_pickle(module):
 
 def register_json(module):
     def adapt_json(val):
-        return demjson.encode(val, strict = True)
+        return json.dumps(val, ensure_ascii=False)
 
     def adapt_jsonset(val):
         d = {k: None for k in val}
-        return demjson.encode(d, strict = True)
+        return json.dumps(d, ensure_ascii=False)
 
     def convert_json(val):
-        return demjson.decode(val, strict = True)
+        return json.loads(val)
 
     def convert_jsonset(val):
-        return set(demjson.decode(val, strict = True).keys())
+        return set(json.loads(val).keys())
 
     module.register_adapter(list, adapt_json)
     module.register_adapter(tuple, adapt_json)

@@ -20,7 +20,7 @@
 
 from collections import OrderedDict
 from unittest import TestCase, main
-from demjson import encode, decode
+from json import dumps
 from dumptruck import DumpTruck, Pickle, quote
 import sqlite3
 import os, shutil
@@ -452,7 +452,7 @@ class TestSaveList(SaveAndCheck):
     self.save_and_check(
       {'model-codes': d}
     , 'models'
-    , [(encode(d),)]
+    , [(dumps(d, ensure_ascii=False),)]
     )
 
 class TestSaveTwice(SaveAndCheck):
