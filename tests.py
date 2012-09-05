@@ -218,7 +218,7 @@ class TestSaveVar(TestDb):
     self.cursor=connection.cursor()
 
   def test_insert(self):
-    self.cursor.execute(u'SELECT key, value, type FROM `_dumptruckvars`')
+    self.cursor.execute(u'SELECT name, value_blob, type FROM `_dumptruckvars`')
     observed = self.cursor.fetchall()
     expected = [(u'birthday', u'November 30, 1888', u'text',)]
     self.assertEqual(observed, expected)
@@ -246,7 +246,7 @@ class DumpTruckVars(TestDb):
   def check(self, key, value, sqltype):
     connection=sqlite3.connect(u'/tmp/test.db')
     self.cursor=connection.cursor()
-    self.cursor.execute(u'SELECT key, value, `type` FROM `_dumptruckvars`')
+    self.cursor.execute(u'SELECT name, value_blob, type FROM `_dumptruckvars`')
     observed = self.cursor.fetchall()
     expected = [(key, value, sqltype)]
     self.assertEqual(observed, expected)

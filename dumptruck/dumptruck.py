@@ -87,19 +87,14 @@ class DumpTruck:
       self.__vars_table_tmp = vars_table_tmp
 
   def __check_or_create_vars_table(self):
-    self.create_table(
-      {'key': '', 'type': ''},
-      quote(self.__vars_table),
-      commit = False
-    )
-    sql = u'ALTER TABLE %s ADD COLUMN value BLOB' % quote(self.__vars_table)
+    sql = u"CREATE TABLE %s (`value_blob` blob, `type` text, `name` text)" % quote(self.__vars_table)
     self.execute(sql, commit = False)
 
     self.commit()
 
     table_info = self.execute(u'PRAGMA table_info(%s)' % quote(self.__vars_table))
     column_names_observed = set([column['name'] for column in table_info])
-    column_names_expected = {'key', 'type', 'value'}
+    column_names_expected = {'name', 'type', 'value_blob'}
     assert column_names_observed == column_names_expected, table_info
 
   def execute(self, sql, *args, **kwargs):
@@ -276,7 +271,7 @@ class DumpTruck:
   def get_var(self, key):
     'Retrieve one saved variable from the database.'
     vt = quote(self.__vars_table)
-    data = self.execute(u'SELECT * FROM %s WHERE `key` = ?' % vt, [key], commit = False)
+    data = self.execute(u'SELECT * FROM %s WHERE `name` = ?' % vt, [key], commit = False)
     if data == []:
       raise NameError(u'The DumpTruck variables table doesn\'t have a value for %s.' % key)
     else:
@@ -286,11 +281,11 @@ class DumpTruck:
       self.execute(u'DROP TABLE IF EXISTS %s' % tmp, commit = False)
 
       # This is vulnerable to injection
-      self.execute(u'CREATE TABLE %s (`value` %s)' % (tmp, row['type']), commit = False)
+      self.execute(u'CREATE TABLE %s (`value_blob` %s)' % (tmp, row['type']), commit = False)
 
       # This is ugly
-      self.execute(u'INSERT INTO %s (`value`) VALUES (?)' % tmp, [row['value']], commit = False)
-      value = self.dump(tmp)[0]['value']
+      self.execute(u'INSERT INTO %s (`value_blob`) VALUES (?)' % tmp, [row['value_blob']], commit = False)
+      value = self.dump(tmp)[0]['value_blob']
       self.execute(u'DROP TABLE %s' % tmp, commit = False)
 
       return value
@@ -307,20 +302,20 @@ class DumpTruck:
     self.execute(u'DROP TABLE IF EXISTS %s' % tmp, commit = False)
 
     # This is vulnerable to injection
-    self.execute(u'CREATE TABLE %s (`value` %s)' % (tmp, column_type), commit = False)
+    self.execute(u'CREATE TABLE %s (`value_blob` %s)' % (tmp, column_type), commit = False)
 
     # This is ugly
-    self.execute(u'INSERT INTO %s (`value`) VALUES (?)' % tmp, [value], commit = False)
+    self.execute(u'INSERT INTO %s (`value_blob`) VALUES (?)' % tmp, [value], commit = False)
     p1 = (quote(self.__vars_table), tmp)
     p2 = [key, column_type, value]
     self.execute(u'''
-INSERT INTO %s (`key`, `type`, `value`)
+INSERT INTO %s (`name`, `type`, `value_blob`)
   SELECT
-    ? AS key,
+    ? AS name,
     ? AS type,
-    value
+    value_blob
   FROM %s
-  WHERE value = ?
+  WHERE value_blob = ?
 ''' % p1, p2)
     self.execute(u'DROP TABLE %s' % tmp, commit = False)
 
