@@ -251,7 +251,8 @@ class DumpTruck:
       # This is vulnerable to injection.
       if len(keys) > 0:
         question_marks = ','.join('?'*len(keys))
-        sql = u'INSERT INTO %s (%s) VALUES (%s);' % (quote(table_name), ','.join(keys), question_marks)
+        sql = u'INSERT OR REPLACE INTO %s (%s) VALUES (%s);' % (
+          quote(table_name), ','.join(keys), question_marks)
         self.execute(sql, values, commit=False)
 
       else:
