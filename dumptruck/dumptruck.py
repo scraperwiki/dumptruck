@@ -87,7 +87,7 @@ class DumpTruck:
       self.__vars_table_tmp = vars_table_tmp
 
   def __check_or_create_vars_table(self):
-    sql = u"CREATE TABLE %s (`value_blob` blob, `type` text, `name` text)" % quote(self.__vars_table)
+    sql = u"CREATE TABLE IF NOT EXISTS %s (`value_blob` blob, `type` text, `name` text)" % quote(self.__vars_table)
     self.execute(sql, commit = False)
 
     self.commit()
