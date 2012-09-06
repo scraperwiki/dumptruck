@@ -254,7 +254,7 @@ class DumpTruck:
         sql = u'INSERT INTO %s DEFAULT VALUES;' % quote(table_name) 
         self.execute(sql, commit=False)
 
-      rowids.append(self.execute('SELECT last_insert_rowid()')[0]['last_insert_rowid()'])
+      rowids.append(self.execute('SELECT last_insert_rowid()', commit=False)[0]['last_insert_rowid()'])
 
     self.__commit_if_necessary(kwargs)
 
