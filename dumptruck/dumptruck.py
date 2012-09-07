@@ -87,7 +87,7 @@ class DumpTruck:
       self.__vars_table_tmp = vars_table_tmp
 
   def __check_or_create_vars_table(self):
-    sql = u"CREATE TABLE IF NOT EXISTS %s (`value_blob` blob, `type` text, `name` text)" % quote(self.__vars_table)
+    sql = u"CREATE TABLE IF NOT EXISTS %s (`value_blob` blob, `type` text, `name` text PRIMARY KEY)" % quote(self.__vars_table)
     self.execute(sql, commit = False)
 
     self.commit()
@@ -108,7 +108,6 @@ class DumpTruck:
     except sqlite3.InterfaceError, msg:
       raise sqlite3.InterfaceError(unicode(msg) + '\nTry converting types or pickling.')
     rows = self.cursor.fetchall()
-
     self.__commit_if_necessary(kwargs)
 
     if None == self.cursor.description:
@@ -309,7 +308,7 @@ class DumpTruck:
     p1 = (quote(self.__vars_table), tmp)
     p2 = [key, column_type, value]
     self.execute(u'''
-INSERT INTO %s (`name`, `type`, `value_blob`)
+INSERT OR REPLACE INTO %s (`name`, `type`, `value_blob`)
   SELECT
     ? AS name,
     ? AS type,
