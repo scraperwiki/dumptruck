@@ -17,6 +17,13 @@ Version 0.0.5 (September 2012)
 ----
 Make dumptruck leaner by removing demjson dependency.
 
+Change how dumptruck variables work. This may cause incompatibilties
+with databases created with an older version of dumptruck.
+
+Fix a bug with save_var.
+
+Speed up insertions of large numbers of rows.
+
 Version 0.0.4 (August 2012)
 ----
 Fix dependency crap.
