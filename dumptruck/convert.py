@@ -92,3 +92,5 @@ def checkdata(data):
       raise ValueError('key must not be blank')
     elif type(key) not in (unicode, str):
       raise ValueError(u'The column name must be of unicode or str type. The column name ("%s") is of type %s. If this error doesn\'t make sense, try "unicode(\'%s\')".' % (key, type(key), key))
+    elif type(value) == dict and not set(map(type, value.keys())).issubset({unicode, str}):
+      raise ValueError('Dictionary keys must all be str or unicode for database insert.')
