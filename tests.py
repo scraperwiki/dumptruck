@@ -453,7 +453,7 @@ class TestSaveList(SaveAndCheck):
     self.save_and_check(
       {'model-codes': d}
     , 'models'
-    , [(dumps(d, ensure_ascii=True),)]
+    , [(dumps(d),)]
     )
 
 class TestSaveTwice(SaveAndCheck):
