@@ -381,8 +381,9 @@ class TestSaveNestedDatetime(SaveAndSelect):
 
 class TestSaveDictIntegers(SaveAndSelect):
   def test_save_integers(self):
-    d = {1: 'A', 2: 'B', 3: 'C'}
-    self.save_and_select({'modelNumber': d})
+    dt = DumpTruck()
+    with self.assertRaises(ValueError):
+      dt.insert({'foo': {1: 'A', 2: 'B', 3: 'C'}})
 
 class TestSaveDict(SaveAndSelect):
   def test_save_text(self):
@@ -452,7 +453,7 @@ class TestSaveList(SaveAndCheck):
     self.save_and_check(
       {'model-codes': d}
     , 'models'
-    , [(dumps(d, ensure_ascii=False),)]
+    , [(dumps(d, ensure_ascii=True),)]
     )
 
 class TestSaveTwice(SaveAndCheck):

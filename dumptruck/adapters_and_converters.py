@@ -55,11 +55,11 @@ def register_pickle(module):
 
 def register_json(module):
     def adapt_json(val):
-        return json.dumps(val, ensure_ascii=False)
+        return json.dumps(val, ensure_ascii=True)
 
     def adapt_jsonset(val):
         d = {k: None for k in val}
-        return json.dumps(d, ensure_ascii=False)
+        return json.dumps(d, ensure_ascii=True)
 
     def convert_json(val):
         return json.loads(val)
