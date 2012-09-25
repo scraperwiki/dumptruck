@@ -218,7 +218,7 @@ class TestSaveVar(TestDb):
     self.cursor=connection.cursor()
 
   def test_insert(self):
-    self.cursor.execute(u'SELECT name, value_blob, type FROM `_dumptruckvars`')
+    self.cursor.execute(u'SELECT key, value, type FROM `_dumptruckvars`')
     observed = self.cursor.fetchall()
     expected = [(u'birthday', u'November 30, 1888', u'text',)]
     self.assertEqual(observed, expected)
@@ -246,7 +246,7 @@ class DumpTruckVars(TestDb):
   def check(self, key, value, sqltype):
     connection=sqlite3.connect(u'/tmp/test.db')
     self.cursor=connection.cursor()
-    self.cursor.execute(u'SELECT name, value_blob, type FROM `_dumptruckvars`')
+    self.cursor.execute(u'SELECT key, value, `type` FROM `_dumptruckvars`')
     observed = self.cursor.fetchall()
     expected = [(key, value, sqltype)]
     self.assertEqual(observed, expected)
@@ -381,11 +381,9 @@ class TestSaveNestedDatetime(SaveAndSelect):
 
 class TestSaveDictIntegers(SaveAndSelect):
   def test_save_integers(self):
-    # This test is tricky - according to JSON spec
-    # you may only have strings as keys of a dict,
-    # so python json cannot handle it natively...
-    d = {1: 'A', 2: 'B', 3: 'C'}
-    self.save_and_select({'modelNumber': d})
+    dt = DumpTruck()
+    with self.assertRaises(ValueError):
+      dt.insert({'foo': {1: 'A', 2: 'B', 3: 'C'}})
 
 class TestSaveDict(SaveAndSelect):
   def test_save_text(self):
@@ -455,7 +453,7 @@ class TestSaveList(SaveAndCheck):
     self.save_and_check(
       {'model-codes': d}
     , 'models'
-    , [(dumps(d, ensure_ascii=False),)]
+    , [(dumps(d),)]
     )
 
 class TestSaveTwice(SaveAndCheck):

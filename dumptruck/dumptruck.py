@@ -87,14 +87,19 @@ class DumpTruck:
       self.__vars_table_tmp = vars_table_tmp
 
   def __check_or_create_vars_table(self):
-    sql = u"CREATE TABLE IF NOT EXISTS %s (`value_blob` blob, `type` text, `name` text PRIMARY KEY)" % quote(self.__vars_table)
+    self.create_table(
+      {'key': '', 'type': ''},
+      quote(self.__vars_table),
+      commit = False
+    )
+    sql = u'ALTER TABLE %s ADD COLUMN value BLOB' % quote(self.__vars_table)
     self.execute(sql, commit = False)
 
     self.commit()
 
     table_info = self.execute(u'PRAGMA table_info(%s)' % quote(self.__vars_table))
     column_names_observed = set([column['name'] for column in table_info])
-    column_names_expected = {'name', 'type', 'value_blob'}
+    column_names_expected = {'key', 'type', 'value'}
     assert column_names_observed == column_names_expected, table_info
 
   def execute(self, sql, *args, **kwargs):
@@ -108,6 +113,7 @@ class DumpTruck:
     except sqlite3.InterfaceError, msg:
       raise sqlite3.InterfaceError(unicode(msg) + '\nTry converting types or pickling.')
     rows = self.cursor.fetchall()
+
     self.__commit_if_necessary(kwargs)
 
     if None == self.cursor.description:
@@ -245,15 +251,14 @@ class DumpTruck:
       # This is vulnerable to injection.
       if len(keys) > 0:
         question_marks = ','.join('?'*len(keys))
-        sql = u'INSERT OR REPLACE INTO %s (%s) VALUES (%s);' % (
-          quote(table_name), ','.join(keys), question_marks)
+        sql = u'INSERT INTO %s (%s) VALUES (%s);' % (quote(table_name), ','.join(keys), question_marks)
         self.execute(sql, values, commit=False)
 
       else:
         sql = u'INSERT INTO %s DEFAULT VALUES;' % quote(table_name) 
         self.execute(sql, commit=False)
 
-      rowids.append(self.execute('SELECT last_insert_rowid()', commit=False)[0]['last_insert_rowid()'])
+      rowids.append(self.execute('SELECT last_insert_rowid()')[0]['last_insert_rowid()'])
 
     self.__commit_if_necessary(kwargs)
 
@@ -270,7 +275,7 @@ class DumpTruck:
   def get_var(self, key):
     'Retrieve one saved variable from the database.'
     vt = quote(self.__vars_table)
-    data = self.execute(u'SELECT * FROM %s WHERE `name` = ?' % vt, [key], commit = False)
+    data = self.execute(u'SELECT * FROM %s WHERE `key` = ?' % vt, [key], commit = False)
     if data == []:
       raise NameError(u'The DumpTruck variables table doesn\'t have a value for %s.' % key)
     else:
@@ -280,11 +285,11 @@ class DumpTruck:
       self.execute(u'DROP TABLE IF EXISTS %s' % tmp, commit = False)
 
       # This is vulnerable to injection
-      self.execute(u'CREATE TABLE %s (`value_blob` %s)' % (tmp, row['type']), commit = False)
+      self.execute(u'CREATE TABLE %s (`value` %s)' % (tmp, row['type']), commit = False)
 
       # This is ugly
-      self.execute(u'INSERT INTO %s (`value_blob`) VALUES (?)' % tmp, [row['value_blob']], commit = False)
-      value = self.dump(tmp)[0]['value_blob']
+      self.execute(u'INSERT INTO %s (`value`) VALUES (?)' % tmp, [row['value']], commit = False)
+      value = self.dump(tmp)[0]['value']
       self.execute(u'DROP TABLE %s' % tmp, commit = False)
 
       return value
@@ -301,20 +306,20 @@ class DumpTruck:
     self.execute(u'DROP TABLE IF EXISTS %s' % tmp, commit = False)
 
     # This is vulnerable to injection
-    self.execute(u'CREATE TABLE %s (`value_blob` %s)' % (tmp, column_type), commit = False)
+    self.execute(u'CREATE TABLE %s (`value` %s)' % (tmp, column_type), commit = False)
 
     # This is ugly
-    self.execute(u'INSERT INTO %s (`value_blob`) VALUES (?)' % tmp, [value], commit = False)
+    self.execute(u'INSERT INTO %s (`value`) VALUES (?)' % tmp, [value], commit = False)
     p1 = (quote(self.__vars_table), tmp)
     p2 = [key, column_type, value]
     self.execute(u'''
-INSERT OR REPLACE INTO %s (`name`, `type`, `value_blob`)
+INSERT INTO %s (`key`, `type`, `value`)
   SELECT
-    ? AS name,
+    ? AS key,
     ? AS type,
-    value_blob
+    value
   FROM %s
-  WHERE value_blob = ?
+  WHERE value = ?
 ''' % p1, p2)
     self.execute(u'DROP TABLE %s' % tmp, commit = False)
 

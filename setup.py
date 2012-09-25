@@ -41,4 +41,5 @@ setup(name='dumptruck',
     #package_data={'': ['LICENSE']},
     #license=open('LICENSE').read(),
     license='GPL',
+#   install_requires = open('requirements.txt').read().split('\n')[:-1],
 )
