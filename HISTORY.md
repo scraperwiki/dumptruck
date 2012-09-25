@@ -13,6 +13,8 @@ Allow very long numbers to be inserted.
 `DumpTruck.create_index` adds a `NOT NULL` constraint on the column if a unique
 index is created.
 
+Added `DumpTruck.rollback` for rolling back transactions
+
 Version 0.0.4 (August 2012)
 ----
 Fix dependency crap.
