@@ -1,6 +1,8 @@
 Future
 ------------
 
+Fix the license and authors so that it implies more than one author and so it uses a BSD license
+
 `DumpTruck.execute` can return a generator or a list; previously, it only
 returned a list.
 
@@ -14,6 +16,18 @@ Allow very long numbers to be inserted.
 index is created.
 
 Added `DumpTruck.rollback` for rolling back transactions
+
+
+Change how dumptruck variables work. This may cause incompatibilties
+with databases created with an older version of dumptruck.
+
+Fix a bug with save_var.
+
+Speed up insertions of large numbers of rows.
+
+Version 0.0.5 (August 2012)
+----
+Make dumptruck leaner by removing demjson dependency.
 
 Version 0.0.4 (August 2012)
 ----
