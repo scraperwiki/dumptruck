@@ -87,12 +87,7 @@ class DumpTruck:
       self.__vars_table_tmp = vars_table_tmp
 
   def __check_or_create_vars_table(self):
-    self.create_table(
-      {'key': '', 'type': ''},
-      quote(self.__vars_table),
-      commit = False
-    )
-    sql = u'ALTER TABLE %s ADD COLUMN value BLOB' % quote(self.__vars_table)
+    sql = u"CREATE TABLE IF NOT EXISTS %s (`key` text PRIMARY KEY, `value` blob, `type` text)" % quote(self.__vars_table)
     self.execute(sql, commit = False)
 
     self.commit()
@@ -258,7 +253,7 @@ class DumpTruck:
         sql = u'INSERT INTO %s DEFAULT VALUES;' % quote(table_name) 
         self.execute(sql, commit=False)
 
-      rowids.append(self.execute('SELECT last_insert_rowid()')[0]['last_insert_rowid()'])
+      rowids.append(self.execute('SELECT last_insert_rowid()', commit=False)[0]['last_insert_rowid()'])
 
     self.__commit_if_necessary(kwargs)
 
@@ -309,7 +304,7 @@ class DumpTruck:
     self.execute(u'CREATE TABLE %s (`value` %s)' % (tmp, column_type), commit = False)
 
     # This is ugly
-    self.execute(u'INSERT INTO %s (`value`) VALUES (?)' % tmp, [value], commit = False)
+    self.execute(u'INSERT OR REPLACE INTO %s (`value`) VALUES (?)' % tmp, [value], commit = False)
     p1 = (quote(self.__vars_table), tmp)
     p2 = [key, column_type, value]
     self.execute(u'''
