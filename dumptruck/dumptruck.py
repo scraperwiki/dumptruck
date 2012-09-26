@@ -304,18 +304,17 @@ class DumpTruck:
     self.execute(u'CREATE TABLE %s (`value` %s)' % (tmp, column_type), commit = False)
 
     # This is ugly
-    self.execute(u'INSERT OR REPLACE INTO %s (`value`) VALUES (?)' % tmp, [value], commit = False)
-    p1 = (quote(self.__vars_table), tmp)
-    p2 = [key, column_type, value]
+    self.execute(u'INSERT INTO %s (`value`) VALUES (?)' % tmp, [value], commit = False)
+    table = (quote(self.__vars_table), tmp)
+    params = [key, column_type]
     self.execute(u'''
-INSERT INTO %s (`key`, `type`, `value`)
+INSERT OR REPLACE INTO %s (`key`, `type`, `value`)
   SELECT
     ? AS key,
     ? AS type,
     value
   FROM %s
-  WHERE value = ?
-''' % p1, p2)
+''' % table, params)
     self.execute(u'DROP TABLE %s' % tmp, commit = False)
 
     self.__commit_if_necessary(kwargs)
