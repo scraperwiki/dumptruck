@@ -193,8 +193,12 @@ class SaveGetVar(TestDb):
   def savegetvar(self, var):
     h = DumpTruck(dbname = '/tmp/test.db')
     h.save_var(u'weird', var)
+    h.close()
+    h = DumpTruck(dbname = '/tmp/test.db')
+    t=os.stat('/tmp/test.db').st_mtime
     self.assertEqual(h.get_var(u'weird'), var)
     h.close()
+    assert os.stat('/tmp/test.db').st_mtime==t
 
 class TestSaveGetPickle(SaveGetVar):
   def test_list(self):
