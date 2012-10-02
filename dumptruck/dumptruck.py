@@ -280,7 +280,7 @@ class DumpTruck:
       self.execute(u'DROP TABLE IF EXISTS %s' % tmp, commit = False)
 
       # This is vulnerable to injection
-      self.execute(u'CREATE TABLE %s (`value` %s)' % (tmp, row['type']), commit = False)
+      self.execute(u'CREATE TEMPORARY TABLE %s (`value` %s)' % (tmp, row['type']), commit = False)
 
       # This is ugly
       self.execute(u'INSERT INTO %s (`value`) VALUES (?)' % tmp, [row['value']], commit = False)
