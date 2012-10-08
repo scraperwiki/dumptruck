@@ -53,17 +53,19 @@ you can use this.
 
     dt = DumpTruck(dbname="bucket-wheel-excavators.db")
 
-It actually takes up to three keyword arguments.
+It actually takes up to four keyword arguments.
 
-    DumpTruck(dbname='dumptruck.db', auto_commit = True, vars_table = "_dumptruckvars")
+    DumpTruck(dbname='dumptruck.db', auto_commit = True, vars_table = "_dumptruckvars", adapt_and_convert = True)
 
 * `dbname` is the database file to save to; the default is dumptruck.db.
 * `vars_table` is the name of the table to use for `DumpTruck.get_var`
-and `DumpTruck.save_var`; default is `_dumptruckvars`. Set it to `None`
-to disable the get_var and save_var methods.
+    and `DumpTruck.save_var`; default is `_dumptruckvars`. Set it to `None`
+    to disable the get_var and save_var methods.
 * `auto_commit` is whether changes to the database should be automatically committed;
-if it is set to `False`, changes must be committed with the `commit` method
-or with the `commit` keywoard argument.
+    if it is set to `False`, changes must be committed with the `commit` method
+    or with the `commit` keywoard argument.
+* `adapt_and_convert` is whether types should be converted automatically; with
+    this on dates get inserted as dates, lists as lists, &c.
 
 ### Saving
 As discussed earlier, the simplest `insert` call looks like this.
