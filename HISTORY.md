@@ -21,6 +21,8 @@ Added `DumpTruck.rollback` for rolling back transactions
 Change how dumptruck variables work. This may cause incompatibilties
 with databases created with an older version of dumptruck.
 
+Version 0.0.6 (September 2012)
+----
 Fix a bug with save_var.
 
 Speed up insertions of large numbers of rows.
