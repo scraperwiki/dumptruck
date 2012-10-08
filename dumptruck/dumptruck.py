@@ -19,15 +19,11 @@
 # You should have received a copy of the GNU Public License
 # along with DumpTruck.  If not, see <http://www.gnu.org/licenses/>.
 
-import sqlite3
 import re
 import datetime
 from collections import OrderedDict
 from convert import convert, quote, simplify
 from adapters_and_converters import register_adapters_and_converters, Pickle
-
-register_adapters_and_converters(sqlite3)
-del(register_adapters_and_converters)
 
 PYTHON_SQLITE_TYPE_MAP={
   unicode: u'text',
@@ -59,8 +55,15 @@ def get_column_type(obj):
 class DumpTruck:
   'A relaxing interface to SQLite'
 
-  def __init__(self, dbname = 'dumptruck.db', vars_table = '_dumptruckvars', vars_table_tmp = '_dumptruckvarstmp', auto_commit = True):
-    pass
+
+  def __init__(self, dbname = 'dumptruck.db', vars_table = '_dumptruckvars', vars_table_tmp = '_dumptruckvarstmp', auto_commit = True, adapt_and_convert = True):
+
+    self.sqlite3 = __import__('sqlite3')
+
+    if adapt_and_convert:
+        register_adapters_and_converters(self.sqlite3)
+        #del(register_adapters_and_converters)
+
     # Should database changes be committed automatically after each command?
     if type(auto_commit) != bool:
       raise TypeError('auto_commit must be True or False.')
@@ -71,7 +74,7 @@ class DumpTruck:
     if type(dbname) not in [unicode, str]:
       raise TypeError('dbname must be a string')
     else:
-      self.connection=sqlite3.connect(dbname, detect_types = sqlite3.PARSE_DECLTYPES)
+      self.connection=self.sqlite3.connect(dbname, detect_types = self.sqlite3.PARSE_DECLTYPES)
       self.cursor=self.connection.cursor()
 
     # Make sure it's a good table name
@@ -105,8 +108,8 @@ class DumpTruck:
     '''
     try:
       self.cursor.execute(sql, *args)
-    except sqlite3.InterfaceError, msg:
-      raise sqlite3.InterfaceError(unicode(msg) + '\nTry converting types or pickling.')
+    except self.sqlite3.InterfaceError, msg:
+      raise self.sqlite3.InterfaceError(unicode(msg) + '\nTry converting types or pickling.')
     rows = self.cursor.fetchall()
 
     self.__commit_if_necessary(kwargs)
@@ -151,7 +154,7 @@ class DumpTruck:
         params = (quote(table_name), key, column_type)
         sql = u'ALTER TABLE %s ADD COLUMN %s %s ' % params
         self.execute(sql, commit = True)
-      except sqlite3.OperationalError, msg:
+      except self.sqlite3.OperationalError, msg:
         if str(msg).split(':')[0] == u'duplicate column name':
           # The column is already there.
           pass
@@ -222,7 +225,7 @@ class DumpTruck:
         pass
       else:
         raise
-    except sqlite3.OperationalError, msg_raw:
+    except self.sqlite3.OperationalError, msg_raw:
       if u'already exists' in unicode(msg_raw):
         pass
     except:
