@@ -25,6 +25,10 @@ Fix a bug with save_var.
 
 Speed up insertions of large numbers of rows.
 
+Version 0.0.6 (October 2012)
+----
+Allow a connection to be made without the adapters and converters.
+
 Version 0.0.5 (August 2012)
 ----
 Make dumptruck leaner by removing demjson dependency.
