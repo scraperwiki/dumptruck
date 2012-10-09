@@ -112,3 +112,9 @@ def register_adapters_and_converters(module):
     register_json(module)
     register_pickle(module)
     register_unicode(module)
+
+def replace_date_converter(module):
+    module.register_converter('DATE', lambda val: val)
+    module.register_converter('date', lambda val: val)
+    module.register_converter('DATETIME', lambda val: val)
+    module.register_converter('datetime', lambda val: val)

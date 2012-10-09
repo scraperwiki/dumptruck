@@ -84,14 +84,15 @@ class TestDb(TestCase):
 #  def test_nonexisting_var(self):
 #   self.assertRaises(NameError,self.h.get_var,'nonexistant_var')
 
-class TestNoAdaptersAndConverters(TestDb):
-  def test_adapt_date(self):
+class TestAdaptersAndConverters(TestDb):
+  def test_adapt_list(self):
     dt = DumpTruck(dbname = '/tmp/test.db', adapt_and_convert = True)
     dt.execute('create table foo (bar jsontext)')
     dt.execute("insert into foo values ('[3,5]')")
-    self.assertListEqual(dt.dump('foo'), [OrderedDict([('bar', '[3,5]')])])
+    self.assertListEqual(dt.dump('foo'), [OrderedDict([('bar', [3,5])])])
 
-  def test_no_adapt_date(self):
+class TestNoAdaptersAndConverters(TestDb):
+  def test_no_adapt_list(self):
     dt = DumpTruck(dbname = '/tmp/test.db', adapt_and_convert = False)
     dt.execute('create table foo (bar jsontext)')
     dt.execute("insert into foo values ('[3,5]')")

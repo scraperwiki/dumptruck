@@ -23,7 +23,7 @@ import re
 import datetime
 from collections import OrderedDict
 from convert import convert, quote, simplify
-from adapters_and_converters import register_adapters_and_converters, Pickle
+from adapters_and_converters import register_adapters_and_converters, Pickle, replace_date_converter
 
 PYTHON_SQLITE_TYPE_MAP={
   unicode: u'text',
@@ -62,7 +62,8 @@ class DumpTruck:
 
     if adapt_and_convert:
         register_adapters_and_converters(self.sqlite3)
-        #del(register_adapters_and_converters)
+    else:
+        replace_date_converter(self.sqlite3)
 
     # Should database changes be committed automatically after each command?
     if type(auto_commit) != bool:
