@@ -21,15 +21,21 @@ Added `DumpTruck.rollback` for rolling back transactions
 Change how dumptruck variables work. This may cause incompatibilties
 with databases created with an older version of dumptruck.
 
+Version 0.0.7 (October 2012)
+----
+A connection can now be made without the adapters and converters by setting the
+`adapt_and_convert` flag.
+
+But this `adapt_and_convert` thing is sort of broken; if you open multiple
+dumptruck instances within the same session, the first setting will be used.
+This is because the setting is made on the `sqlite3` module, which is cached,
+and we haven't figured out how to ignore the cache.
+
 Version 0.0.6 (September 2012)
 ----
 Fix a bug with save_var.
 
 Speed up insertions of large numbers of rows.
-
-Version 0.0.6 (October 2012)
-----
-Allow a connection to be made without the adapters and converters.
 
 Version 0.0.5 (August 2012)
 ----
