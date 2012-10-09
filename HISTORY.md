@@ -31,6 +31,8 @@ dumptruck instances within the same session, the first setting will be used.
 This is because the setting is made on the `sqlite3` module, which is cached,
 and we haven't figured out how to ignore the cache.
 
+We also switched to MIT license.
+
 Version 0.0.6 (September 2012)
 ----
 Fix a bug with save_var.
