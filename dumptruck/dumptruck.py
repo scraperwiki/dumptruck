@@ -211,7 +211,12 @@ class DumpTruck:
         self.__check_and_add_columns(table_name, row)
 
 
-  def insert(self, data, table_name = 'dumptruck', **kwargs):
+  def insert(self, data, table_name = 'dumptruck', upsert = False, **kwargs):
+    if upsert:
+      upserttext=' OR REPLACE'
+    else:
+      upserttext=''
+
     # Skip if empty
     if len(data) == 0 and not hasattr(data, 'keys'):
       return []
@@ -254,11 +259,11 @@ class DumpTruck:
       # This is vulnerable to injection.
       if len(keys) > 0:
         question_marks = ','.join('?'*len(keys))
-        sql = u'INSERT INTO %s (%s) VALUES (%s);' % (quote(table_name), ','.join(keys), question_marks)
+        sql = u'INSERT %s INTO %s (%s) VALUES (%s);' % (upserttext, quote(table_name), ','.join(keys), question_marks)
         self.execute(sql, values, commit=False)
 
       else:
-        sql = u'INSERT INTO %s DEFAULT VALUES;' % quote(table_name) 
+        sql = u'INSERT %s INTO %s DEFAULT VALUES;' % (upserttext, quote(table_name)) 
         self.execute(sql, commit=False)
 
       rowids.append(self.execute('SELECT last_insert_rowid()', commit=False)[0]['last_insert_rowid()'])
@@ -270,6 +275,9 @@ class DumpTruck:
       return rowids[0]
     else:
       return rowids
+
+  def upsert(self, *args, **kwargs):
+    self.insert(upsert=True, *args, **kwargs)
 
   def __commit_if_necessary(self, kwargs):
     if kwargs.get('commit', self.auto_commit):
