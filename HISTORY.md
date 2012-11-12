@@ -21,6 +21,10 @@ Added `DumpTruck.rollback` for rolling back transactions
 Change how dumptruck variables work. This may cause incompatibilties
 with databases created with an older version of dumptruck.
 
+Version 0.0.8 (November 2012)
+----
+Add upsert command (Dragon).
+
 Version 0.0.7 (October 2012)
 ----
 A connection can now be made without the adapters and converters by setting the

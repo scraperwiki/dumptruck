@@ -25,7 +25,7 @@
 from dumptruck import *
 
 __title__ = 'dumptruck'
-__version__ = '0.0.7-u'
-__author__ = 'Thomas Levine'
+__version__ = '0.0.8'
+__author__ = 'ScraperWiki Ltd.'
 __license__ = 'MIT'
 __copyright__ = 'Copyright 2012 ScraperWiki Ltd.'
