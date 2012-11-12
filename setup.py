@@ -25,12 +25,10 @@ from distutils.core import setup
 import dumptruck
 
 setup(name='dumptruck',
-    author='Thomas Levine',
-    #author_email='perluette@thomaslevine.com',
-    author_email='thomas@scraperwiki.com',
+    author=dumptruck.__author__,
+    author_email='pypi@scraperwiki.com',
     description='Relaxing interface to SQLite',
-    url='https://github.com/tlevine/dumptruck',
-    #url='http://hacks.thomaslevine.com/dumptruck',
+    url='https://github.com/scraperwiki/dumptruck.git',
     classifiers=[
         'Intended Audience :: Developers',
         'Intended Audience :: Science/Research',
