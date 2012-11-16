@@ -19,6 +19,10 @@ Added `DumpTruck.rollback` for rolling back transactions
 Change how dumptruck variables work. This may cause incompatibilties
 with databases created with an older version of dumptruck.
 
+Version 0.1.0 (November 2012)
+----
+Handles lxml strings correctly.
+
 Version 0.0.9 (November 2012)
 ----
 Set author correctly.
