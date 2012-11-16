@@ -25,6 +25,7 @@
 
 import re
 import datetime
+import lxml.etree
 from collections import OrderedDict
 from convert import convert, quote, simplify
 from adapters_and_converters import register_adapters_and_converters, Pickle, replace_date_converter
@@ -32,6 +33,7 @@ from adapters_and_converters import register_adapters_and_converters, Pickle, re
 PYTHON_SQLITE_TYPE_MAP={
   unicode: u'text',
   str: u'text',
+  lxml.etree._ElementStringResult: u'text',
 
   int: u'integer',
   long: u'integer',
