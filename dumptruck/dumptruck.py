@@ -34,6 +34,7 @@ PYTHON_SQLITE_TYPE_MAP={
   unicode: u'text',
   str: u'text',
   lxml.etree._ElementStringResult: u'text',
+  lxml.etree._ElementUnicodeResult: u'text',
 
   int: u'integer',
   long: u'integer',
