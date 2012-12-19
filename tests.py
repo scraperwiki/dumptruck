@@ -29,6 +29,7 @@ from dumptruck import DumpTruck, Pickle, quote
 import sqlite3
 import os, shutil
 import datetime
+import lxml.etree, lxml.html
 
 DB_FILE = '/tmp/test.db'
 
@@ -95,6 +96,11 @@ class TestAdaptersAndConverters(TestDb):
     dt.execute('create table foo (bar jsontext)')
     dt.execute("insert into foo values ('[3,5]')")
     self.assertListEqual(dt.dump('foo'), [OrderedDict([('bar', [3,5])])])
+  def test_convert_lxml(self):
+    dt = DumpTruck(dbname = '/tmp/test.db', adapt_and_convert = True)
+    elementstringresult = lxml.html.fromstring('<html>Hi</html>').xpath('//*/text()')[0]
+    dt.insert({'bar': elementstringresult}, 'foo')
+    self.assertEqual(type(dt.dump('foo')[0]['bar']), unicode)
 
 class TestNoAdaptersAndConverters(TestDb):
   def test_no_adapt_list(self):
