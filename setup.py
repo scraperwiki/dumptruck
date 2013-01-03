@@ -22,10 +22,9 @@
 # OR OTHER DEALINGS IN THE SOFTWARE.
 
 from distutils.core import setup
-import dumptruck
 
 setup(name='dumptruck',
-    author=dumptruck.__author__,
+    author='ScraperWiki Ltd.',
     author_email='pypi@scraperwiki.com',
     description='Relaxing interface to SQLite',
     url='https://github.com/scraperwiki/dumptruck.git',
@@ -38,9 +37,10 @@ setup(name='dumptruck',
         'Topic :: Database :: Front-Ends',
     ],
     packages=['dumptruck'],
+    install_requires=['lxml'],
 
     # From requests
-    version=dumptruck.__version__,
+    version='0.1.1',
     #long_description=open('README.md').read() + '\n\n' + open('HISTORY.md').read(), #needs to be rst
     #package_data={'': ['LICENSE']},
     #license=open('LICENSE').read(),
