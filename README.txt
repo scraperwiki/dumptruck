@@ -35,8 +35,9 @@ new rows.
 
     dt.insert([{"foo", "one"}, {"foo", "two"}], "new-table") == [2, 3]
 
-By default, insert doesn't automatically replace rows which have the key: you
-can use `dt.upsert` (with the same syntax) instead to change this behaviour.
+If there are UNIQUE constraints on the table (perhaps from `create_index`) then
+`insert` will fail if these constraints are violated. You can use `upsert` (with
+the same syntax) to replace the existing row instead.
 
 ### Retrieve
 Once the database contains data, you can retrieve them.
