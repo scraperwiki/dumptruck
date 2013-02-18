@@ -41,9 +41,6 @@ setup(name='dumptruck',
 
     # From requests
     version='0.1.1',
-    #long_description=open('README.md').read() + '\n\n' + open('HISTORY.md').read(), #needs to be rst
-    #package_data={'': ['LICENSE']},
-    #license=open('LICENSE').read(),
     license='MIT',
-#   install_requires = open('requirements.txt').read().split('\n')[:-1],
 )
+
