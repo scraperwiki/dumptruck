@@ -97,6 +97,13 @@ class DumpTruck:
     else:
       self.__vars_table_tmp = vars_table_tmp
 
+  def column_names(self, table):
+      """An iterable of column names, for a particular table."""
+
+      table_info = self.execute(
+        u'PRAGMA table_info(%s)' % quote(table))
+      return (column['name'] for column in table_info)
+
   def __check_or_create_vars_table(self):
     sql = u"CREATE TABLE IF NOT EXISTS %s (`key` text PRIMARY KEY, `value` blob, `type` text)" % quote(self.__vars_table)
     self.execute(sql, commit = False)
