@@ -25,7 +25,6 @@
 
 import re
 import datetime
-import lxml.etree
 from collections import OrderedDict
 from convert import convert, quote, simplify
 from adapters_and_converters import register_adapters_and_converters, Pickle, replace_date_converter
@@ -33,8 +32,6 @@ from adapters_and_converters import register_adapters_and_converters, Pickle, re
 PYTHON_SQLITE_TYPE_MAP={
   unicode: u'text',
   str: u'text',
-  lxml.etree._ElementStringResult: u'text',
-  lxml.etree._ElementUnicodeResult: u'text',
 
   int: u'integer',
   long: u'integer',
@@ -48,6 +45,19 @@ PYTHON_SQLITE_TYPE_MAP={
   list: u'json text',
   set: u'jsonset text',
 }
+
+try:
+    import lxml.etree
+    PYTHON_SQLITE_TYPE_MAP.update(
+      {
+        lxml.etree._ElementStringResult: u'text',
+        lxml.etree._ElementUnicodeResult: u'text'
+      })
+except ImportError:
+    # lxml enhancement is optional, so don't worry if not
+    # available.
+    pass
+
 
 def get_column_type(obj):
   'Decide the type of a column to contain an object.'

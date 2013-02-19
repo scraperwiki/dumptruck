@@ -37,7 +37,7 @@ setup(name='dumptruck',
         'Topic :: Database :: Front-Ends',
     ],
     packages=['dumptruck'],
-    install_requires=['lxml'],
+    install_requires=[],
 
     # From requests
     version='0.1.2',
