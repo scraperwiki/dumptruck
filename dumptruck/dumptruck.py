@@ -364,7 +364,7 @@ INSERT OR REPLACE INTO %s (`key`, `type`, `value`)
       """Return a sequence of (name,type) pairs where type is
       either "table" or "view"."""
       result = self.execute(
-        u'SELECT name FROM sqlite_master WHERE type in ("table", "view")',
+        u'SELECT name,type FROM sqlite_master WHERE type in ("table", "view")',
         commit=False)
       return ((row['name'],row['type']) for row in result)
 
