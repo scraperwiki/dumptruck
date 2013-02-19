@@ -108,7 +108,8 @@ class DumpTruck:
       self.__vars_table_tmp = vars_table_tmp
 
   def column_names(self, table):
-      """An iterable of column names, for a particular table."""
+      """An iterable of column names, for a particular table or
+      view."""
 
       table_info = self.execute(
         u'PRAGMA table_info(%s)' % quote(table))
@@ -356,8 +357,17 @@ INSERT OR REPLACE INTO %s (`key`, `type`, `value`)
     self.__commit_if_necessary(kwargs)
 
   def tables(self):
-    result = self.execute(u'SELECT name FROM sqlite_master WHERE TYPE="table"', commit = False)
+    result = self.execute(u'SELECT name FROM sqlite_master WHERE TYPE="table"', commit=False)
     return set([row['name'] for row in result])
+
+  def tablesAndViews(self):
+      """Return a sequence of (name,type) pairs where type is
+      either "table" or "view"."""
+      result = self.execute(
+        u'SELECT name FROM sqlite_master WHERE type in ("table", "view")',
+        commit=False)
+      return ((row['name'],row['type']) for row in result)
+
 
   def drop(self, table_name = 'dumptruck', if_exists = False, **kwargs):
     'Drop a table.'
