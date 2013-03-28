@@ -14,6 +14,8 @@ Install, save data and retrieve it using default settings.
 
 Open the database connection by initializing the a DumpTruck object
 
+    from dumptruck import DumpTruck
+
     dt = DumpTruck()
 
 ### Save
@@ -112,7 +114,7 @@ you can use the dead-simple pickle interface.
     dt.insert(data)
 
     # This works
-    from DumpTruck import Pickle
+    from dumptruck import Pickle
     data = Pickle({"weirdthing": {range(100): None})
     dt.insert(data)
 
