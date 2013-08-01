@@ -33,6 +33,14 @@ import lxml.etree, lxml.html
 
 DB_FILE = '/tmp/test.db'
 
+class TestUnicode(TestCase):
+  import dumptruck
+  dt = dumptruck.DumpTruck(':memory:')
+  print "one"
+  dt.insert(table_name = u'\u1234', data = {'a':1}, unique_keys = [])
+  print "two"
+  dt.insert(table_name = u'\u1234', data = {'a':1}, unique_keys = [])
+
 class TestQuote(TestCase):
   def assertQuote(self, textIn, textOut):
     self.assertEqual(quote(textIn), textOut)
