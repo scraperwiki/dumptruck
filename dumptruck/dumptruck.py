@@ -257,7 +257,7 @@ class DumpTruck:
       else:
         raise
     except self.sqlite3.OperationalError, msg_raw:
-      if u'already exists' in unicode(msg_raw):
+      if 'already exists' in msg_raw:
         pass
     except:
       raise
