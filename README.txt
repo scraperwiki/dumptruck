@@ -125,7 +125,7 @@ Column names and table names automatically get quoted if you pass them without q
 so you can use bizarre table and column names, like `no^[hs!'e]?'sf_"&'`
 
 #### Null values
-`None` dictionary values are always equivalent to non-existance of the key.
+`None` dictionary values are always equivalent to non-existence of the key.
 That is, these insert commands are equivalent.
 
     dt = DumpTruck()
