@@ -94,7 +94,7 @@ You can also pass a list of dictionaries.
     dt.insert(data)
 
 #### Complex objects
-You can even past nested structures; dictionaries,
+You can even pass nested structures; dictionaries,
 sets and lists will automatically be dumped to JSON.
 
     data=[
