@@ -79,7 +79,7 @@ As discussed earlier, the simplest `insert` call looks like this.
     dt.insert({"firstname": "Thomas", "lastname": "Levine"})
 
 #### Different tables
-By default, that saves to the table `dumptruck`. You can specify different table;
+By default, that saves to the table `dumptruck`. You can specify a different table;
 this saves to the table `diesel-engineers`.
 
     dt.insert({"firstname": "Thomas", "lastname": "Levine"}, "diesel-engineers")
