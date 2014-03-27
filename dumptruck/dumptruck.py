@@ -5,17 +5,17 @@
 # This file is part of DumpTruck.
 
 # Copyright (C) 2012 ScraperWiki Ltd. and other contributors
-# 
+#
 # Permission is hereby granted, free of charge, to any person obtaining a copy of this
 # software and associated documentation files (the "Software"), to deal in the Software
 # without restriction, including without limitation the rights to use, copy, modify,
 # merge, publish, distribute, sublicense, and/or sell copies of the Software, and to
 # permit persons to whom the Software is furnished to do so, subject to the following
 # conditions:
-# 
+#
 # The above copyright notice and this permission notice shall be included in all copies
 # or substantial portions of the Software.
-# 
+#
 # THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
 # INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
 # PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
@@ -73,7 +73,7 @@ class DumpTruck:
   'A relaxing interface to SQLite'
 
 
-  def __init__(self, dbname = 'dumptruck.db', vars_table = '_dumptruckvars', vars_table_tmp = '_dumptruckvarstmp', auto_commit = True, adapt_and_convert = True):
+  def __init__(self, dbname = 'dumptruck.db', vars_table = '_dumptruckvars', vars_table_tmp = '_dumptruckvarstmp', auto_commit = True, adapt_and_convert = True, timeout = 5):
 
     self.sqlite3 = __import__('sqlite3')
 
@@ -92,7 +92,7 @@ class DumpTruck:
     if type(dbname) not in [unicode, str]:
       raise TypeError('dbname must be a string')
     else:
-      self.connection=self.sqlite3.connect(dbname, detect_types = self.sqlite3.PARSE_DECLTYPES)
+      self.connection=self.sqlite3.connect(dbname, detect_types = self.sqlite3.PARSE_DECLTYPES, timeout=timeout)
       self.cursor=self.connection.cursor()
 
     # Make sure it's a good table name
@@ -143,7 +143,7 @@ class DumpTruck:
     if None == self.cursor.description:
       return None
     else:
-      colnames = [d[0].decode('utf-8') for d in self.cursor.description] 
+      colnames = [d[0].decode('utf-8') for d in self.cursor.description]
       rawdata = [OrderedDict(zip(colnames,row)) for row in rows]
       return rawdata
 
@@ -227,7 +227,7 @@ class DumpTruck:
         raise
       else:
         self.commit()
- 
+
       for row in converted_data:
         self.__check_and_add_columns(table_name, row)
 
@@ -267,7 +267,7 @@ class DumpTruck:
 
     for row in converted_data:
       self.__check_and_add_columns(table_name, row)
-    
+
     # .keys() and .items() are in the same order
     # http://www.python.org/dev/peps/pep-3106/
 
@@ -284,7 +284,7 @@ class DumpTruck:
         self.execute(sql, values, commit=False)
 
       else:
-        sql = u'INSERT %s INTO %s DEFAULT VALUES;' % (upserttext, quote(table_name)) 
+        sql = u'INSERT %s INTO %s DEFAULT VALUES;' % (upserttext, quote(table_name))
         self.execute(sql, commit=False)
 
       rowids.append(self.execute('SELECT last_insert_rowid()', commit=False)[0]['last_insert_rowid()'])
