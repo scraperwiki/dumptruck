@@ -94,7 +94,7 @@ def checkdata(data):
     # Column names
     if key in [None, '']:
       raise ValueError('key must not be blank')
-    elif isinstance(key, (unicode, str)):
+    elif not isinstance(key, (unicode, str)):
       raise ValueError(u'The column name must be of unicode or str type. The column name ("%s") is of type %s. If this error doesn\'t make sense, try "unicode(\'%s\')".' % (key, type(key), key))
     elif isinstance(value, dict) and not all(isinstance(k, (unicode, str)) for k in value.keys()):
       raise ValueError('Dictionary keys must all be str or unicode for database insert.')
