@@ -104,7 +104,7 @@ class TestAdaptersAndConverters(TestDb):
     dt = DumpTruck(dbname = '/tmp/test.db', adapt_and_convert = True)
     dt.execute('create table foo (bar jsontext)')
     dt.execute("insert into foo values ('[3,5]')")
-    self.assertListEqual(dt.dump('foo'), [OrderedDict([('bar', [3,5])])])
+    self.assertListEqual(dt.dump('foo'), [OrderedDict([('bar', '[3,5]')])])
   def test_convert_lxml(self):
     dt = DumpTruck(dbname = '/tmp/test.db', adapt_and_convert = True)
     elementstringresult = lxml.html.fromstring('<html>Hi</html>').xpath('//*/text()')[0]
@@ -134,7 +134,7 @@ class TestNoAdaptersAndConverters(TestDb):
     dt.execute("INSERT INTO pork_sales VALUES ('[12,3,4]')")
 
     observedData = dt.execute('SELECT week FROM pork_sales')
-    self.assertListEqual(observedData, [{u"week": u"[12,3,4]"}])
+    self.assertListEqual(observedData, [OrderedDict([u"week", u"[12,3,4]"])])
 
   def test_special_type_date(self):
     """Adapters and converters should not be enabled."""
