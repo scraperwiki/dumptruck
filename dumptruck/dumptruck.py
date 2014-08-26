@@ -34,19 +34,25 @@ import old_dumptruck
 
 class DumpTruck(old_dumptruck.DumpTruck):
     def __init__(self, dbname = 'dumptruck.db', vars_table = '_dumptruckvars', vars_table_tmp = '_dumptruckvarstmp', auto_commit = True, adapt_and_convert = True, timeout = 5):
+        self.auto_commit = auto_commit
+
         engine = sqlalchemy.create_engine('sqlite:///{}'.format(dbname), echo=True, connect_args={'timeout': timeout})
         self.conn = engine.connect()
         self.trans = self.conn.begin()
 
     def execute(self, sql_query, *args, **kwargs):
         s = sqlalchemy.sql.text(sql_query)
-        conn.execute(s).fetchall()
+        result = self.conn.execute(s)
 
         self.__commit_if_necessary(kwargs)
+
+        if not result.returns_rows:
+            return None
+
+        return [OrderedDict(row) for row in result.fetchall()]
+
 
     def commit(self):
         'Commit database transactions and start a new transaction.'
         self.trans.commit()
         self.trans = self.conn.begin()
-
-from old_dumptruck import *
