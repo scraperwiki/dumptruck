@@ -29,7 +29,7 @@ import json
 from collections import OrderedDict
 import sqlalchemy
 from sqlalchemy.dialects.sqlite import TEXT, INTEGER, BOOLEAN, FLOAT, DATE, DATETIME 
-from convert import convert, quote, simplify
+from convert import convert
 
 import old_dumptruck
 
