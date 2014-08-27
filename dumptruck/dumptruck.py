@@ -29,7 +29,7 @@ import json
 from collections import OrderedDict
 import sqlalchemy
 from sqlalchemy.dialects.sqlite import TEXT, INTEGER, BOOLEAN, FLOAT, DATE, DATETIME 
-from convert import convert
+from convert import convert, simplify
 
 import old_dumptruck
 
@@ -123,6 +123,23 @@ class DumpTruck(old_dumptruck.DumpTruck):
                 for new_column in new_columns:
                     s = sqlalchemy.sql.text('ALTER TABLE {} ADD {} {}'.format(table_name, new_column.name, new_column.type))
                     self.conn.execute(s)
+
+    def create_index(self, column_names, table_name, if_not_exists=True, unique=False, **kwargs):
+        """Create a unique index on the column(s) passed."""
+        metadata = sqlalchemy.MetaData(bind=self.engine)
+        metadata.reflect()
+        table = sqlalchemy.Table(table_name, metadata)
+
+        index_name = simplify(table_name) + '_' + '_'.join(map(simplify, column_names))
+
+        columns = []
+        for column_name in column_names:
+            columns.append(table.columns[column_name])
+
+        index = sqlalchemy.schema.Index(index_name, *columns, unique=unique)
+        if index not in table.indexes or not if_not_exists:
+            index.create(bind=self.engine)
+
 
     def get_column_type(self, column_value):
         return PYTHON_SQLITE_TYPE_MAP[type(column_value)]
