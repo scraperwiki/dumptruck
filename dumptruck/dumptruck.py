@@ -1,6 +1,6 @@
 #!/usr/bin/env python2
 # -*- encoding: utf-8 -*-
-'Relaxing interface to SQLite'
+"""Relaxing interface to SQLite"""
 
 # This file is part of DumpTruck.
 
