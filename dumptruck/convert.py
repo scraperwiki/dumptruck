@@ -27,11 +27,6 @@ import re
 import datetime
 from collections import OrderedDict
 
-QUOTEPAIRS = [
-  (u'`', u'`'),
-  (u'[', u']'),
-]
-
 def convert(data):
 
   try:
@@ -63,31 +58,11 @@ def convert(data):
     if len(set([k.lower() for k in row.keys()])) != len(row.keys()):
       raise ValueError(u'You passed the same column name twice. (Column names are insensitive to case.)')
 
-    data_quoted.append(zip([quote(k) for k in row.keys()], row.values()))
+    data_quoted.append(zip(row.keys(), row.values()))
   return data_quoted
 
 def simplify(text):
   return re.sub(r'[^a-zA-Z0-9]', '', text)
-
-def quote(text):
-  'Handle quote characters'
-
-  # Convert to unicode.
-  if not isinstance(text, unicode):
-    text = text.decode('utf-8')
-
-  # Look for quote characters. Keep the text as is if it's already quoted.
-  for qp in QUOTEPAIRS:
-    if text[0] == qp[0] and text[-1] == qp[-1] and len(text) >= 2:
-      return text
-
-  # If it's not quoted, try quoting
-  for qp in QUOTEPAIRS:
-    if qp[1] not in text:
-      return qp[0] + text + qp[1]
-
-  #Darn
-  raise ValueError(u'The value "%s" is not quoted and contains too many quote characters to quote' % text)
 
 def checkdata(data):
   for key, value in data.items():

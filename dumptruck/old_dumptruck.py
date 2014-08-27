@@ -26,7 +26,6 @@
 import re
 import datetime
 from collections import OrderedDict
-from convert import convert, quote, simplify
 from adapters_and_converters import register_adapters_and_converters, Pickle, replace_date_converter
 
 PYTHON_SQLITE_TYPE_MAP={
