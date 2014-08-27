@@ -121,7 +121,6 @@ class DumpTruck(old_dumptruck.DumpTruck):
 
             if original_columns != list(table.columns) and original_columns != []:
                 for new_column in new_columns:
-                    #TODO: This is vulnerable and must be fixed
                     s = sqlalchemy.sql.text('ALTER TABLE {} ADD {} {}'.format(table_name, new_column.name, new_column.type))
                     self.conn.execute(s)
 
