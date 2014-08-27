@@ -103,14 +103,27 @@ class DumpTruck(old_dumptruck.DumpTruck):
         else:
             startdata = OrderedDict(converted_data[0])
 
-        metadata = sqlalchemy.MetaData()
-        table = sqlalchemy.Table(table_name, metadata)
+        metadata = sqlalchemy.MetaData(bind=self.engine)
+        metadata.reflect()
 
+        table = sqlalchemy.Table(table_name, metadata, extend_existing=True)
+        original_columns = list(table.columns)
+
+        new_columns = []
         for column_name, column_value in startdata.items():
-            table.append_column(sqlalchemy.Column(column_name, self.get_column_type(column_value)))
+            new_column = sqlalchemy.Column(column_name, self.get_column_type(column_value))
+            if not str(new_column) in table.columns:
+                new_columns.append(new_column)
+                table.append_column(new_column)
 
         with self.conn.begin() as transaction:
             metadata.create_all(self.engine)
+
+            if original_columns != list(table.columns) and original_columns != []:
+                for new_column in new_columns:
+                    #TODO: This is vulnerable and must be fixed
+                    s = sqlalchemy.sql.text('ALTER TABLE {} ADD {} {}'.format(table_name, new_column.name, new_column.type))
+                    self.conn.execute(s)
 
     def get_column_type(self, column_value):
         return PYTHON_SQLITE_TYPE_MAP[type(column_value)]
