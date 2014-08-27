@@ -80,8 +80,10 @@ class DumpTruck(old_dumptruck.DumpTruck):
         s = sqlalchemy.sql.text(sql_query)
 
         if kwargs.get('commit', self.auto_commit):
+            self.trans.commit()
             with self.conn.begin() as transaction:
                 result = self.conn.execute(s)
+            self.trans = self.conn.begin()
         else:
             result = self.conn.execute(s)
 
