@@ -69,7 +69,7 @@ PYTHON_SQLITE_TYPE_MAP = {
 }
 
 class DumpTruck(old_dumptruck.DumpTruck):
-    def __init__(self, dbname = 'dumptruck.db', vars_table = '_dumptruckvars', vars_table_tmp = '_dumptruckvarstmp', auto_commit = True, adapt_and_convert = True, timeout = 5):
+    def __init__(self, dbname = 'dumptruck.db', vars_table = '_dumptruckvars', vars_table_tmp = '_dumptruckvarstmp', auto_commit=True, adapt_and_convert=True, timeout=5):
         self.auto_commit = auto_commit
 
         self.engine = sqlalchemy.create_engine('sqlite:///{}'.format(dbname), echo=True, connect_args={'timeout': timeout})
@@ -92,8 +92,27 @@ class DumpTruck(old_dumptruck.DumpTruck):
 
         return [OrderedDict(row) for row in result.fetchall()]
 
+    def upsert(self, *args, **kwargs):
+        self.insert(upsert=True, *args, **kwargs)
+
     def insert(self, data, table_name='dumptruck', upsert=False, **kwargs):
-        pass
+        # Skip if empty
+        if len(data) == 0 and not hasattr(data, 'keys'):
+            return
+
+        prefixes = ['OR REPLACE']
+        prefixes = []
+
+        for row in data:
+            metadata = sqlalchemy.MetaData(bind=self.engine)
+            metadata.reflect()
+
+            table = sqlalchemy.Table(table_name, metadata, extend_existing=True)
+            ins = table.insert(prefixes=prefixes).values(data)
+            self.conn.execute(ins)
+
+        if kwargs.get('commit', self.auto_commit):
+            self.commit()
 
     def create_table(self, data, table_name, **kwargs):
         converted_data = convert(data)
@@ -136,10 +155,10 @@ class DumpTruck(old_dumptruck.DumpTruck):
         for column_name in column_names:
             columns.append(table.columns[column_name])
 
+        current_indices = [x.name for x in table.indexes]
         index = sqlalchemy.schema.Index(index_name, *columns, unique=unique)
-        if index not in table.indexes or not if_not_exists:
+        if index.name not in current_indices or not if_not_exists:
             index.create(bind=self.engine)
-
 
     def get_column_type(self, column_value):
         return PYTHON_SQLITE_TYPE_MAP[type(column_value)]
