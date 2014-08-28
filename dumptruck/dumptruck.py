@@ -127,9 +127,10 @@ class DumpTruck(old_dumptruck.DumpTruck):
 
         for row in data:
             metadata = sqlalchemy.MetaData(bind=self.engine)
-            metadata.reflect()
+            metadata.reflect(only=[table_name])
 
             table = sqlalchemy.Table(table_name, metadata, extend_existing=True)
+
             ins = table.insert(prefixes=prefixes).values(data)
             self.conn.execute(ins)
 
