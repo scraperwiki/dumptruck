@@ -219,6 +219,25 @@ class DumpTruck(old_dumptruck.DumpTruck):
         self.create_table([row], self.__vars_table)
         self.insert([row], self.__vars_table)
 
+        if kwargs.get('commit', self.auto_commit):
+            self.commit()
+
+    def get_var(self, key):
+        """Read one saved variable from the database."""
+        self.commit()
+
+        metadata = sqlalchemy.MetaData(bind=self.engine)
+        metadata.reflect()
+        table = sqlalchemy.Table(self.__vars_table, metadata)
+
+        s = sqlalchemy.select([table.c.value]).where(table.c.key == key)
+        result = self.conn.execute(s).fetchone()
+
+        if not result:
+            raise NameError('The DumpTruck variables table doesn\'t have a value for %s.' % key)
+        else:
+            return result[0]
+
     def get_column_type(self, column_value):
         """Return the appropriate SQL column type for the given value."""
         return PYTHON_SQLITE_TYPE_MAP[type(column_value)]
