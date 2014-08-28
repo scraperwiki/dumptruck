@@ -100,8 +100,7 @@ class DumpTruck(old_dumptruck.DumpTruck):
         if len(data) == 0 and not hasattr(data, 'keys'):
             return
 
-        prefixes = ['OR REPLACE']
-        prefixes = []
+        prefixes = ['OR REPLACE'] if upsert else []
 
         for row in data:
             metadata = sqlalchemy.MetaData(bind=self.engine)
