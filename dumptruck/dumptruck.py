@@ -53,6 +53,8 @@ class JSONObject(sqlalchemy.TypeDecorator):
 
 class Blob(str):
     """Represents a string as a blob."""
+    def __init__(self, *args, **kwargs):
+        super(Blob, self).__init__(*args, **kwargs)
 
 PYTHON_SQLITE_TYPE_MAP = {
     unicode: TEXT,
@@ -210,7 +212,8 @@ class DumpTruck(old_dumptruck.DumpTruck):
     def save_var(self, key, value, **kwargs):
         """Save one variable to the database."""
         column_type = self.get_column_type(value)
-        row = OrderedDict([['key', key], ['value', Blob(value)], ['type', str(column_type)]])
+        #TODO: Use blob type, using text for now
+        row = OrderedDict([['key', key], ['value', value], ['type', column_type.__visit_name__.lower()]])
 
         self.create_table([row], self.__vars_table)
         self.insert([row], self.__vars_table)
