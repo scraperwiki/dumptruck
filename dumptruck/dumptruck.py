@@ -82,6 +82,7 @@ class DumpTruck(old_dumptruck.DumpTruck):
         self.engine = sqlalchemy.create_engine('sqlite:///{}'.format(dbname), echo=True, connect_args={'timeout': timeout})
         self.conn = self.engine.connect()
         self.trans = self.conn.begin()
+        self.connection = self.trans # To preserve API
 
         self.__vars_table = vars_table
 
