@@ -21,7 +21,7 @@ These two make it easy to save individual variables.
 These two are wrappers for common SQL commands.
 
 * `show_tables`: Return a set containing the names of the tables in the database.
-* `drop`: Delete a particular table.
+* `drop_table`: Delete a particular table.
 
 This one lets you commit any changes that you previously delayed.
 

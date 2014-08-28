@@ -181,9 +181,9 @@ DumpTruck provides specialized wrapper around some common commands.
 
     dt.tables()
 
-`DumpTruck.drop` drops a table.
+`DumpTruck.drop_table` drops a table.
 
-    dt.drop("diesel-engineers")
+    dt.drop_table("diesel-engineers")
 
 `DumpTruck.dump` returns the entire particular table as a list of dictionaries.
 
@@ -251,7 +251,7 @@ For more information on indices and, particularly, the `PRAGMA` commands, check
 the [SQLite documentation]().
 
 ### Delaying commits
-By default, the `insert`, `get_var`, `drop` and `execute` methods automatically commit changes.
+By default, the `insert`, `get_var`, `drop_table` and `execute` methods automatically commit changes.
 You can stop one of them from committing by passing `commit=False` to the method.
 Commit manually with the `commit` method.  For example:
 

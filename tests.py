@@ -174,16 +174,16 @@ class TestDump(TestDb):
 class TestDrop(TestDb):
   def test_drop_nonexistant(self):
     h = DumpTruck(dbname = '/tmp/test.db')
-    self.assertRaises(sqlite3.OperationalError, h.drop)
+    self.assertRaises(sqlite3.OperationalError, h.drop_table)
 
   def test_drop_nonexistant_if_exists(self):
     h = DumpTruck(dbname = '/tmp/test.db')
-    h.drop(if_exists = True)
+    h.drop_table(if_exists = True)
 
   def test_save(self):
     h = DumpTruck(dbname = '/tmp/test.db')
     h.insert({'firstname': 'Robert', 'lastname': 'LeTourneau'}, 'foo')
-    h.drop('foo')
+    h.drop_table('foo')
     self.assertEqual(h.tables(), set([]))
     h.close()
 

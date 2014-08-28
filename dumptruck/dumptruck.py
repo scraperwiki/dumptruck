@@ -163,6 +163,19 @@ class DumpTruck(old_dumptruck.DumpTruck):
                     s = sqlalchemy.sql.text('ALTER TABLE {} ADD {} {}'.format(table_name, new_column.name, new_column.type))
                     self.conn.execute(s)
 
+    def drop_table(self, table_name='dumptruck', if_exists=False, **kwargs):
+        """
+        Drop a table. If if_exists is True, the existence of the table
+        will be checked first, otherwise dropping a nonexistant table
+        will result in an error.
+        """
+        metadata = sqlalchemy.MetaData(bind=self.engine)
+        metadata.reflect()
+
+        table = sqlalchemy.Table(table_name, metadata)
+
+        table.drop(bind=self.engine, checkfirst=if_exists)
+
     def create_index(self, column_names, table_name, if_not_exists=True, unique=False, **kwargs):
         """
         Create a new index of the columns in column_names, where column_names is a list of strings,
