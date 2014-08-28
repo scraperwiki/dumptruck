@@ -77,6 +77,10 @@ class DumpTruck(old_dumptruck.DumpTruck):
         self.trans = self.conn.begin()
 
     def execute(self, sql_query, *args, **kwargs):
+        """
+        Execute an arbitrary SQL query given by sql_query, returning any
+        results as a list of OrderedDicts.
+        """
         s = sqlalchemy.sql.text(sql_query)
 
         if kwargs.get('commit', self.auto_commit):
@@ -93,9 +97,20 @@ class DumpTruck(old_dumptruck.DumpTruck):
         return [OrderedDict(row) for row in result.fetchall()]
 
     def upsert(self, *args, **kwargs):
+        """
+        Insert the given data into the table table_name, where data is a list
+        of dictionaries keyed by column name. Inserting a row with an index value
+        already present in the database will result in the row being replaced.
+        """
         self.insert(upsert=True, *args, **kwargs)
 
     def insert(self, data, table_name='dumptruck', upsert=False, **kwargs):
+        """
+        Insert the given data into the table table_name, where data is a list
+        of dictionaries keyed by column name. If upsert is True, inserting a row
+        with an index value already present in the database will result in the row
+        being replaced, otherwise doing so will generate an error.
+        """
         # Skip if empty
         if len(data) == 0 and not hasattr(data, 'keys'):
             return
@@ -114,10 +129,15 @@ class DumpTruck(old_dumptruck.DumpTruck):
             self.commit()
 
     def create_table(self, data, table_name, **kwargs):
+        """
+        Create a new table with name table_name and column names and types
+        based on the first element of data, where data is a list of dictionaries or
+        OrderedDicts keyed by column name.
+        """
         converted_data = convert(data)
 
         if len(converted_data) == 0 or converted_data[0] == []:
-            raise ValueError('You passed no sample values, or all the values you passed were null.')
+            raise ValueError('You passed no sample values, or all the values you passed were None.')
         else:
             startdata = OrderedDict(converted_data[0])
 
@@ -143,7 +163,12 @@ class DumpTruck(old_dumptruck.DumpTruck):
                     self.conn.execute(s)
 
     def create_index(self, column_names, table_name, if_not_exists=True, unique=False, **kwargs):
-        """Create a unique index on the column(s) passed."""
+        """
+        Create a new index of the columns in column_names, where column_names is a list of strings,
+        on table table_name. If unique is True, it will be a unique index. If if_not_exists is True,
+        the index be checked to make sure it does not already exists, otherwise creating duplicate
+        indices will result in an error.
+        """
         metadata = sqlalchemy.MetaData(bind=self.engine)
         metadata.reflect()
         table = sqlalchemy.Table(table_name, metadata)
@@ -160,8 +185,10 @@ class DumpTruck(old_dumptruck.DumpTruck):
             index.create(bind=self.engine)
 
     def get_column_type(self, column_value):
+        """Return the appropriate SQL column type for the given value."""
         return PYTHON_SQLITE_TYPE_MAP[type(column_value)]
 
     def commit(self):
+        """Commit any pending changes to the database."""
         self.trans.commit()
         self.trans = self.conn.begin()
