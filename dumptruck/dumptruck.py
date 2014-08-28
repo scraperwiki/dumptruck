@@ -140,7 +140,8 @@ class DumpTruck(old_dumptruck.DumpTruck):
         """
         Create a new table with name table_name and column names and types
         based on the first element of data, where data is a list of dictionaries or
-        OrderedDicts keyed by column name.
+        OrderedDicts keyed by column name. If the table already exists, it will be
+        altered to include any new columns.
         """
         converted_data = convert(data)
 
