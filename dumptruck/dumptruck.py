@@ -28,7 +28,7 @@ import datetime
 import json
 from collections import OrderedDict
 import sqlalchemy
-from sqlalchemy.dialects.sqlite import TEXT, INTEGER, BOOLEAN, FLOAT, DATE, DATETIME 
+from sqlalchemy.dialects.sqlite import TEXT, INTEGER, BOOLEAN, FLOAT, DATE, DATETIME, BLOB
 from convert import convert, simplify
 
 import old_dumptruck
@@ -36,7 +36,7 @@ import old_dumptruck
 class JSONObject(sqlalchemy.TypeDecorator):
     """Represents a dict, list or set as a json-encoded string."""
 
-    impl = sqlalchemy.String
+    impl = TEXT
 
     def process_bind_param(self, value, dialect):
         if value is not None:
@@ -50,6 +50,9 @@ class JSONObject(sqlalchemy.TypeDecorator):
         if value is not None:
             value = json.loads(value)
         return value
+
+class Blob(str):
+    """Represents a string as a blob."""
 
 PYTHON_SQLITE_TYPE_MAP = {
     unicode: TEXT,
@@ -65,16 +68,20 @@ PYTHON_SQLITE_TYPE_MAP = {
 
     dict: JSONObject,
     list: JSONObject,
-    set: JSONObject
+    set: JSONObject,
+
+    Blob: BLOB
 }
 
 class DumpTruck(old_dumptruck.DumpTruck):
-    def __init__(self, dbname = 'dumptruck.db', vars_table = '_dumptruckvars', vars_table_tmp = '_dumptruckvarstmp', auto_commit=True, adapt_and_convert=True, timeout=5):
+    def __init__(self, dbname = 'dumptruck.db', vars_table = '_dumptruckvars', auto_commit=True, adapt_and_convert=True, timeout=5):
         self.auto_commit = auto_commit
 
         self.engine = sqlalchemy.create_engine('sqlite:///{}'.format(dbname), echo=True, connect_args={'timeout': timeout})
         self.conn = self.engine.connect()
         self.trans = self.conn.begin()
+
+        self.__vars_table = vars_table
 
     def execute(self, sql_query, *args, **kwargs):
         """
@@ -197,6 +204,14 @@ class DumpTruck(old_dumptruck.DumpTruck):
         index = sqlalchemy.schema.Index(index_name, *columns, unique=unique)
         if index.name not in current_indices or not if_not_exists:
             index.create(bind=self.engine)
+
+    def save_var(self, key, value, **kwargs):
+        """Save one variable to the database."""
+        column_type = self.get_column_type(value)
+        row = OrderedDict([['key', key], ['value', Blob(value)], ['type', str(column_type)]])
+
+        self.create_table([row], self.__vars_table)
+        self.insert([row], self.__vars_table)
 
     def get_column_type(self, column_value):
         """Return the appropriate SQL column type for the given value."""
