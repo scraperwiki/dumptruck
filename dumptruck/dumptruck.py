@@ -79,17 +79,18 @@ class DumpTruck(old_dumptruck.DumpTruck):
     def execute(self, sql_query, *args, **kwargs):
         """
         Execute an arbitrary SQL query given by sql_query, returning any
-        results as a list of OrderedDicts.
+        results as a list of OrderedDicts. A list of data can be supplied,
+        which is substitued into question marks in the query.
         """
-        s = sqlalchemy.sql.text(sql_query)
+        data = args
 
         if kwargs.get('commit', self.auto_commit):
             self.trans.commit()
             with self.conn.begin() as transaction:
-                result = self.conn.execute(s)
+                result = self.conn.execute(sql_query, data)
             self.trans = self.conn.begin()
         else:
-            result = self.conn.execute(s)
+            result = self.conn.execute(sql_query, data)
 
         if not result.returns_rows:
             return None
