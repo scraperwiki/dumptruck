@@ -76,15 +76,10 @@ PYTHON_SQLITE_TYPE_MAP = {
 }
 
 class DumpTruck(old_dumptruck.DumpTruck):
-    def __init__(self, dbname = 'dumptruck.db', vars_table = '_dumptruckvars', auto_commit=True, adapt_and_convert=True, timeout=5, temporary=False):
+    def __init__(self, dbname = 'dumptruck.db', vars_table = '_dumptruckvars', auto_commit=True, adapt_and_convert=True, timeout=5):
         self.auto_commit = auto_commit
 
-        if temporary:
-            db_path = 'sqlite://'
-        else:
-            db_path = 'sqlite:///{}'.format(dbname)
-
-        self.engine = sqlalchemy.create_engine(db_path, echo=False, connect_args={'timeout': timeout})
+        self.engine = sqlalchemy.create_engine('sqlite:///{}'.format(dbname), echo=False, connect_args={'timeout': timeout})
         self.conn = self.engine.connect()
         self.trans = self.conn.begin()
         self.connection = self.trans # To preserve API
@@ -240,11 +235,11 @@ class DumpTruck(old_dumptruck.DumpTruck):
         result = self.conn.execute(s).fetchone()
 
         # Insert data into temporary table and select it, to get the right type
-        dt = DumpTruck(temporary=True, adapt_and_convert=False)
-        dt.execute("CREATE TABLE tmp ('value' {0})".format(result.type), commit=True)
+        self.execute("CREATE TEMPORARY TABLE tmp ('value' {0})".format(result.type))
         t = sqlalchemy.sql.text("INSERT INTO tmp VALUES (:value)")
-        dt.conn.execute(t, value=result.value)
-        var = dt.dump('tmp')[0].get('value')
+        self.conn.execute(t, value=result.value)
+        var = self.dump('tmp')[0].get('value')
+        self.execute("DROP TABLE tmp")
 
         if not result:
             raise NameError('The DumpTruck variables table doesn\'t have a value for %s.' % key)
