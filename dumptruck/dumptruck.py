@@ -50,7 +50,7 @@ PYTHON_SQLITE_TYPE_MAP = {
 }
 
 class DumpTruck:
-    def __init__(self, dbname = 'dumptruck.db', vars_table = '_dumptruckvars', auto_commit=True, timeout=5, adapt_and_convert=None):
+    def __init__(self, dbname = 'dumptruck.db', vars_table = '_dumptruckvars', auto_commit=True, timeout=5, **kwargs):
         self.auto_commit = auto_commit
 
         self.engine = sqlalchemy.create_engine('sqlite:///{}'.format(dbname), echo=False, connect_args={'timeout': timeout})
