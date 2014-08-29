@@ -31,8 +31,6 @@ import sqlalchemy
 from sqlalchemy.dialects.sqlite import TEXT, INTEGER, BOOLEAN, FLOAT, DATE, DATETIME, BLOB
 from convert import convert, simplify
 
-import old_dumptruck
-
 class JSONObject(sqlalchemy.TypeDecorator):
     """Represents a dict, list or set as a json-encoded string."""
 
@@ -75,7 +73,7 @@ PYTHON_SQLITE_TYPE_MAP = {
     Blob: BLOB
 }
 
-class DumpTruck(old_dumptruck.DumpTruck):
+class DumpTruck:
     def __init__(self, dbname = 'dumptruck.db', vars_table = '_dumptruckvars', auto_commit=True, adapt_and_convert=True, timeout=5):
         self.auto_commit = auto_commit
 
