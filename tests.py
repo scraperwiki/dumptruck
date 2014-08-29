@@ -25,7 +25,7 @@
 from collections import OrderedDict
 from unittest import TestCase, main
 from json import dumps
-from dumptruck import DumpTruck, Pickle, quote
+from dumptruck import DumpTruck
 import sqlite3
 import os, shutil
 import datetime
