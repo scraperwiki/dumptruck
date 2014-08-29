@@ -25,28 +25,9 @@
 
 import re
 import datetime
-import json
 from collections import OrderedDict
 import sqlalchemy
 from sqlalchemy.dialects.sqlite import TEXT, INTEGER, BOOLEAN, FLOAT, DATE, DATETIME, BLOB
-
-class JSONObject(sqlalchemy.TypeDecorator):
-    """Represents a dict, list or set as a json-encoded string."""
-
-    impl = TEXT
-
-    def process_bind_param(self, value, dialect):
-        if value is not None:
-            if type(value) == dict or type(value) == list or type(value) == set:
-                if type(value) == set:
-                    value = list(value)
-                value = json.dumps(value)
-        return value
-
-    def process_result_value(self, value, dialect):
-        if value is not None:
-            value = json.loads(value)
-        return value
 
 class Blob(str):
     """Represents a string as a blob."""
@@ -64,10 +45,6 @@ PYTHON_SQLITE_TYPE_MAP = {
 
     datetime.date: DATE,
     datetime.datetime: DATETIME,
-
-    dict: JSONObject,
-    list: JSONObject,
-    set: JSONObject,
 
     Blob: BLOB
 }
