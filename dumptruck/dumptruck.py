@@ -76,10 +76,15 @@ PYTHON_SQLITE_TYPE_MAP = {
 }
 
 class DumpTruck(old_dumptruck.DumpTruck):
-    def __init__(self, dbname = 'dumptruck.db', vars_table = '_dumptruckvars', auto_commit=True, adapt_and_convert=True, timeout=5):
+    def __init__(self, dbname = 'dumptruck.db', vars_table = '_dumptruckvars', auto_commit=True, adapt_and_convert=True, timeout=5, temporary=False):
         self.auto_commit = auto_commit
 
-        self.engine = sqlalchemy.create_engine('sqlite:///{}'.format(dbname), echo=True, connect_args={'timeout': timeout})
+        if temporary:
+            db_path = 'sqlite://'
+        else:
+            db_path = 'sqlite:///{}'.format(dbname)
+
+        self.engine = sqlalchemy.create_engine(db_path, echo=False, connect_args={'timeout': timeout})
         self.conn = self.engine.connect()
         self.trans = self.conn.begin()
         self.connection = self.trans # To preserve API
@@ -214,10 +219,11 @@ class DumpTruck(old_dumptruck.DumpTruck):
         """Save one variable to the database."""
         column_type = self.get_column_type(value)
         #TODO: Use blob type, using text for now
-        row = OrderedDict([['key', key], ['value', value], ['type', column_type.__visit_name__.lower()]])
+        type_row = OrderedDict([['key', ''], ['value', ''], ['type', '']])
+        data_row = OrderedDict([['key', key], ['value', value], ['type', column_type.__visit_name__.lower()]])
 
-        self.create_table([row], self.__vars_table)
-        self.insert([row], self.__vars_table)
+        self.create_table([type_row], self.__vars_table)
+        self.insert([data_row], self.__vars_table)
 
         if kwargs.get('commit', self.auto_commit):
             self.commit()
@@ -230,13 +236,20 @@ class DumpTruck(old_dumptruck.DumpTruck):
         metadata.reflect()
         table = sqlalchemy.Table(self.__vars_table, metadata)
 
-        s = sqlalchemy.select([table.c.value]).where(table.c.key == key)
+        s = sqlalchemy.select([table.c.value, table.c.type]).where(table.c.key == key)
         result = self.conn.execute(s).fetchone()
+
+        # Insert data into temporary table and select it, to get the right type
+        dt = DumpTruck(temporary=True, adapt_and_convert=False)
+        dt.execute("CREATE TABLE tmp ('value' {0})".format(result.type), commit=True)
+        t = sqlalchemy.sql.text("INSERT INTO tmp VALUES (:value)")
+        dt.conn.execute(t, value=result.value)
+        var = dt.dump('tmp')[0].get('value')
 
         if not result:
             raise NameError('The DumpTruck variables table doesn\'t have a value for %s.' % key)
         else:
-            return result[0]
+            return var
 
     def get_column_type(self, column_value):
         """Return the appropriate SQL column type for the given value."""
@@ -246,3 +259,6 @@ class DumpTruck(old_dumptruck.DumpTruck):
         """Commit any pending changes to the database."""
         self.trans.commit()
         self.trans = self.conn.begin()
+
+    def dump(self, table_name='dumptruck'):
+        return self.execute("SELECT * FROM {}".format(table_name))
