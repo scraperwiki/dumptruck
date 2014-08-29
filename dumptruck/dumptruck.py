@@ -29,7 +29,6 @@ import json
 from collections import OrderedDict
 import sqlalchemy
 from sqlalchemy.dialects.sqlite import TEXT, INTEGER, BOOLEAN, FLOAT, DATE, DATETIME, BLOB
-from convert import convert, simplify
 
 class JSONObject(sqlalchemy.TypeDecorator):
     """Represents a dict, list or set as a json-encoded string."""
@@ -74,7 +73,7 @@ PYTHON_SQLITE_TYPE_MAP = {
 }
 
 class DumpTruck:
-    def __init__(self, dbname = 'dumptruck.db', vars_table = '_dumptruckvars', auto_commit=True, adapt_and_convert=True, timeout=5):
+    def __init__(self, dbname = 'dumptruck.db', vars_table = '_dumptruckvars', auto_commit=True, timeout=5, adapt_and_convert=None):
         self.auto_commit = auto_commit
 
         self.engine = sqlalchemy.create_engine('sqlite:///{}'.format(dbname), echo=False, connect_args={'timeout': timeout})
@@ -141,16 +140,23 @@ class DumpTruck:
     def create_table(self, data, table_name, **kwargs):
         """
         Create a new table with name table_name and column names and types
-        based on the first element of data, where data is a list of dictionaries or
-        OrderedDicts keyed by column name. If the table already exists, it will be
-        altered to include any new columns.
+        based on the first element of data, where data is a list (or single instance)
+        of dictionaries or OrderedDicts keyed by column name. If the table already
+        exists, it will be altered to include any new columns.
         """
-        converted_data = convert(data)
-
-        if len(converted_data) == 0 or converted_data[0] == []:
-            raise ValueError('You passed no sample values, or all the values you passed were None.')
+        if type(data) == OrderedDict or type(data) == dict:
+            startdata = data
         else:
-            startdata = OrderedDict(converted_data[0])
+            startdata = data[0]
+
+        all_none = True
+        for value in startdata.values():
+            if value is not None:
+                all_none = False
+                break
+
+        if len(data) == 0 or all_none:
+            raise ValueError('You passed no sample values, or all the values you passed were None.')
 
         metadata = sqlalchemy.MetaData(bind=self.engine)
         metadata.reflect()
@@ -197,7 +203,8 @@ class DumpTruck:
         metadata.reflect()
         table = sqlalchemy.Table(table_name, metadata)
 
-        index_name = simplify(table_name) + '_' + '_'.join(map(simplify, column_names))
+        index_name = re.sub(r'[^a-zA-Z0-9]', '', table_name) + '_'
+        index_name += '_'.join(map(lambda x: re.sub(r'[^a-zA-Z0-9]', '', x), column_names))
 
         columns = []
         for column_name in column_names:
