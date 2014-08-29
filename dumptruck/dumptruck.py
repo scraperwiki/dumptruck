@@ -218,9 +218,8 @@ class DumpTruck:
     def save_var(self, key, value, **kwargs):
         """Save one variable to the database."""
         column_type = self.get_column_type(value)
-        #TODO: Use blob type, using text for now
-        type_row = OrderedDict([['key', ''], ['value', ''], ['type', '']])
-        data_row = OrderedDict([['key', key], ['value', value], ['type', column_type.__visit_name__.lower()]])
+        type_row = OrderedDict([['key', ''], ['value', Blob()], ['type', '']])
+        data_row = OrderedDict([['key', key], ['value', Blob(value)], ['type', column_type.__visit_name__.lower()]])
 
         self.create_table([type_row], self.__vars_table)
         self.insert([data_row], self.__vars_table)
