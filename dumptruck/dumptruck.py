@@ -30,7 +30,7 @@ import sqlalchemy
 from sqlalchemy.dialects.sqlite import TEXT, INTEGER, BOOLEAN, FLOAT, DATE, DATETIME, BLOB
 
 class Blob(str):
-    """Represents a string as a blob."""
+    """Represents a blob as a string."""
     def __init__(self, *args, **kwargs):
         super(Blob, self).__init__(*args, **kwargs)
 
@@ -63,8 +63,8 @@ class DumpTruck:
     def execute(self, sql_query, *args, **kwargs):
         """
         Execute an arbitrary SQL query given by sql_query, returning any
-        results as a list of OrderedDicts. A list of data can be supplied,
-        which is substitued into question marks in the query.
+        results as a list of OrderedDicts. A list of values can be supplied as an,
+        additional argument, which will be substitued into question marks in the query.
         """
         data = args
 
@@ -117,9 +117,10 @@ class DumpTruck:
     def create_table(self, data, table_name, **kwargs):
         """
         Create a new table with name table_name and column names and types
-        based on the first element of data, where data is a list (or single instance)
-        of dictionaries or OrderedDicts keyed by column name. If the table already
-        exists, it will be altered to include any new columns.
+        based on the first element of data. Data can be a single data element,
+        or a list of data elements where a data element is a dictionaries or
+        OrderedDicts keyed by column name. If the table already exists, it
+        will be altered to include any new columns.
         """
         if type(data) == OrderedDict or type(data) == dict:
             startdata = data
@@ -193,7 +194,10 @@ class DumpTruck:
             index.create(bind=self.engine)
 
     def save_var(self, key, value, **kwargs):
-        """Save one variable to the database."""
+        """
+        Save a variable to the table specified by self.vars_table. Key is
+        the name of the variable, and value is the value.
+        """
         column_type = self.get_column_type(value)
         type_row = OrderedDict([['key', ''], ['value', Blob()], ['type', '']])
         data_row = OrderedDict([['key', key], ['value', Blob(value)], ['type', column_type.__visit_name__.lower()]])
@@ -205,7 +209,10 @@ class DumpTruck:
             self.commit()
 
     def get_var(self, key):
-        """Read one saved variable from the database."""
+        """
+        Returns the variable with the provided key from the
+        table specified by self.vars_table.
+        """
         self.commit()
 
         metadata = sqlalchemy.MetaData(bind=self.engine)
@@ -228,13 +235,20 @@ class DumpTruck:
             return var
 
     def get_column_type(self, column_value):
-        """Return the appropriate SQL column type for the given value."""
+        """
+        Return the appropriate SQL column type for the given value.
+        """
         return PYTHON_SQLITE_TYPE_MAP[type(column_value)]
 
     def commit(self):
-        """Commit any pending changes to the database."""
+        """
+        Commit any pending changes to the database.
+        """
         self.trans.commit()
         self.trans = self.conn.begin()
 
     def dump(self, table_name='dumptruck'):
+        """
+        Return the complete contents of the table table_name.
+        """
         return self.execute("SELECT * FROM {}".format(table_name))
