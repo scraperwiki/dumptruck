@@ -101,7 +101,7 @@ class TestIndices(TestDb):
         dt.execute('create table pineapple (bar integer, baz integer);')
         dt.create_index(['bar', 'baz'], 'pineapple')
 
-        with self.assertRaises(sqlite3.OperationalError):
+        with self.assertRaises(sqlalchemy.exc.OperationalError):
             dt.create_index(['bar', 'baz'], 'pineapple', if_not_exists = False)
 
     def test_create_if_not_exists(self):
@@ -278,7 +278,7 @@ class TestCreateTable(TestDb):
     def test_if_exists(self):
         dt = DumpTruck(dbname = '/tmp/test.db')
         dt.create_table({'foo': 'bar'}, 'zort')
-        with self.assertRaises(sqlite3.OperationalError):
+        with self.assertRaises(sqlalchemy.exc.OperationalError):
             dt.create_table({'foo': 'bar'}, 'zort', error_if_exists = True)
 
 class TestCreateTableOnInsert(TestDb):
