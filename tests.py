@@ -200,18 +200,9 @@ class TestSaveVar(TestDb):
         self.assertEqual(observed, expected)
 
     def test_has_some_index(self):
-        '''
-        PRAGMA index_info(index-name);
-
-        This pragma returns one row each column in the named index. The first column of the result is the rank of the column within the index. The second column of the result is the rank of the column within the table. The third column of output is the name of the column being indexed.
-
-        PRAGMA index_list(table-name);
-
-        This pragma returns one row for each index associated with the given table. Columns of the result set include the index name and a flag to indicate whether or not the index is UNIQUE.
-        '''
         self.cursor.execute(u'PRAGMA index_list(_dumptruckvars)')
         indices = self.cursor.fetchall()
-#   self.assertNotEqual(indices,[])
+        self.assertNotEqual(indices,[])
 
 class DumpTruckVars(TestDb):
     def save(self, key, value):
