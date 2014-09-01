@@ -228,8 +228,7 @@ class DumpTruck:
 
         self.create_table([type_row], self.__vars_table)
         self.create_index(['key'], self.__vars_table, unique=True)
-        self.insert([data_row], self.__vars_table)
-
+        self.upsert([data_row], self.__vars_table)
 
         if kwargs.get('commit', self.auto_commit):
             self.commit()
