@@ -631,7 +631,7 @@ class TestNull(SaveAndCheck):
     "The first row must have a non-null value so the schema can be defined."
     dt = DumpTruck(dbname = '/tmp/test.db')
     with self.assertRaises(ValueError):
-      dt.insert({'foo': None, 'bar': None}, 'two')
+      dt.create_table({'foo': None, 'bar': None}, 'two')
     dt.close()
 
   def test_second_insert(self):
@@ -654,17 +654,17 @@ class TestNull(SaveAndCheck):
     "The first row must have a non-null value so the schema can be defined."
     dt = DumpTruck(dbname = '/tmp/test.db')
     with self.assertRaises(ValueError):
-      dt.insert({}, 'two')
+      dt.create_table({}, 'two')
     dt.close()
 
   def test_empty_row_second_insert(self):
-    "An empty row acts like any other row."
+    "An empty row has no effect"
     dt = DumpTruck(dbname = '/tmp/test.db')
     dt.create_table({'foo': 'uhtnh', 'bar': 'aoue'}, 'nine')
     dt.insert({}, 'nine')
     c = dt.execute('select count(*) as c from nine')[0]['c']
     dt.close()
-    self.assertEqual(c, 1)
+    self.assertEqual(c, 0)
 
   def test_no_rows_create_table(self):
     "The insert must have a row so the schema can be defined."
