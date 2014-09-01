@@ -116,7 +116,11 @@ class DumpTruck:
         prefixes = ['OR REPLACE'] if upsert else []
 
         metadata = sqlalchemy.MetaData(bind=self.engine)
-        metadata.reflect(only=[table_name])
+
+        try:
+            metadata.reflect(only=[table_name])
+        except sqlalchemy.exc.InvalidRequestError:
+            raise ValueError("no such table: {}".format(table_name))
 
         table = sqlalchemy.Table(table_name, metadata, extend_existing=True)
 
