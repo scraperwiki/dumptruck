@@ -32,12 +32,12 @@ import os, shutil
 import datetime
 import lxml.etree, lxml.html
 
-DB_FILE = '/tmp/test.db'
+DB_FILE = ':memory:'
 
 class TestUnicode(TestCase):
     def test_unicode_insert(self):
         import dumptruck
-        dt = dumptruck.DumpTruck(':memory:')
+        dt = dumptruck.DumpTruck(DB_FILE)
         dt.create_table({'a': 1}, u'\u1234')
         dt.insert(table_name=u'\u1234', data={'a': 1})
         dt.insert(table_name=u'\u1234', data={'a': 1})
@@ -51,7 +51,7 @@ class TestDb(TestCase):
 
     def cleanUp(self):
         'Clean up temporary files.'
-        for filename in ('/tmp/test.db', 'dumptruck.db'):
+        for filename in (DB_FILE, 'dumptruck.db'):
             try:
                 os.remove(filename)
             except OSError as e:
@@ -59,7 +59,7 @@ class TestDb(TestCase):
 
 class TestQuoting(TestDb):
     def test_question_mark(self):
-        dt = DumpTruck(dbname = '/tmp/test.db')
+        dt = DumpTruck(dbname = DB_FILE)
         dt.execute('CREATE TABLE foo (bar TEXT)')
         dt.execute('INSERT INTO foo(bar) VALUES (?)', ['baz'])
         observed = [row['bar'] for row in dt.execute('SELECT bar from foo')]
@@ -67,11 +67,11 @@ class TestQuoting(TestDb):
 
 class TestDump(TestDb):
     def test_dump_nonexistant(self):
-        h = DumpTruck(dbname = '/tmp/test.db')
+        h = DumpTruck(dbname = DB_FILE)
         self.assertRaises(sqlalchemy.exc.OperationalError, h.dump)
 
     def test_save(self):
-        h = DumpTruck(dbname = '/tmp/test.db')
+        h = DumpTruck(dbname = DB_FILE)
         data = [{'firstname': 'Robert', 'lastname': 'LeTourneau'}]
         h.create_table(data, 'foo')
         h.insert(data, 'foo')
@@ -80,15 +80,15 @@ class TestDump(TestDb):
 
 class TestDrop(TestDb):
     def test_drop_nonexistant(self):
-        h = DumpTruck(dbname = '/tmp/test.db')
+        h = DumpTruck(dbname = DB_FILE)
         self.assertRaises(sqlalchemy.exc.OperationalError, h.drop_table)
 
     def test_drop_nonexistant_if_exists(self):
-        h = DumpTruck(dbname = '/tmp/test.db')
+        h = DumpTruck(dbname = DB_FILE)
         h.drop_table(if_exists = True)
 
     def test_save(self):
-        h = DumpTruck(dbname = '/tmp/test.db')
+        h = DumpTruck(dbname = DB_FILE)
         h.create_table({'firstname': 'Robert', 'lastname': 'LeTourneau'}, 'foo')
         h.insert({'firstname': 'Robert', 'lastname': 'LeTourneau'}, 'foo')
         h.drop_table('foo')
@@ -97,7 +97,7 @@ class TestDrop(TestDb):
 
 class TestIndices(TestDb):
     def test_create_if_exists(self):
-        dt = DumpTruck(dbname = '/tmp/test.db')
+        dt = DumpTruck(dbname = DB_FILE)
         dt.execute('create table pineapple (bar integer, baz integer);')
         dt.create_index(['bar', 'baz'], 'pineapple')
 
@@ -105,7 +105,7 @@ class TestIndices(TestDb):
             dt.create_index(['bar', 'baz'], 'pineapple', if_not_exists = False)
 
     def test_create_if_not_exists(self):
-        dt = DumpTruck(dbname = '/tmp/test.db')
+        dt = DumpTruck(dbname = DB_FILE)
         dt.execute('create table mango (bar integer, baz integer);')
         dt.create_index(['bar', 'baz'], 'mango')
 
@@ -113,7 +113,7 @@ class TestIndices(TestDb):
         dt.create_index(['bar', 'baz'], 'mango', if_not_exists = True)
 
     def test_unique(self):
-        dt = DumpTruck(dbname = '/tmp/test.db')
+        dt = DumpTruck(dbname = DB_FILE)
         dt.execute('create table watermelon (bar integer, baz integer);')
         dt.create_index(['bar', 'baz'], 'watermelon', unique = True)
         observed = dt.execute('PRAGMA index_info(watermelon_bar_baz)')
@@ -139,7 +139,7 @@ class TestIndices(TestDb):
         self.assertEqual(index[u'unique'], 1)
 
     def test_non_unique(self):
-        dt = DumpTruck(dbname = '/tmp/test.db')
+        dt = DumpTruck(dbname = DB_FILE)
         dt.execute('create table tomato (bar integer, baz integer);')
         dt.create_index(['bar', 'baz'], 'tomato')
         observed = dt.execute('PRAGMA index_info(tomato_bar_baz)')
@@ -166,14 +166,14 @@ class TestIndices(TestDb):
 
 class SaveGetVar(TestDb):
     def savegetvar(self, var):
-        h = DumpTruck(dbname = '/tmp/test.db')
+        h = DumpTruck(dbname = DB_FILE)
         h.save_var(u'weird', var)
         h.close()
-        h = DumpTruck(dbname = '/tmp/test.db')
-        t=os.stat('/tmp/test.db').st_mtime
+        h = DumpTruck(dbname = DB_FILE)
+        t=os.stat(DB_FILE).st_mtime
         self.assertEqual(h.get_var(u'weird'), var)
         h.close()
-        assert os.stat('/tmp/test.db').st_mtime==t
+        assert os.stat(DB_FILE).st_mtime==t
 
 class TestSaveGetPickle(SaveGetVar):
     def test_list(self):
@@ -190,10 +190,10 @@ class TestSaveGetDict(SaveGetVar):
 class TestSaveVar(TestDb):
     def setUp(self):
         self.cleanUp()
-        h = DumpTruck(dbname = u'/tmp/test.db')
+        h = DumpTruck(dbname = DB_FILE)
         h.save_var(u'birthday', u'November 30, 1888')
         h.close()
-        connection=sqlite3.connect(u'/tmp/test.db')
+        connection=sqlite3.connect(DB_FILE)
         self.cursor=connection.cursor()
 
     def test_insert(self):
@@ -209,12 +209,12 @@ class TestSaveVar(TestDb):
 
 class DumpTruckVars(TestDb):
     def save(self, key, value):
-        h = DumpTruck(dbname = u'/tmp/test.db')
+        h = DumpTruck(dbname = DB_FILE)
         h.save_var(key, value)
         h.close()
 
     def check(self, key, value, sqltype):
-        connection=sqlite3.connect(u'/tmp/test.db')
+        connection=sqlite3.connect(DB_FILE)
         self.cursor=connection.cursor()
         self.cursor.execute(u'SELECT key, value, `type` FROM `_dumptruckvars`')
         observed = self.cursor.fetchall()
@@ -222,7 +222,7 @@ class DumpTruckVars(TestDb):
         self.assertEqual(observed, expected)
 
     def get(self, key, value):
-        h = DumpTruck(dbname = u'/tmp/test.db')
+        h = DumpTruck(dbname = DB_FILE)
         self.assertEqual(h.get_var(key), value)
         h.close()
 
@@ -257,11 +257,11 @@ class TestSelect(TestDb):
 
 class TestCreateTable(TestDb):
     def test_create_table(self):
-        h = DumpTruck(dbname = '/tmp/test.db')
+        h = DumpTruck(dbname = DB_FILE)
         h.create_table({'foo': 0, 'bar': 1, 'baz': 2}, 'zombies')
         h.close()
 
-        connection=sqlite3.connect('/tmp/test.db')
+        connection=sqlite3.connect(DB_FILE)
         cursor=connection.cursor()
         cursor.execute('SELECT foo, bar, baz FROM zombies')
         observed = cursor.fetchall()
@@ -271,19 +271,19 @@ class TestCreateTable(TestDb):
         self.assertListEqual(observed, expected)
 
     def test_if_not_exists(self):
-        dt = DumpTruck(dbname = '/tmp/test.db')
+        dt = DumpTruck(dbname = DB_FILE)
         dt.create_table({'foo': 'bar'}, 'baz')
         dt.create_table({'foo': 'bar'}, 'baz', error_if_exists = False)
 
     def test_if_exists(self):
-        dt = DumpTruck(dbname = '/tmp/test.db')
+        dt = DumpTruck(dbname = DB_FILE)
         dt.create_table({'foo': 'bar'}, 'zort')
         with self.assertRaises(sqlalchemy.exc.OperationalError):
             dt.create_table({'foo': 'bar'}, 'zort', error_if_exists = True)
 
 class TestCreateTableOnInsert(TestDb):
     def test_if_not_exists(self):
-        dt = DumpTruck(dbname = '/tmp/test.db')
+        dt = DumpTruck(dbname = DB_FILE)
         dt.insert({'foo': 'bar'}, 'baz')
         dt.insert({'foo': 'bar'}, 'baz')
 
@@ -301,7 +301,7 @@ class SaveAndCheck(TestDb):
             tableOut = tableIn
 
         # Insert
-        h = DumpTruck(dbname = '/tmp/test.db')
+        h = DumpTruck(dbname = DB_FILE)
         h.create_table(dataIn, tableIn)
         h.insert(dataIn, table_name=tableIn)
         if twice:
@@ -309,7 +309,7 @@ class SaveAndCheck(TestDb):
         h.close()
 
         # Observe with DumpTruck
-        h = DumpTruck(dbname = '/tmp/test.db')
+        h = DumpTruck(dbname = DB_FILE)
         observed = h.execute(u'SELECT * FROM "%s"' % tableOut)
         h.close()
 
@@ -533,9 +533,9 @@ class TestInvalidDumpTruckParams(TestDb):
 
 class TestDumpTruckParams(TestDb):
     def test_params(self):
-        self.assertFalse(os.path.isfile('/tmp/test.db'))
-        h = DumpTruck(dbname='/tmp/test.db',auto_commit=False,vars_table='baz')
-        self.assertTrue(os.path.isfile('/tmp/test.db'))
+        self.assertFalse(os.path.isfile(DB_FILE))
+        h = DumpTruck(dbname=DB_FILE,auto_commit=False,vars_table='baz')
+        self.assertTrue(os.path.isfile(DB_FILE))
 #   self.assertEqual(h.auto_commit, False)
 #   self.assertEqual(h.__vars_table, 'baz')
 
@@ -550,33 +550,33 @@ class TestParamsDefaults(TestDb):
 class TestCaseInsensitivity(TestDb):
     "Insertions with two keys of the same case are not allowed."
     def test_bad_create_table(self):
-        dt = DumpTruck(dbname = '/tmp/test.db')
+        dt = DumpTruck(dbname = DB_FILE)
         with self.assertRaises(ValueError):
             dt.create_table({'a': 'b', 'A': 'B'}, 'foo')
 
     def test_bad_insert(self):
-        dt = DumpTruck(dbname = '/tmp/test.db')
+        dt = DumpTruck(dbname = DB_FILE)
         with self.assertRaises(ValueError):
             dt.create_table({'a': 'b', 'A': 'B'}, 'foo')
 
 class TestNull(SaveAndCheck):
     def test_create_table(self):
         "The first row must have a non-null value so the schema can be defined."
-        dt = DumpTruck(dbname = '/tmp/test.db')
+        dt = DumpTruck(dbname = DB_FILE)
         with self.assertRaises(ValueError):
             dt.create_table({'foo': None, 'bar': None}, 'one')
         dt.close()
 
     def test_first_insert(self):
         "The first row must have a non-null value so the schema can be defined."
-        dt = DumpTruck(dbname = '/tmp/test.db')
+        dt = DumpTruck(dbname = DB_FILE)
         with self.assertRaises(ValueError):
             dt.create_table({'foo': None, 'bar': None}, 'two')
         dt.close()
 
     def test_second_insert(self):
         "Inserting a second row that is all null adds an empty row."
-        dt = DumpTruck(dbname = '/tmp/test.db')
+        dt = DumpTruck(dbname = DB_FILE)
         dt.create_table({'foo': 'uhtnh', 'bar': 'aoue'}, 'three')
         dt.insert({'foo': None, 'bar': None}, 'three')
         c = dt.execute('select count(*) as c from three')[0]['c']
@@ -585,21 +585,21 @@ class TestNull(SaveAndCheck):
 
     def test_empty_row_create_table(self):
         "The schema row must have a non-null value."
-        dt = DumpTruck(dbname = '/tmp/test.db')
+        dt = DumpTruck(dbname = DB_FILE)
         with self.assertRaises(ValueError):
             dt.create_table({}, 'two')
         dt.close()
 
     def test_empty_row_first_insert(self):
         "The first row must have a non-null value so the schema can be defined."
-        dt = DumpTruck(dbname = '/tmp/test.db')
+        dt = DumpTruck(dbname = DB_FILE)
         with self.assertRaises(ValueError):
             dt.create_table({}, 'two')
         dt.close()
 
     def test_empty_row_second_insert(self):
         "An empty row has no effect"
-        dt = DumpTruck(dbname = '/tmp/test.db')
+        dt = DumpTruck(dbname = DB_FILE)
         dt.create_table({'foo': 'uhtnh', 'bar': 'aoue'}, 'nine')
         dt.insert({}, 'nine')
         c = dt.execute('select count(*) as c from nine')[0]['c']
@@ -608,21 +608,21 @@ class TestNull(SaveAndCheck):
 
     def test_no_rows_create_table(self):
         "The insert must have a row so the schema can be defined."
-        dt = DumpTruck(dbname = '/tmp/test.db')
+        dt = DumpTruck(dbname = DB_FILE)
         with self.assertRaises(ValueError):
             dt.create_table([], 'two')
         dt.close()
 
     def test_no_rows_first_insert(self):
         "Nothing happens if no rows are inserted to a table that isn't there."
-        dt = DumpTruck(dbname = '/tmp/test.db')
+        dt = DumpTruck(dbname = DB_FILE)
         dt.insert([], 'ninety')
         self.assertSetEqual(dt.tables(), set())
         dt.close()
 
     def test_no_rows_second_insert(self):
         "Nothing happens if no rows are inserted to a table that is there."
-        dt = DumpTruck(dbname = '/tmp/test.db')
+        dt = DumpTruck(dbname = DB_FILE)
         dt.create_table({'foo': 'uhtnh', 'bar': 'aoue'}, 'ninety')
         dt.insert([], 'ninety')
         c = dt.execute('select count(*) as c from ninety')[0]['c']
@@ -631,12 +631,12 @@ class TestNull(SaveAndCheck):
 
 class TestRowId(TestDb):
     def test_one(self):
-        dt = DumpTruck(dbname = '/tmp/test.db')
+        dt = DumpTruck(dbname = DB_FILE)
         rowid = dt.insert({u'foo': 8})
         self.assertEqual(rowid, 1)
 
     def test_many(self):
-        dt = DumpTruck(dbname = '/tmp/test.db')
+        dt = DumpTruck(dbname = DB_FILE)
         rowid = dt.insert([{u'foo': 8}, {u'bar': 5}])
         self.assertEqual(rowid, [1, 2])
 
