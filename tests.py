@@ -372,11 +372,12 @@ class SaveCheckSelect(TestDb):
 class SaveAndCheck(TestDb):
   def save_and_check(self, dataIn, tableIn, dataOut, tableOut = None, twice = True):
     if tableOut == None:
-      tableOut = quote(tableIn)
+      tableOut = tableIn
 
     # Insert
     h = DumpTruck(dbname = '/tmp/test.db')
-    h.insert(dataIn, tableIn)
+    h.create_table(dataIn, tableIn)
+    h.insert(dataIn, table_name=tableIn)
     h.close()
 
     # Observe with pysqlite
