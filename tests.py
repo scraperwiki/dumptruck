@@ -175,17 +175,18 @@ class SaveGetVar(TestDb):
         h.close()
         assert os.stat(DB_FILE).st_mtime==t
 
-class TestSaveGetPickle(SaveGetVar):
-    def test_list(self):
-        self.savegetvar(Pickle({30: None}))
-
-class TestSaveGetList(SaveGetVar):
-    def test_list(self):
-        self.savegetvar([])
-
-class TestSaveGetDict(SaveGetVar):
-    def test_dict(self):
-        self.savegetvar({})
+# TODO: Not sure if these are needed
+#class TestSaveGetPickle(SaveGetVar):
+#    def test_list(self):
+#        self.savegetvar(Pickle({30: None}))
+#
+#class TestSaveGetList(SaveGetVar):
+#    def test_list(self):
+#        self.savegetvar([])
+#
+#class TestSaveGetDict(SaveGetVar):
+#    def test_dict(self):
+#        self.savegetvar({})
 
 class TestSaveVar(TestDb):
     def setUp(self):
