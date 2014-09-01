@@ -380,25 +380,15 @@ class SaveAndCheck(TestDb):
     h.insert(dataIn, table_name=tableIn)
     h.close()
 
-    # Observe with pysqlite
-    connection=sqlite3.connect('/tmp/test.db')
-    cursor=connection.cursor()
-    cursor.execute(u'SELECT * FROM "%s"' % tableOut)
-    observed1 = cursor.fetchall()
-    connection.close()
+    # Observe with DumpTruck
+    h = DumpTruck(dbname = '/tmp/test.db')
+    observed = h.execute(u'SELECT * FROM "%s"' % tableOut)
+    h.close()
 
-    if twice:
-      # Observe with DumpTruck
-      h = DumpTruck(dbname = '/tmp/test.db')
-      observed2 = h.execute(u'SELECT * FROM "%s"' % tableOut)
-      h.close()
+    #Check
+    expected = dataOut
 
-      #Check
-      expected1 = dataOut
-      expected2 = [dataIn] if type(dataIn) in (dict, OrderedDict) else dataIn
-
-      self.assertListEqual(observed1, expected1)
-      self.assertListEqual(observed2, expected2)
+    self.assertListEqual(observed, expected)
 
 class SaveAndSelect(TestDb):
   def save_and_select(self, d):
