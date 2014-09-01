@@ -107,8 +107,11 @@ class DumpTruck:
         being replaced, otherwise doing so will generate an error.
         """
         # Skip if empty
-        if len(data) == 0 and not hasattr(data, 'keys'):
+        if len(data) == 0:
             return
+
+        if type(data) in (dict, OrderedDict):
+            data = [data]
 
         prefixes = ['OR REPLACE'] if upsert else []
 
