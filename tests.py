@@ -329,12 +329,6 @@ class TestSelect(TestDb):
     self.assertListEqual(data_observed, data_expected)
     os.remove('landbank_branches.sqlite')
 
-class TestShowTables(TestDb):
-  def test_show_tables(self):
-    shutil.copy('fixtures/landbank_branches.sqlite','/tmp/test.db')
-    h = DumpTruck(dbname = '/tmp/test.db')
-    self.assertSetEqual(h.tables(),set(['blocks','branches']))
-
 class TestCreateTable(TestDb):
   def test_create_table(self):
     h = DumpTruck(dbname = '/tmp/test.db')
