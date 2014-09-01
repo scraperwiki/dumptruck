@@ -142,7 +142,10 @@ class DumpTruck:
         if type(data) == OrderedDict or type(data) == dict:
             startdata = data
         else:
-            startdata = data[0]
+            if len(data) > 0:
+                startdata = data[0]
+            else:
+                startdata = {}
 
         all_none = True
         for value in startdata.values():
