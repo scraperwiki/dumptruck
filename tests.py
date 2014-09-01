@@ -89,6 +89,7 @@ class TestDrop(TestDb):
 
     def test_save(self):
         h = DumpTruck(dbname = '/tmp/test.db')
+        h.create_table({'firstname': 'Robert', 'lastname': 'LeTourneau'}, 'foo')
         h.insert({'firstname': 'Robert', 'lastname': 'LeTourneau'}, 'foo')
         h.drop_table('foo')
         self.assertEqual(h.tables(), set([]))
