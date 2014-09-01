@@ -292,7 +292,7 @@ class DumpTruckVars(TestDb):
     self.cursor=connection.cursor()
     self.cursor.execute(u'SELECT key, value, `type` FROM `_dumptruckvars`')
     observed = self.cursor.fetchall()
-    expected = [(key, value, sqltype)]
+    expected = [(key, buffer(str(value)), sqltype)]
     self.assertEqual(observed, expected)
 
   def get(self, key, value):
