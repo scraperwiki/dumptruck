@@ -193,6 +193,7 @@ class TestSaveVar(TestDb):
     def setUp(self):
         self.cleanUp()
         h = DumpTruck(dbname=DB_FILE_TMP)
+        h.drop_table('_dumptruckvars')
         h.save_var(u'birthday', u'November 30, 1888')
         h.close()
         connection=sqlite3.connect(DB_FILE_TMP)
