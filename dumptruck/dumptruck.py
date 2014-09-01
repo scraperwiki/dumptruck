@@ -29,6 +29,16 @@ from collections import OrderedDict
 import sqlalchemy
 from sqlalchemy.dialects.sqlite import TEXT, INTEGER, BOOLEAN, FLOAT, DATE, DATETIME, BLOB
 
+class NoMicrosecondDatetime(DATETIME):
+    """
+    Allows us to store datetime objects without added microseconds.
+    """
+    def __init__(self, *args, **kwargs):
+        super(NoMicrosecondDatetime, self).__init__(truncate_microseconds=True, *args, **kwargs)
+
+    def adapt(self, impltype, *args, **kwargs):
+        return NoMicrosecondDatetime(*args, **kwargs)
+
 class Blob(str):
     """Represents a blob as a string."""
     def __init__(self, *args, **kwargs):
@@ -106,6 +116,10 @@ class DumpTruck:
         metadata.reflect(only=[table_name])
 
         table = sqlalchemy.Table(table_name, metadata, extend_existing=True)
+
+        for col in table.c:
+            if col.type.__visit_name__  == 'DATETIME':
+                col.type = NoMicrosecondDatetime
 
         for row in data:
             ins = table.insert(prefixes=prefixes).values(data)
@@ -238,6 +252,9 @@ class DumpTruck:
         """
         Return the appropriate SQL column type for the given value.
         """
+        if type(column_value) == datetime.datetime and column_value.microsecond == 0:
+            return NoMicrosecondDatetime
+
         return PYTHON_SQLITE_TYPE_MAP[type(column_value)]
 
     def commit(self):
