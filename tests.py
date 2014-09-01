@@ -81,7 +81,7 @@ class TestDump(TestDb):
 class TestDrop(TestDb):
     def test_drop_nonexistant(self):
         h = DumpTruck(dbname = '/tmp/test.db')
-        self.assertRaises(sqlite3.OperationalError, h.drop_table)
+        self.assertRaises(sqlalchemy.exc.OperationalError, h.drop_table)
 
     def test_drop_nonexistant_if_exists(self):
         h = DumpTruck(dbname = '/tmp/test.db')
