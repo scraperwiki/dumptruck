@@ -37,36 +37,9 @@ class TestUnicode(TestCase):
   def test_unicode_insert(self):
     import dumptruck
     dt = dumptruck.DumpTruck(':memory:')
-    print "one"
-    dt.insert(table_name = u'\u1234', data = {'a':1}, unique_keys = [])
-    print "two"
-    dt.insert(table_name = u'\u1234', data = {'a':1}, unique_keys = [])
-
-class TestQuote(TestCase):
-  def assertQuote(self, textIn, textOut):
-    self.assertEqual(quote(textIn), textOut)
-
-  def test_quote(self):
-    self.assertQuote('a','`a`')
-
-    self.assertQuote('[','`[`')
-    self.assertQuote('`','[`]')
-    self.assertQuote('"','`"`')
-    self.assertQuote('\'','`\'`')
-
-    self.assertQuote('[aoeu]','[aoeu]')
-
-    self.assertQuote('ao 98!?o-_Ho[e&((*^ueu','`ao 98!?o-_Ho[e&((*^ueu`')
-    self.assertQuote('ao 98!?o-_H`oe&((*^ueu','[ao 98!?o-_H`oe&((*^ueu]')
-    self.assertQuote('no^[hs!\'e]?\'sf_"&\'', '`no^[hs!\'e]?\'sf_"&\'`')
-
-class TestQuoteError(TestCase):
-  'Unquotables should raise a particular ValueError.'
-  def assertQuoteError(self, textIn):
-    self.assertRaises(ValueError, lambda: quote(textIn))
-
-  def test_quote_error(self):
-    self.assertQuoteError(']`')
+    dt.create_table({'a': 1}, u'\u1234')
+    dt.insert(table_name=u'\u1234', data={'a': 1})
+    dt.insert(table_name=u'\u1234', data={'a': 1})
 
 class TestDb(TestCase):
   def setUp(self):
