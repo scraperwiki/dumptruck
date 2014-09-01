@@ -102,12 +102,12 @@ class DumpTruck:
 
         prefixes = ['OR REPLACE'] if upsert else []
 
+        metadata = sqlalchemy.MetaData(bind=self.engine)
+        metadata.reflect(only=[table_name])
+
+        table = sqlalchemy.Table(table_name, metadata, extend_existing=True)
+
         for row in data:
-            metadata = sqlalchemy.MetaData(bind=self.engine)
-            metadata.reflect(only=[table_name])
-
-            table = sqlalchemy.Table(table_name, metadata, extend_existing=True)
-
             ins = table.insert(prefixes=prefixes).values(data)
             self.conn.execute(ins)
 
