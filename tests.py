@@ -55,20 +55,6 @@ class TestDb(TestCase):
                 os.remove(filename)
             except OSError as e:
                 pass
-#     if (2, 'No such file or directory')!=e:
-#     raise
-
-#Move this to a ScraperWiki drop-in replacement library.
-#class TestGetVar(TestDb):
-#  def setUp(self):
-#  self.cleanUp()
-#  self.h = DumpTruck(dbname = 'fixtures/absa-dumptruckvars.sqlite',vars_table='swvariables')
-#
-#  def test_existing_var(self):
-#   self.assertEquals(self.h.get_var('DATE'),1329518937.92)
-#
-#  def test_nonexisting_var(self):
-#   self.assertRaises(NameError,self.h.get_var,'nonexistant_var')
 
 class TestQuoting(TestDb):
     def test_question_mark(self):
