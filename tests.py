@@ -26,6 +26,7 @@ from collections import OrderedDict
 from unittest import TestCase, main
 from json import dumps
 from dumptruck import DumpTruck
+import sqlalchemy
 import sqlite3
 import os, shutil
 import datetime
@@ -65,9 +66,9 @@ class TestQuoting(TestDb):
         self.assertListEqual(observed, ['baz'])
 
 class TestDump(TestDb):
-    def test_drop_nonexistant(self):
+    def test_dump_nonexistant(self):
         h = DumpTruck(dbname = '/tmp/test.db')
-        self.assertRaises(sqlite3.OperationalError, h.dump)
+        self.assertRaises(sqlalchemy.exc.OperationalError, h.dump)
 
     def test_save(self):
         h = DumpTruck(dbname = '/tmp/test.db')
