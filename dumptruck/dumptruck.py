@@ -247,6 +247,12 @@ class DumpTruck:
         self.trans.commit()
         self.trans = self.conn.begin()
 
+    def close(self):
+        """
+        Close the connection to the database.
+        """
+        self.conn.close()
+
     def dump(self, table_name='dumptruck'):
         """
         Return the complete contents of the table table_name.
