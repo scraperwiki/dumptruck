@@ -316,7 +316,7 @@ class SaveCheckSelect(TestDb):
   '''
 
 class SaveAndCheck(TestDb):
-  def save_and_check(self, dataIn, tableIn, dataOut, tableOut = None, twice = True):
+  def save_and_check(self, dataIn, tableIn, dataOut, tableOut = None, twice=False):
     if tableOut == None:
       tableOut = tableIn
 
@@ -324,6 +324,8 @@ class SaveAndCheck(TestDb):
     h = DumpTruck(dbname = '/tmp/test.db')
     h.create_table(dataIn, tableIn)
     h.insert(dataIn, table_name=tableIn)
+    if twice:
+      h.insert(dataIn, table_name=tableIn)
     h.close()
 
     # Observe with DumpTruck
