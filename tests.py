@@ -46,7 +46,6 @@ class TestDb(TestCase):
     self.cleanUp()
 
   def tearDown(self):
-    #pass
     self.cleanUp()
 
   def cleanUp(self):
@@ -56,73 +55,20 @@ class TestDb(TestCase):
         os.remove(filename)
       except OSError as e:
         pass
-#       if (2, 'No such file or directory')!=e:
-#         raise
+#     if (2, 'No such file or directory')!=e:
+#     raise
 
 #Move this to a ScraperWiki drop-in replacement library.
 #class TestGetVar(TestDb):
 #  def setUp(self):
-#    self.cleanUp()
-#    self.h = DumpTruck(dbname = 'fixtures/absa-dumptruckvars.sqlite',vars_table='swvariables')
+#  self.cleanUp()
+#  self.h = DumpTruck(dbname = 'fixtures/absa-dumptruckvars.sqlite',vars_table='swvariables')
 #
 #  def test_existing_var(self):
 #   self.assertEquals(self.h.get_var('DATE'),1329518937.92)
 #
 #  def test_nonexisting_var(self):
 #   self.assertRaises(NameError,self.h.get_var,'nonexistant_var')
-
-
-class TestAdaptersAndConverters(TestDb):
-  def test_adapt_list(self):
-    dt = DumpTruck(dbname = '/tmp/test.db', adapt_and_convert = True)
-    dt.execute('create table foo (bar jsontext)')
-    dt.execute("insert into foo values ('[3,5]')")
-    self.assertListEqual(dt.dump('foo'), [OrderedDict([('bar', '[3,5]')])])
-  def test_convert_lxml(self):
-    dt = DumpTruck(dbname = '/tmp/test.db', adapt_and_convert = True)
-    elementstringresult = lxml.html.fromstring('<html>Hi</html>').xpath('//*/text()')[0]
-    dt.insert({'bar': elementstringresult}, 'foo')
-    self.assertEqual(type(dt.dump('foo')[0]['bar']), unicode)
-
-class TestNoAdaptersAndConverters(TestDb):
-  def test_no_adapt_list(self):
-    dt = DumpTruck(dbname = '/tmp/test.db', adapt_and_convert = False)
-    dt.execute('create table foo (bar jsontext)')
-    dt.execute("insert into foo values ('[3,5]')")
-    self.assertListEqual(dt.dump('foo'), [OrderedDict([('bar', '[3,5]')])])
-
-  # TODO: Find out what this test is for
-  '''
-  def test_few_converters(self):
-    dt = DumpTruck(dbname = '/tmp/test.db', adapt_and_convert = False)
-    self.assertLess(len(dt.sqlite3.converters), 5)
-  '''
-
-  # TODO: Find out what this test is for
-  '''
-  def test_lambdas(self):
-    dt = DumpTruck(dbname = '/tmp/test.db', adapt_and_convert = False)
-    for f in dt.sqlite3.converters.values():
-      self.assertEqual(f.__name__, '<lambda>')
-  '''
-
-  def test_special_type_list(self):
-    """Adapters and converters should not be enabled."""
-    dt = DumpTruck(dbname = '/tmp/test.db', adapt_and_convert = False)
-    dt.execute('CREATE TABLE pork_sales (week json);')
-    dt.execute("INSERT INTO pork_sales VALUES ('[12,3,4]')")
-
-    observedData = dt.execute('SELECT week FROM pork_sales')
-    self.assertListEqual(observedData, [OrderedDict([u"week", u"[12,3,4]"])])
-
-  def test_special_type_date(self):
-    """Adapters and converters should not be enabled."""
-    dt = DumpTruck(dbname = '/tmp/test.db', adapt_and_convert = False)
-    dt.execute('CREATE TABLE pork_sales (week date);')
-    dt.execute("INSERT INTO pork_sales VALUES ('2012-10-08')")
-
-    observedData = dt.execute('SELECT week FROM pork_sales')
-    self.assertListEqual(observedData, [{u"week": u"2012-10-08"}])
 
 class TestQuoting(TestDb):
   def test_question_mark(self):
