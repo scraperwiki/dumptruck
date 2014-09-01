@@ -257,6 +257,14 @@ class DumpTruck:
 
         return PYTHON_SQLITE_TYPE_MAP[type(column_value)]
 
+    def tables(self):
+        """
+        Return a set of the names of the tables currently in the database.
+        """
+        metadata = sqlalchemy.MetaData(bind=self.engine)
+        metadata.reflect()
+        return set(metadata.tables.keys())
+
     def commit(self):
         """
         Commit any pending changes to the database.
