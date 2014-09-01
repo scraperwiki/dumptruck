@@ -383,14 +383,14 @@ class SaveAndCheck(TestDb):
     # Observe with pysqlite
     connection=sqlite3.connect('/tmp/test.db')
     cursor=connection.cursor()
-    cursor.execute(u'SELECT * FROM %s' % tableOut)
+    cursor.execute(u'SELECT * FROM "%s"' % tableOut)
     observed1 = cursor.fetchall()
     connection.close()
 
     if twice:
       # Observe with DumpTruck
       h = DumpTruck(dbname = '/tmp/test.db')
-      observed2 = h.execute(u'SELECT * FROM %s' % tableOut)
+      observed2 = h.execute(u'SELECT * FROM "%s"' % tableOut)
       h.close()
 
       #Check
