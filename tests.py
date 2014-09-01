@@ -191,10 +191,10 @@ class SaveGetVar(TestDb):
 class TestSaveVar(TestDb):
     def setUp(self):
         self.cleanUp()
-        h = DumpTruck(dbname = DB_FILE)
+        h = DumpTruck(dbname='/tmp/test.db')
         h.save_var(u'birthday', u'November 30, 1888')
         h.close()
-        connection=sqlite3.connect(DB_FILE)
+        connection=sqlite3.connect('/tmp/test.db')
         self.cursor=connection.cursor()
 
     def test_insert(self):
