@@ -403,6 +403,7 @@ class SaveAndCheck(TestDb):
 class SaveAndSelect(TestDb):
   def save_and_select(self, d):
     dt = DumpTruck()
+    dt.create_table({'foo': d}, 'dumptruck')
     dt.insert({'foo': d})
 
     observed = dt.dump()[0]['foo']
