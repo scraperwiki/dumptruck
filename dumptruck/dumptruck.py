@@ -173,7 +173,7 @@ class DumpTruck:
         metadata.reflect()
 
         if error_if_exists and table_name in metadata.tables.keys():
-            raise sqlalchemy.exc.OperationalError('table already exists: {}'.format(table_name))
+            raise sqlalchemy.exc.OperationalError('table already exists: {}'.format(table_name), '', '')
 
         table = sqlalchemy.Table(table_name, metadata, extend_existing=True)
         original_columns = list(table.columns)
