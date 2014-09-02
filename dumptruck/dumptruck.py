@@ -144,7 +144,7 @@ class DumpTruck:
         if kwargs.get('commit', self.auto_commit):
             self.commit()
 
-    def create_table(self, data, table_name, **kwargs):
+    def create_table(self, data, table_name, error_if_exists=False, **kwargs):
         """
         Create a new table with name table_name and column names and types
         based on the first element of data. Data can be a single data element,
@@ -171,6 +171,9 @@ class DumpTruck:
 
         metadata = sqlalchemy.MetaData(bind=self.engine)
         metadata.reflect()
+
+        if error_if_exists and table_name in metadata.tables.keys():
+            raise sqlalchemy.exc.OperationalError('table already exists: {}'.format(table_name))
 
         table = sqlalchemy.Table(table_name, metadata, extend_existing=True)
         original_columns = list(table.columns)
