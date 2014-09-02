@@ -532,12 +532,11 @@ class TestInvalidDumpTruckParams(TestDb):
         for value in nonstr_values:
             self.assertRaises(TypeError, DumpTruck, vars_table = value)
 
-
 class TestDumpTruckParams(TestDb):
     def test_params(self):
-        self.assertFalse(os.path.isfile(DB_FILE_MEMORY))
+        self.assertFalse(os.path.isfile('/tmp/test_2.db'))
         h = DumpTruck(dbname=DB_FILE_MEMORY,auto_commit=False,vars_table='baz')
-        self.assertTrue(os.path.isfile(DB_FILE_MEMORY))
+        self.assertTrue(os.path.isfile(DB_FILE_TMP))
 #   self.assertEqual(h.auto_commit, False)
 #   self.assertEqual(h.__vars_table, 'baz')
 
