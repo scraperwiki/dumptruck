@@ -237,11 +237,11 @@ class TestSelect(TestDb):
 
 class TestCreateTable(TestDb):
     def test_create_table(self):
-        h = DumpTruck(dbname = DB_FILE_MEMORY)
+        h = DumpTruck(dbname = DB_FILE_TMP)
         h.create_table({'foo': 0, 'bar': 1, 'baz': 2}, 'zombies')
         h.close()
 
-        connection=sqlite3.connect(DB_FILE_MEMORY)
+        connection=sqlite3.connect(DB_FILE_TMP)
         cursor=connection.cursor()
         cursor.execute('SELECT foo, bar, baz FROM zombies')
         observed = cursor.fetchall()
