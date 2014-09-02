@@ -27,7 +27,7 @@ import re
 import datetime
 from collections import OrderedDict
 import sqlalchemy
-from sqlalchemy.dialects.sqlite import TEXT, INTEGER, BOOLEAN, FLOAT, DATE, DATETIME, BLOB
+from sqlalchemy.dialects.sqlite import TEXT, INTEGER, BOOLEAN, REAL, DATE, DATETIME, BLOB
 
 class NoMicrosecondDatetime(DATETIME):
     """
@@ -51,7 +51,7 @@ PYTHON_SQLITE_TYPE_MAP = {
     int: INTEGER,
     long: INTEGER,
     bool: BOOLEAN,
-    float: FLOAT,
+    float: REAL,
 
     datetime.date: DATE,
     datetime.datetime: DATETIME,
