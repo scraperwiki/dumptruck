@@ -213,7 +213,7 @@ class TestSaveVar(TestDb):
 class DumpTruckVars(TestDb):
     def save(self, key, value):
         h = DumpTruck(dbname=DB_FILE_TMP)
-        h.drop_table('_dumptruckvars')
+        h.drop_table('_dumptruckvars', if_exists=True)
         h.save_var(key, value)
         h.close()
 
@@ -283,7 +283,7 @@ class TestCreateTable(TestDb):
         dt = DumpTruck(dbname = DB_FILE_MEMORY)
         dt.create_table({'foo': 'bar'}, 'zort')
         with self.assertRaises(sqlalchemy.exc.OperationalError):
-            dt.create_table({'foo': 'bar'}, 'zort', error_if_exists = True)
+            dt.create_table({'foo': 'bar'}, 'zort', error_if_exists=True)
 
 class TestCreateTableOnInsert(TestDb):
     def test_if_not_exists(self):
