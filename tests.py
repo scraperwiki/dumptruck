@@ -458,12 +458,12 @@ class TestCaseInsensitivity(TestDb):
     "Insertions with two keys of the same case are not allowed."
     def test_bad_create_table(self):
         dt = DumpTruck(dbname = DB_FILE_MEMORY)
-        with self.assertRaises(ValueError):
+        with self.assertRaises(sqlalchemy.exc.OperationalError):
             dt.create_table({'a': 'b', 'A': 'B'}, 'foo')
 
     def test_bad_insert(self):
         dt = DumpTruck(dbname = DB_FILE_MEMORY)
-        with self.assertRaises(ValueError):
+        with self.assertRaises(sqlalchemy.exc.OperationalError):
             dt.create_table({'a': 'b', 'A': 'B'}, 'foo')
 
 class TestNull(SaveAndCheck):
