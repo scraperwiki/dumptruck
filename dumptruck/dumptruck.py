@@ -61,14 +61,23 @@ PYTHON_SQLITE_TYPE_MAP = {
 
 class DumpTruck:
     def __init__(self, dbname = 'dumptruck.db', vars_table = '_dumptruckvars', auto_commit=True, timeout=5, **kwargs):
-        self.auto_commit = auto_commit
+        if type(auto_commit) is bool:
+            self.auto_commit = auto_commit
+        else:
+            raise TypeError('auto_commit must be a boolean value')
+
+        if type(vars_table) in (str, unicode, None):
+            self.__vars_table = vars_table
+        else:
+            raise TypeError('vars_table must be a string or unicode string')
+
+        if not type(dbname) in (str, unicode, None):
+            raise TypeError('dbname must be a string or unicode string')
 
         self.engine = sqlalchemy.create_engine('sqlite:///{}'.format(dbname), echo=False, connect_args={'timeout': timeout})
         self.conn = self.engine.connect()
         self.trans = self.conn.begin()
         self.connection = self.trans # To preserve API
-
-        self.__vars_table = vars_table
 
     def execute(self, sql_query, *args, **kwargs):
         """
