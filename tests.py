@@ -264,6 +264,7 @@ class TestCreateTable(TestDb):
 class TestCreateTableOnInsert(TestDb):
     def test_if_not_exists(self):
         dt = DumpTruck(dbname = DB_FILE_MEMORY)
+        dt.create_table({'foo': 'bar'}, 'baz')
         dt.insert({'foo': 'bar'}, 'baz')
         dt.insert({'foo': 'bar'}, 'baz')
 
