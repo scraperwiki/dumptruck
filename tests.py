@@ -310,10 +310,8 @@ class SaveAndCheck(TestDb):
         h.insert(dataIn, table_name=tableIn)
         if twice:
             h.insert(dataIn, table_name=tableIn)
-        h.close()
 
         # Observe with DumpTruck
-        h = DumpTruck(dbname = DB_FILE_MEMORY)
         observed = h.execute(u'SELECT * FROM "%s"' % tableOut)
         h.close()
 
