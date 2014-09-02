@@ -49,7 +49,7 @@ PYTHON_SQLITE_TYPE_MAP = {
     str: TEXT,
 
     int: INTEGER,
-    long: INTEGER,
+    long: REAL,
     bool: BOOLEAN,
     float: REAL,
 
