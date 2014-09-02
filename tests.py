@@ -383,10 +383,6 @@ class TestSaveWeirdTableName3(SaveAndCheck):
         d = {'lastname': 'LeTourneau'}
         self.save_and_check(d, '[asoeu]', [OrderedDict(d)])
 
-class TestMultipleColumns(SaveAndSelect):
-    def test_save(self):
-        self.save_and_select({'firstname': 'Robert', 'lastname': 'LeTourneau'})
-
 class TestSaveHyphen(SaveAndCheck):
     def test_save_int(self):
         self.save_and_check(
