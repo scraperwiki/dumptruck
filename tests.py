@@ -329,46 +329,6 @@ class SaveAndSelect(TestDb):
         observed = dt.dump()[0]['foo']
         self.assertEqual(d, observed)
 
-class TestSaveNestedDate(SaveAndSelect):
-    def test_save_nested_date(self):
-        d = {'1': datetime.datetime(2012, 3, 5).date()}
-        self.assertRaises(sqlite3.InterfaceError, lambda: self.save_and_select({'modelNumber': d}))
-
-class TestSaveNestedDatetime(SaveAndSelect):
-    def test_save_nested_datetime(self):
-        d = {'1': datetime.datetime(2012, 3, 5)}
-        self.assertRaises(sqlite3.InterfaceError, lambda: self.save_and_select({'modelNumber': d}))
-
-class TestSaveDictIntegers(SaveAndSelect):
-    def test_save_integers(self):
-        dt = DumpTruck()
-        with self.assertRaises(ValueError):
-            dt.insert({'foo': {1: 'A', 2: 'B', 3: 'C'}})
-
-class TestSaveDict(SaveAndSelect):
-    def test_save_text(self):
-        d = {'1': 'A', '2': 'B', '3': 'C'}
-        self.save_and_select({'modelNumber': d})
-
-# TODO: Find out if this is needed
-#class TestSaveNested(SaveAndSelect):
-#  def test_save_nested(self):
-#  d = {'1': 1}
-#  self.save_and_select({'modelNumber': d})
-
-# TODO: Find out if this is needed
-#class TestSaveNone(SaveAndSelect):
-#  def test_save_nested(self):
-#    self.save_and_select({'modelNumber': None})
-
-class TestSaveEmptyDict(SaveAndSelect):
-    def test_empty_dict(self):
-        self.save_and_select({})
-
-class TestSaveEmptyList(SaveAndSelect):
-    def test_empty_list(self):
-        self.save_and_select([])
-
 class TestSaveLong1(SaveAndSelect):
     def test_zeroes(self):
         self.save_and_select(100000000000000000000000000000000)
@@ -386,15 +346,6 @@ class TestSavePickle(SaveAndSelect):
         import pickle
         self.save_and_select(pickle.dumps(SaveAndSelect))
 
-#class TestSaveLambda(SaveAndSelect):
-#  def test_save_lambda(self):
-#  self.save_and_select(lambda x: x^2)
-
-# TODO: Find out if this is needed
-#class TestSaveSet(SaveAndSelect):
-#  def test_save_set(self):
-#  self.save_and_select(set(['A', 'B', 'C']))
-
 class TestSaveBoolean(SaveAndCheck):
     def test_save_true(self):
         d = {'a': True}
@@ -403,16 +354,6 @@ class TestSaveBoolean(SaveAndCheck):
     def test_save_true(self):
         d = {'a': False}
         self.save_and_check(d, 'a', [OrderedDict(d)])
-
-# TODO: Find out if this is needed
-#class TestSaveList(SaveAndCheck):
-#  def test_save_integers(self):
-#  d = ['A', 'B', 'C']
-#  self.save_and_check(
-#    {'model-codes': d}
-#  , 'models'
-#  , [(dumps(d),)]
-#  )
 
 class TestSaveTwice(SaveAndCheck):
     def test_save_twice(self):
@@ -428,18 +369,6 @@ class TestSaveUnicodeKey(SaveAndCheck):
     def test_save(self):
         d = {u'英国': 'yes'}
         self.save_and_check(d, 'country', [OrderedDict(d)])
-
-# TODO: Find out if this is needed
-#class TestOrderedDict(SaveAndCheck):
-#  def test_save(self):
-#  d = OrderedDict([
-#    (u'first_column', 3),
-#    (u'second_column', 8),
-#    (u'third_column', 5),
-#    (u'fourth_column', 1),
-#    (u'fifth_column', 9),
-#    ])
-#  self.save_and_check(d, 'hhh', [(3, 8, 5, 1, 9 )], [d, [d]])
 
 class TestSaveUnicodeEncodedKey(SaveAndCheck):
     def test_save(self):
